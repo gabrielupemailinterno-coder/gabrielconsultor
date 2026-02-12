@@ -1,7 +1,7 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Target, TrendingDown, Workflow, Users } from "lucide-react";
-
-const WHATSAPP_URL = "https://wa.me/5532998316501?text=quero%20saber%20mais%20sobre%20sua%20consultoria";
+import LeadFormDialog from "@/components/LeadFormDialog";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -20,8 +20,14 @@ const painPoints = [
 ];
 
 const Index = () => {
+  const [formOpen, setFormOpen] = useState(false);
+
+  const openForm = () => setFormOpen(true);
+
   return (
     <main className="min-h-screen bg-background text-foreground font-sans">
+      <LeadFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
+
       {/* Hero */}
       <section className="section-padding flex items-center justify-center min-h-[90vh] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-secondary/30 to-transparent pointer-events-none" />
@@ -53,17 +59,15 @@ const Index = () => {
             <br className="hidden md:block" />
             Onde a estratégia encontra a execução.
           </motion.p>
-          <motion.a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <motion.button
+            onClick={openForm}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
             className="inline-block bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md hover:brightness-110 transition-all duration-300"
           >
             Agendar Diagnóstico Profissional
-          </motion.a>
+          </motion.button>
         </div>
       </section>
 
@@ -146,14 +150,12 @@ const Index = () => {
                 <li className="flex gap-2"><span className="text-primary">—</span> Plano de ação detalhado e priorizado</li>
                 <li className="flex gap-2"><span className="text-primary">—</span> Execução conduzida pelo seu time</li>
               </ul>
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={openForm}
                 className="inline-block text-center bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-6 py-3 rounded-md hover:brightness-110 transition-all duration-300"
               >
                 Solicitar Proposta
-              </a>
+              </button>
             </motion.div>
 
             {/* Card 02 */}
@@ -177,14 +179,12 @@ const Index = () => {
                 <li className="flex gap-2"><span className="text-primary">—</span> Revisão de métricas e KPIs a cada ciclo</li>
                 <li className="flex gap-2"><span className="text-primary">—</span> Ajustes de rota em tempo real</li>
               </ul>
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={openForm}
                 className="inline-block text-center bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-6 py-3 rounded-md hover:brightness-110 transition-all duration-300"
               >
                 Solicitar Proposta
-              </a>
+              </button>
             </motion.div>
           </div>
         </div>
@@ -236,10 +236,8 @@ const Index = () => {
           >
             Agende uma conversa sem compromisso e descubra como transformar seu processo de vendas.
           </motion.p>
-          <motion.a
-            href={WHATSAPP_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <motion.button
+            onClick={openForm}
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
@@ -248,7 +246,7 @@ const Index = () => {
             className="inline-block bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md hover:brightness-110 transition-all duration-300"
           >
             Agendar Diagnóstico Profissional
-          </motion.a>
+          </motion.button>
         </div>
       </section>
 
