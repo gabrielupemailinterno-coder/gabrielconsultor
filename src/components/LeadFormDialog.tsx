@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, CheckCircle } from "lucide-react";
 import { z } from "zod";
 
-const SCRIPT_URL = "%%GOOGLE_SCRIPT_URL%%";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytvh1YI0Mwhy_gRIpFuMX9C0HaYruZxPzw41d7Snr6nMBZCTbzhqv8jdc7cEoT-pVR/exec";
 
 const leadSchema = z.object({
   name: z.string().trim().min(1, "Preencha seu nome").max(100),
