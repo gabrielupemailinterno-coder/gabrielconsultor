@@ -4,52 +4,52 @@
 
 @layer base {
   :root {
-    --background: 216 69% 11%;
-    --foreground: 0 0% 100%;
+    --background: 12 35% 11%;
+    --foreground: 30 30% 96%;
 
-    --card: 216 60% 14%;
-    --card-foreground: 0 0% 100%;
+    --card: 12 30% 15%;
+    --card-foreground: 30 30% 96%;
 
-    --popover: 216 60% 14%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 12 30% 15%;
+    --popover-foreground: 30 30% 96%;
 
-    --primary: 40 52% 56%;
-    --primary-foreground: 216 69% 11%;
+    --primary: 20 78% 58%;
+    --primary-foreground: 12 35% 11%;
 
-    --secondary: 216 50% 18%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 190 35% 22%;
+    --secondary-foreground: 30 30% 96%;
 
-    --muted: 216 40% 20%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 12 25% 20%;
+    --muted-foreground: 25 15% 72%;
 
-    --accent: 40 52% 56%;
-    --accent-foreground: 216 69% 11%;
+    --accent: 190 45% 45%;
+    --accent-foreground: 12 35% 11%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 52% 56% / 0.2;
-    --input: 216 40% 20%;
-    --ring: 40 52% 56%;
+    --border: 20 78% 58% / 0.2;
+    --input: 12 25% 20%;
+    --ring: 20 78% 58%;
 
     --radius: 0.5rem;
 
-    --gold: 40 52% 56%;
-    --gold-light: 40 45% 70%;
-    --navy-light: 216 50% 18%;
-    --navy-deep: 216 69% 11%;
+    --gold: 20 78% 58%;
+    --gold-light: 30 80% 70%;
+    --navy-light: 190 35% 22%;
+    --navy-deep: 12 35% 11%;
 
     --font-serif: 'Libre Baskerville', Georgia, serif;
     --font-sans: 'Inter', system-ui, sans-serif;
 
-    --sidebar-background: 216 69% 11%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 40 52% 56%;
-    --sidebar-primary-foreground: 216 69% 11%;
-    --sidebar-accent: 216 50% 18%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 216 40% 20%;
-    --sidebar-ring: 40 52% 56%;
+    --sidebar-background: 12 35% 11%;
+    --sidebar-foreground: 30 30% 96%;
+    --sidebar-primary: 20 78% 58%;
+    --sidebar-primary-foreground: 12 35% 11%;
+    --sidebar-accent: 190 35% 22%;
+    --sidebar-accent-foreground: 30 30% 96%;
+    --sidebar-border: 12 25% 20%;
+    --sidebar-ring: 20 78% 58%;
   }
 }
 
