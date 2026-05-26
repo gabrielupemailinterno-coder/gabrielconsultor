@@ -258,7 +258,7 @@ const Index = () => {
                   src={gabrielPhoto}
                   alt="Gabriel Vieira, consultor em Sales Ops e MVPs com IA"
                   loading="lazy"
-                  className="relative w-full h-full object-cover rounded-full border-2 border-primary/40 shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.4)]"
+                  className="relative w-full h-full object-cover object-[center_15%] rounded-full border-2 border-primary/40 shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.4)]"
                 />
               </div>
             </motion.div>
