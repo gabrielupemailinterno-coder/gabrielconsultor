@@ -76,4 +76,23 @@
   .section-padding {
     @apply py-20 md:py-28 px-6;
   }
+
+  .cta-glow {
+    box-shadow: 0 0 0 0 hsl(var(--primary) / 0.5);
+    transition: box-shadow 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+  }
+  .cta-glow:hover {
+    box-shadow: 0 0 32px 0 hsl(var(--primary) / 0.55), 0 0 8px 0 hsl(var(--primary) / 0.4);
+    transform: translateY(-1px);
+    filter: brightness(1.08);
+  }
+
+  .card-hover {
+    transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-4px);
+    border-color: hsl(var(--primary) / 0.6);
+    box-shadow: 0 12px 40px -12px hsl(var(--primary) / 0.25);
+  }
 }
