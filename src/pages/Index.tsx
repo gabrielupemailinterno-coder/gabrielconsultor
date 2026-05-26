@@ -379,10 +379,41 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 border-t border-border">
-        <p className="text-center text-muted-foreground text-xs tracking-wide">
-          © {new Date().getFullYear()} Gabriel · Consultoria em Sales Ops & MVPs com IA
-        </p>
+      <footer className="py-10 border-t border-border">
+        <div className="container max-w-5xl flex flex-col items-center gap-6">
+          <div className="flex items-center gap-3">
+            <a
+              href={LINKEDIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn de Gabriel Vieira"
+              className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <Linkedin size={16} />
+            </a>
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram de Gabriel Vieira"
+              className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <Instagram size={16} />
+            </a>
+            <a
+              href={GOOGLE_PROFILE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Perfil do Google de Gabriel Vieira"
+              className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <MapPin size={16} />
+            </a>
+          </div>
+          <p className="text-center text-muted-foreground text-xs tracking-wide">
+            © {new Date().getFullYear()} Gabriel Vieira · Consultoria em Sales Ops & MVPs com IA
+          </p>
+        </div>
       </footer>
     </main>
   );
