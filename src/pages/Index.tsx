@@ -294,6 +294,78 @@ const Index = () => {
 
       <div className="gold-divider" />
 
+      {/* Packages */}
+      <section id="pacotes" className="section-padding">
+        <div className="container max-w-6xl">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            className="text-center mb-14"
+          >
+            <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
+              Pacotes & Investimento
+            </span>
+            <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4">
+              Dois caminhos para profissionalizar o jogo.
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Da auditoria operacional ao conselho estratégico de longo prazo —
+              escolha o formato que cabe no momento do seu negócio.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+            {packages.map((p, i) => (
+              <motion.div
+                key={p.tag}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                custom={i}
+                className="card-hover relative bg-card border border-primary/30 rounded-2xl p-8 md:p-10 flex flex-col"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
+                    <p.icon className="text-primary" size={24} strokeWidth={1.75} />
+                  </div>
+                  <span className="text-[10px] tracking-[0.2em] uppercase text-primary border border-primary/30 rounded-full px-3 py-1">
+                    {p.duration}
+                  </span>
+                </div>
+                <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
+                  {p.tag}
+                </span>
+                <h3 className="font-serif text-2xl mt-3 mb-6">{p.headline}</h3>
+                <ul className="space-y-4 mb-8 flex-1">
+                  {p.bullets.map((b) => (
+                    <li key={b.title} className="flex gap-3">
+                      <Check className="text-primary mt-0.5 shrink-0" size={18} strokeWidth={2} />
+                      <div>
+                        <p className="text-foreground font-medium text-sm">{b.title}</p>
+                        <p className="text-muted-foreground text-sm leading-relaxed">{b.desc}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={openForm}
+                  className="inline-flex items-center justify-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-6 py-3 rounded-md hover:bg-primary/10 transition-colors"
+                >
+                  Saber mais
+                  <ArrowRight size={16} />
+                </button>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="gold-divider" />
+
       {/* About */}
       <section id="sobre" className="section-padding">
         <div className="container max-w-5xl">
@@ -332,22 +404,28 @@ const Index = () => {
               </h2>
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  Sou consultor focado em{" "}
-                  <strong className="text-foreground">Sales Operations</strong>,
-                  estruturação de processos comerciais e aplicação de{" "}
-                  <strong className="text-foreground">Inteligência Artificial</strong>{" "}
-                  para acelerar a operação de empresas B2B.
+                  Sou <strong className="text-foreground">Zootecnista (CRMV-MG 2742)</strong>{" "}
+                  e atuo na intersecção exata entre o rigor técnico do campo e a{" "}
+                  <strong className="text-foreground">alta performance executiva</strong>.
+                  Com passagens estratégicas por grupos como{" "}
+                  <strong className="text-foreground">Seara</strong>,{" "}
+                  <strong className="text-foreground">Rivelli Alimentos</strong> e{" "}
+                  <strong className="text-foreground">Grupo Ascenario</strong>,
+                  moldei uma consultoria que não aceita estagnação nem
+                  ineficiência operacional.
                 </p>
                 <p>
-                  Atuo lado a lado com diretores comerciais e fundadores
-                  desenhando funis, auditando CRM, construindo painéis de{" "}
-                  <strong className="text-foreground">métricas</strong> e
-                  entregando MVPs prontos para operar — sem depender de filas
-                  internas de TI.
+                  Minha formação pelo <strong className="text-foreground">G4 Educação</strong>{" "}
+                  me permite aplicar no agronegócio e em empresas o que há de mais
+                  avançado em <strong className="text-foreground">Growth</strong> e{" "}
+                  <strong className="text-foreground">gestão de alta performance</strong>.
+                  Não me limito ao operacional: leio o campo e o escritório com visão
+                  de <em>big picture</em>, focando em estratégia e automação para que o
+                  negócio não dependa da memória das pessoas.
                 </p>
                 <p>
-                  Meu compromisso é simples: processo claro, dado limpo e
-                  execução previsível.
+                  Meu compromisso é simples: processo claro, dado limpo e execução
+                  previsível — guiada por sistema, não por intuição.
                 </p>
               </div>
             </motion.div>
