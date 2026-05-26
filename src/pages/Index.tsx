@@ -6,7 +6,6 @@ import {
   Workflow,
   Users,
   Database,
-  LineChart,
   Sparkles,
   GraduationCap,
   Trophy,
