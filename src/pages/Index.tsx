@@ -252,8 +252,14 @@ const Index = () => {
               custom={0}
               className="mx-auto md:mx-0"
             >
-              <div className="w-52 h-52 md:w-60 md:h-60 rounded-full border border-primary/40 bg-secondary/40 overflow-hidden flex items-center justify-center">
-                <span className="font-serif text-5xl text-primary">GC</span>
+              <div className="relative mx-auto md:mx-0 w-56 h-56 md:w-64 md:h-64">
+                <div className="absolute -inset-2 rounded-full bg-primary/10 blur-2xl" />
+                <img
+                  src={gabrielPhoto}
+                  alt="Gabriel Vieira, consultor em Sales Ops e MVPs com IA"
+                  loading="lazy"
+                  className="relative w-full h-full object-cover rounded-full border-2 border-primary/40 shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.4)]"
+                />
               </div>
             </motion.div>
 
