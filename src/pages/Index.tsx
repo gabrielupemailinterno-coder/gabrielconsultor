@@ -11,8 +11,12 @@ import {
   Trophy,
   Calendar,
   ArrowRight,
+  Linkedin,
+  Instagram,
+  MapPin,
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
+import gabrielPhoto from "@/assets/gabriel.jpg";
 
 const CALENDAR_URL = "https://calendar.app.google/1GgJUz3DD3KuznGMA";
 
