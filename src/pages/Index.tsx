@@ -459,9 +459,9 @@ const Index = () => {
 
       <div className="gold-divider" />
 
-      {/* Scheduling */}
+      {/* Closing / CTA */}
       <section id="agenda" className="section-padding">
-        <div className="container max-w-2xl text-center">
+        <div className="container max-w-3xl text-center">
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -470,14 +470,21 @@ const Index = () => {
             custom={0}
           >
             <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
-              Agenda Aberta
+              Próximo passo
             </span>
-            <h2 className="font-serif text-2xl md:text-4xl mt-3 mb-4">
-              Escolha um horário e vamos conversar.
+            <h2 className="font-serif text-3xl md:text-5xl mt-3 mb-6 leading-tight">
+              Será um prazer{" "}
+              <span className="text-primary">potencializar seus resultados.</span>
             </h2>
-            <p className="text-muted-foreground mb-10">
-              Uma conversa de 30 minutos, sem compromisso, para entender seu
-              cenário e mapear próximos passos.
+            <p className="text-muted-foreground text-base md:text-lg leading-relaxed max-w-2xl mx-auto mb-4">
+              Faço um diagnóstico detalhado da sua operação para identificar os
+              gargalos que estão drenando sua margem e desenhar o caminho para a
+              escalabilidade do seu negócio.
+            </p>
+            <p className="text-muted-foreground text-base md:text-lg leading-relaxed max-w-2xl mx-auto mb-10">
+              O objetivo é transformar sua empresa ou fazenda em um sistema
+              previsível, onde cada decisão é guiada por dados e processos — e não
+              por intuição. Vamos profissionalizar o jogo.
             </p>
           </motion.div>
 
@@ -487,24 +494,24 @@ const Index = () => {
             whileInView="visible"
             viewport={{ once: true }}
             custom={1}
-            className="bg-card border border-primary/30 rounded-2xl p-10 md:p-12"
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Calendar
-              className="mx-auto text-primary mb-6"
-              size={40}
-              strokeWidth={1.5}
-            />
-            <h3 className="font-serif text-xl mb-3">Agendamento online</h3>
-            <p className="text-muted-foreground text-sm mb-8 max-w-md mx-auto">
-              Acesse minha agenda pública do Google Calendar e selecione o
-              melhor momento.
-            </p>
-            <button
-              onClick={openCalendar}
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackClick("cta", "open_whatsapp_closing")}
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
             >
+              <MessageCircle size={16} />
+              Entrar em contato
+            </a>
+            <button
+              onClick={openCalendar}
+              className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
+            >
               <Calendar size={16} />
-              Abrir Agenda
+              Abrir agenda
             </button>
           </motion.div>
         </div>
@@ -514,6 +521,15 @@ const Index = () => {
       <footer className="py-10 border-t border-border">
         <div className="container max-w-5xl flex flex-col items-center gap-6">
           <div className="flex items-center gap-3">
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp de Gabriel Vieira"
+              className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              <MessageCircle size={16} />
+            </a>
             <a
               href={LINKEDIN_URL}
               target="_blank"
@@ -543,7 +559,7 @@ const Index = () => {
             </a>
           </div>
           <p className="text-center text-muted-foreground text-xs tracking-wide">
-            © {new Date().getFullYear()} Gabriel Vieira · Consultoria em Sales Ops & MVPs com IA
+            © {new Date().getFullYear()} Gabriel Vieira · Consultoria & Estratégia · CRMV-MG 2742
           </p>
         </div>
       </footer>
