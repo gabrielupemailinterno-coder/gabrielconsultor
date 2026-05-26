@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import { motion } from "framer-motion";
 import {
@@ -361,6 +362,75 @@ const Index = () => {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <div className="gold-divider" />
+
+      {/* Mentoria Profissional - Plano Individual */}
+      <section id="mentoria-profissional" className="section-padding">
+        <div className="container max-w-5xl">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            className="relative bg-card border border-primary/40 rounded-2xl p-8 md:p-12 overflow-hidden"
+          >
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="grid md:grid-cols-[1fr_auto] gap-10 items-center relative">
+              <div>
+                <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
+                  Plano individual · Mensalidade fixa
+                </span>
+                <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4">
+                  Mentoria Profissional para vendas, suporte e CS.
+                </h2>
+                <p className="text-muted-foreground leading-relaxed mb-6 max-w-2xl">
+                  Acompanhamento mensal para profissionais da linha de frente
+                  que querem bater meta com método, evoluir na carreira e parar
+                  de depender de motivação para performar. Sessões 1:1, plano
+                  de evolução pessoal e suporte direto via WhatsApp.
+                </p>
+                <ul className="grid sm:grid-cols-2 gap-3 mb-8">
+                  {[
+                    "2 sessões 1:1 por mês",
+                    "Plano de evolução pessoal",
+                    "Suporte por WhatsApp",
+                    "Templates e playbooks",
+                  ].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-foreground/90">
+                      <Check className="text-primary shrink-0" size={16} strokeWidth={2.5} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/mentoria-profissional"
+                  onClick={() => trackClick("cta", "mp_section_cta")}
+                  className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-7 py-3.5 rounded-md"
+                >
+                  Conhecer a mentoria
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+
+              <div className="flex flex-col items-center justify-center bg-background/60 border border-primary/30 rounded-2xl px-8 py-6 md:min-w-[220px]">
+                <span className="text-primary text-[10px] tracking-[0.3em] uppercase font-medium mb-2">
+                  A partir de
+                </span>
+                <div className="flex items-baseline gap-1">
+                  <span className="font-serif text-sm text-muted-foreground">R$</span>
+                  <span className="font-serif text-5xl font-bold text-foreground">197</span>
+                </div>
+                <span className="text-muted-foreground text-xs mt-1">por mês</span>
+                <span className="text-[10px] tracking-wide uppercase text-primary mt-3">
+                  Sem fidelidade
+                </span>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
