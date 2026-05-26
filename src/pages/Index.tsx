@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import { motion } from "framer-motion";
 import {
   Target,
