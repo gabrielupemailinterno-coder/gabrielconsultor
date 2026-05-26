@@ -15,11 +15,16 @@ import {
   Linkedin,
   Instagram,
   MapPin,
+  MessageCircle,
+  Check,
+  Briefcase,
+  Compass,
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import gabrielPhoto from "@/assets/gabriel.jpg";
 
 const CALENDAR_URL = "https://calendar.app.google/1GgJUz3DD3KuznGMA";
+const WHATSAPP_URL = "https://api.whatsapp.com/send?phone=5532998316501&text=Ol%C3%A1%2C%20gostaria%20de%20saber%20como%20funciona%20o%20diagn%C3%B3stico";
 const LINKEDIN_URL = "https://www.linkedin.com/in/gabrielvieirapassos/";
 const INSTAGRAM_URL = "https://www.instagram.com/gabrielvieira.z/";
 const GOOGLE_PROFILE_URL = "https://share.google/naQLLA5qD0Xg5af5m";
@@ -60,6 +65,31 @@ const services = [
     icon: GraduationCap,
     title: "Mentoria Comercial",
     desc: "Acompanhamento contínuo do líder e do time comercial, com revisão de KPIs e ajustes de rota a cada ciclo.",
+  },
+];
+
+const packages = [
+  {
+    icon: Briefcase,
+    tag: "Consultoria Operacional",
+    duration: "4 a 8 semanas",
+    headline: "Ajuste a engrenagem que segura sua margem.",
+    bullets: [
+      { title: "Ajuste de fluxo", desc: "Organização da engrenagem desde a compra de insumos até a venda final." },
+      { title: "Estancamento de gargalos", desc: "Auditoria para identificar onde o dinheiro está sumindo por falha técnica ou de gestão." },
+      { title: "Indicadores reais", desc: "Base de dados única para visualizar a margem real do negócio." },
+    ],
+  },
+  {
+    icon: Compass,
+    tag: "Mentoria Estratégica",
+    duration: "12 semanas",
+    headline: "Da decisão por feeling à gestão por processos.",
+    bullets: [
+      { title: "Cultura de gestão", desc: "Treinamento do olhar do dono para analisar o negócio via processos, não \"feeling\"." },
+      { title: "Tecnologia e IA", desc: "Implementação de ferramentas modernas para automação de tarefas e otimização do tempo." },
+      { title: "Conselho estratégico", desc: "Acompanhamento em decisões de investimento, expansão e sucessão." },
+    ],
   },
 ];
 
