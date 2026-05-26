@@ -143,7 +143,7 @@ const Index = () => {
             transition={{ duration: 0.8 }}
             className="text-primary tracking-[0.25em] uppercase text-xs font-sans font-medium mb-6"
           >
-            Gabriel · Sales Ops & MVPs com IA
+            Gabriel Vieira · Consultoria & Estratégia
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -151,8 +151,8 @@ const Index = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="font-serif text-3xl md:text-5xl lg:text-[3.4rem] leading-[1.1] font-bold mb-6"
           >
-            Pare de perder vendas com{" "}
-            <span className="text-primary">processos que só funcionam no papel.</span>
+            Processos que escalam o lucro com{" "}
+            <span className="text-primary">organização.</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -161,8 +161,8 @@ const Index = () => {
             className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed"
           >
             Consultoria em Sales Operations, processos comerciais e MVPs com IA
-            para diretores e fundadores que precisam de execução rápida,
-            previsível e baseada em dados.
+            para empresas e operações que precisam transformar intuição em
+            sistema previsível, guiado por dados.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -177,11 +177,21 @@ const Index = () => {
               <Calendar size={16} />
               Agendar Diagnóstico
             </button>
-            <button
-              onClick={openForm}
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackClick("cta", "open_whatsapp_hero")}
               className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
             >
-              Receber Proposta
+              <MessageCircle size={16} />
+              Falar no WhatsApp
+            </a>
+            <button
+              onClick={openForm}
+              className="inline-flex items-center gap-2 text-foreground/80 font-sans font-medium text-sm tracking-wide uppercase px-3 py-4 hover:text-primary transition-colors"
+            >
+              Receber proposta
               <ArrowRight size={16} />
             </button>
           </motion.div>
