@@ -629,7 +629,7 @@ const Index = () => {
             </a>
           </div>
           <p className="text-center text-muted-foreground text-xs tracking-wide">
-            © {new Date().getFullYear()} Gabriel Vieira · Consultoria & Estratégia · CRMV-MG 2742
+            © {new Date().getFullYear()} Gabriel Vieira · Consultoria & Estratégia · CRMV-MG 2742 · CNPJ 66.956.549/0001-62
           </p>
         </div>
       </footer>
