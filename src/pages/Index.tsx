@@ -19,6 +19,9 @@ import LeadFormDialog from "@/components/LeadFormDialog";
 import gabrielPhoto from "@/assets/gabriel.jpg";
 
 const CALENDAR_URL = "https://calendar.app.google/1GgJUz3DD3KuznGMA";
+const LINKEDIN_URL = "https://www.linkedin.com/in/gabrielvieirapassos/";
+const INSTAGRAM_URL = "https://www.instagram.com/gabrielvieira.z/";
+const GOOGLE_PROFILE_URL = "https://share.google/naQLLA5qD0Xg5af5m";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
