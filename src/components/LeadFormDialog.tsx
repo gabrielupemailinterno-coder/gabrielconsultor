@@ -98,6 +98,7 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
           >
             <button
               onClick={onClose}
+              aria-label="Fechar formulário"
               className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
             >
               <X size={20} />
@@ -117,9 +118,12 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
                 </p>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
+                    <label htmlFor="lead-name" className="sr-only">Seu nome</label>
                     <input
+                      id="lead-name"
                       type="text"
                       placeholder="Seu nome *"
+                      aria-label="Seu nome"
                       value={form.name}
                       onChange={(e) => handleChange("name", e.target.value)}
                       className={inputClass}
@@ -127,9 +131,12 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
                     {errors.name && <p className="text-destructive text-xs mt-1">{errors.name}</p>}
                   </div>
                   <div>
+                    <label htmlFor="lead-phone" className="sr-only">Telefone</label>
                     <input
+                      id="lead-phone"
                       type="tel"
                       placeholder="Telefone *"
+                      aria-label="Telefone"
                       value={form.phone}
                       onChange={(e) => handleChange("phone", e.target.value)}
                       className={inputClass}
@@ -137,9 +144,12 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
                     {errors.phone && <p className="text-destructive text-xs mt-1">{errors.phone}</p>}
                   </div>
                   <div>
+                    <label htmlFor="lead-email" className="sr-only">Email</label>
                     <input
+                      id="lead-email"
                       type="email"
                       placeholder="Email *"
+                      aria-label="Email"
                       value={form.email}
                       onChange={(e) => handleChange("email", e.target.value)}
                       className={inputClass}
@@ -147,26 +157,35 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
                     {errors.email && <p className="text-destructive text-xs mt-1">{errors.email}</p>}
                   </div>
                   <div>
+                    <label htmlFor="lead-company" className="sr-only">Nome da empresa</label>
                     <input
+                      id="lead-company"
                       type="text"
                       placeholder="Nome da Empresa"
+                      aria-label="Nome da empresa"
                       value={form.companyName}
                       onChange={(e) => handleChange("companyName", e.target.value)}
                       className={inputClass}
                     />
                   </div>
                   <div>
+                    <label htmlFor="lead-revenue" className="sr-only">Faturamento mensal aproximado</label>
                     <input
+                      id="lead-revenue"
                       type="text"
                       placeholder="Faturamento mensal aproximado"
+                      aria-label="Faturamento mensal aproximado"
                       value={form.revenue}
                       onChange={(e) => handleChange("revenue", e.target.value)}
                       className={inputClass}
                     />
                   </div>
                   <div>
+                    <label htmlFor="lead-pain" className="sr-only">Qual sua maior dor atualmente?</label>
                     <textarea
+                      id="lead-pain"
                       placeholder="Qual sua maior dor atualmente?"
+                      aria-label="Qual sua maior dor atualmente?"
                       value={form.mainPain}
                       onChange={(e) => handleChange("mainPain", e.target.value)}
                       rows={3}
