@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -100,8 +101,50 @@ const MentoriaProfissional = () => {
     setFormOpen(true);
   };
 
+  const pageUrl = "https://gabrielconsultor.lovable.app/mentoria-profissional";
+  const pageTitle = "Mentoria Profissional 1:1 para Vendas e CS · R$197/mês | Gabriel Vieira";
+  const pageDesc = "Mentoria individual mensal para vendedores, SDRs e profissionais de customer success que querem bater meta, evoluir na carreira e destravar performance pessoal com método.";
+
   return (
     <main className="min-h-screen bg-background text-foreground font-sans">
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
+        <link rel="canonical" href={pageUrl} />
+        <meta property="og:type" content="article" />
+        <meta property="og:url" content={pageUrl} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDesc} />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDesc} />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Service",
+          name: "Mentoria Profissional 1:1",
+          serviceType: "Mentoria de carreira para profissionais comerciais e CS",
+          description: pageDesc,
+          url: pageUrl,
+          areaServed: "BR",
+          provider: {
+            "@type": "Person",
+            name: "Gabriel Vieira",
+            url: "https://gabrielconsultor.lovable.app/",
+          },
+          offers: {
+            "@type": "Offer",
+            price: "197.00",
+            priceCurrency: "BRL",
+            priceSpecification: {
+              "@type": "UnitPriceSpecification",
+              price: "197.00",
+              priceCurrency: "BRL",
+              unitCode: "MON",
+              billingDuration: "P1M",
+            },
+            availability: "https://schema.org/InStock",
+          },
+        })}</script>
+      </Helmet>
       <LeadFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
 
       {/* Back link */}
