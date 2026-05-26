@@ -2,8 +2,8 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, CheckCircle } from "lucide-react";
 import { z } from "zod";
-
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytvh1YI0Mwhy_gRIpFuMX9C0HaYruZxPzw41d7Snr6nMBZCTbzhqv8jdc7cEoT-pVR/exec";
+import { supabase } from "@/integrations/supabase/client";
+import { trackClick } from "@/hooks/useAnalytics";
 
 const leadSchema = z.object({
   name: z.string().trim().min(1, "Preencha seu nome").max(100),
@@ -53,24 +53,24 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
 
     setStatus("loading");
     try {
-      await fetch(SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({
-          action: "addRow",
-          data: {
-            ...result.data,
-            submissionTime: new Date().toISOString(),
-          },
-        }),
+      const { error } = await supabase.from("leads").insert({
+        name: result.data.name,
+        phone: result.data.phone,
+        email: result.data.email,
+        company_name: result.data.companyName || null,
+        revenue: result.data.revenue || null,
+        main_pain: result.data.mainPain || null,
+        source: window.location.pathname,
       });
+      if (error) throw error;
+      trackClick("form_submit", "lead_form_submitted");
       setStatus("success");
       setTimeout(() => {
         onClose();
         setStatus("idle");
         setForm({ name: "", phone: "", email: "", companyName: "", revenue: "", mainPain: "" });
       }, 2500);
-    } catch {
+    } catch (err) {
       setStatus("idle");
       alert("Erro ao enviar. Tente novamente.");
     }

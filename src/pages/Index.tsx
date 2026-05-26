@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import { motion } from "framer-motion";
 import {
   Target,
@@ -64,9 +65,22 @@ const services = [
 
 const Index = () => {
   const [formOpen, setFormOpen] = useState(false);
+  useAnalytics("/");
 
-  const openForm = () => setFormOpen(true);
-  const openCalendar = () => window.open(CALENDAR_URL, "_blank", "noopener,noreferrer");
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const t = (e.target as HTMLElement).closest("a, button");
+      if (!t) return;
+      const label = (t.getAttribute("data-track") || t.textContent || "").trim().slice(0, 120);
+      const type = t.tagName.toLowerCase() === "a" ? "link" : "button";
+      if (label) trackClick(type, label);
+    };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, []);
+
+  const openForm = () => { trackClick("cta", "open_lead_form"); setFormOpen(true); };
+  const openCalendar = () => { trackClick("cta", "open_calendar"); window.open(CALENDAR_URL, "_blank", "noopener,noreferrer"); };
 
   return (
     <main className="min-h-screen bg-background text-foreground font-sans">
