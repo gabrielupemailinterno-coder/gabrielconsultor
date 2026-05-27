@@ -107,8 +107,34 @@ export const indexCopy = {
     reviewsEyebrow: "Prova social",
     reviewsHeading: "Avaliações reais de clientes no Google",
     reviewsDesc: "Quem já passou pelo diagnóstico e pela consultoria compartilhou a experiência direto no meu perfil do Google. Leia na fonte.",
-    reviewsCta: "Ver avaliações no Google",
+    reviewsCta: "Ver todas no Google",
     reviewsStarsLabel: "5 estrelas",
+    reviewsRatingLabel: "Nota 5 de 5",
+    reviewsCount: "(12 avaliações)",
+    reviewsSource: "Fonte: Perfil do Google · atualizado manualmente",
+    reviewsOn: "Avaliação no",
+    reviewsList: [
+      {
+        author: "Stephanie Guilherme Ferreira",
+        text: "Excelente profissional, comprometido com as entregas, com estratégias que realmente funcionam e dão retorno positivo para a empresa! Indico de olhos fechados!",
+      },
+      {
+        author: "Iara Souza",
+        text: "Excelente profissional, com muita inteligência comercial e visão estratégica. Atendimento de qualidade e foco em resultados. Recomendo!",
+      },
+      {
+        author: "Yasmin Marinelli",
+        text: "Ótimo profissional, resoluções rápidas e competência, indicaria pra todos que querem evolução!",
+      },
+      {
+        author: "Mayara Vilas Bôas Martins",
+        text: "Profissional excelente! Atendimento impecável, muito educado e sempre disposto a ajudar da melhor forma possível. Dá pra perceber o cuidado e dedicação no que faz. Super recomendo!",
+      },
+      {
+        author: "Marcella Almeida Pacheco",
+        text: "Excelente trabalho, com muito cuidado e atenção aos detalhes.",
+      },
+    ],
 
     footerAriaWhatsapp: "WhatsApp de Gabriel Vieira",
     footerAriaLinkedin: "LinkedIn de Gabriel Vieira",
