@@ -21,6 +21,7 @@ import {
   Check,
   Briefcase,
   Compass,
+  Star,
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import gabrielPhoto from "@/assets/gabriel.jpg";
