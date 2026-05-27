@@ -1,76 +1,59 @@
-# Sprint LinkedIn — 30 dias para vender a Mentoria Profissional (R$197/mês)
+# Internacionalização automática (PT/EN + BRL/USD)
 
-Objetivo: gerar de 10 a 20 leads qualificados via DM/WhatsApp e fechar as primeiras vagas (limite de 15 mentorados ativos), usando 4 posts/semana em 4 formatos (texto, carrossel, vídeo curto, enquete).
+## O que vai acontecer
 
-## Persona-alvo
-Vendedores, SDRs, profissionais de suporte/CS e líderes operacionais de PMEs B2B, 25–40 anos, que batem (ou tentam bater) meta todo mês e querem evoluir de carreira sem depender de sorte.
+1. Visitante do Brasil → vê tudo em PT, preços em R$ (igual hoje).
+2. Visitante de outro país → vê tudo em **inglês** automaticamente, preço em **USD** (R$ ÷ 5).
+3. Botão `PT | EN` no header pra forçar manualmente.
+4. Preferência salva em localStorage.
 
-## Pilares de conteúdo (4)
-1. **Método sobre motivação** — processo, rotina, KPIs pessoais, ritual de pipeline. Mata o "vendedor de talento".
-2. **Bastidores da operação** — cases reais (anonimizados) de SDR/CS/vendedor que destravou meta, número antes/depois, o que mudou.
-3. **Diagnóstico provocativo** — erros que vendedor/CS comete sem perceber, mitos de carreira comercial, "por que você não foi promovido".
-4. **Oferta e prova** — o que é a mentoria, para quem é, depoimentos, vagas restantes, CTA direto.
+## Como vou construir
 
-Distribuição semanal: 2 posts de pilar 1–2 (atração), 1 de pilar 3 (engajamento), 1 de pilar 4 (conversão).
+**1. Detecção de país/idioma**
+- Usa `navigator.language` (ex: `pt-BR`, `en-US`, `es-ES`).
+- Se começar com `pt` → PT/BRL. Senão → EN/USD.
+- (Mais robusto que IP, gratuito, instantâneo.)
 
-## Rodízio de formatos (4/semana)
-- **Segunda** — Texto puro (story/case) → pilar 2
-- **Quarta** — Carrossel (framework/checklist) → pilar 1
-- **Quinta** — Enquete ou pergunta curta → pilar 3
-- **Sexta** — Vídeo curto 45–60s (rosto na câmera) → pilar 4
+**2. Tradução para inglês via Lovable AI (uma vez, agora)**
+- Extraio todas as strings dos arquivos `Index.tsx`, `MentoriaProfissional.tsx`, `LeadFormDialog.tsx`, `NotFound.tsx`, `index.html` (meta tags).
+- Mando pra IA traduzir mantendo tom profissional/comercial.
+- Salvo em `src/locales/en.json`.
+- PT fica em `src/locales/pt.json` (extraído do código atual).
 
-## Calendário dos 30 dias
+**3. Sistema i18n leve**
+- `src/contexts/LocaleContext.tsx` — provider com `locale`, `t(key)`, `currency`, `formatPrice()`.
+- `formatPrice(197)` → `"R$ 197"` em PT, `"USD 39"` em EN (divide por 5, arredonda).
+- Toggle `<LanguageSwitcher />` no header.
 
-```text
-Semana 1 — AUTORIDADE (quem é você, por que ouvir)
- S1  Texto      Case: SDR que dobrou reuniões trocando "follow-up" por cadência de 7 toques
- S1  Carrossel  "Os 5 KPIs pessoais que todo vendedor deveria revisar toda sexta"
- S1  Enquete    "O que mais te trava hoje?" (Leads ruins / Follow-up / Fechamento / Preço)
- S1  Vídeo      Quem é Gabriel + por que criei a mentoria de R$197
+**4. Substituição nos componentes**
+- Trocar strings hardcoded por `t("hero.title")`, etc.
+- Preço `R$ 197/mês` vira `{formatPrice(197)}/{t("month")}`.
+- Meta tags do `<head>` continuam em PT (SEO Brasil), mas adicionado `<html lang>` dinâmico via React.
 
-Semana 2 — DOR (espelhar o problema)
- S2  Texto      "Você não tem problema de meta, tem problema de processo" — 3 sinais
- S2  Carrossel  "Pipeline fantasma: 7 oportunidades que você precisa matar hoje"
- S2  Enquete    "Quantas horas/semana você perde em tarefa operacional?"
- S2  Vídeo      Bastidor de uma sessão de mentoria (sem expor o mentorado)
+**5. SEO**
+- `hreflang` tags pra Google entender as 2 versões.
+- Para SEO real em inglês (Google indexar versão EN), o ideal seria rota `/en/...`, mas isso é um upgrade futuro — por agora a troca client-side resolve a experiência do visitante.
 
-Semana 3 — MÉTODO (mostre como você pensa)
- S3  Texto      Framework "Rotina dos 30 min" — o que fazer toda manhã antes do CRM
- S3  Carrossel  "Como pedir aumento com dados: o dossiê que monto com mentorados"
- S3  Pergunta   "Qual seu maior bloqueio para virar consultivo no atendimento?"
- S3  Vídeo      Mini-aula: 3 perguntas que viram um suporte em vendedor consultivo
+## Limitações honestas
 
-Semana 4 — OFERTA (conversão dura)
- S4  Texto      Depoimento real + número do mentorado (com permissão)
- S4  Carrossel  "Mentoria de R$197/mês: o que está incluso, para quem é, para quem não é"
- S4  Enquete    "Você toparia 2 sessões/mês + WhatsApp por menos que sua conta de celular?"
- S4  Vídeo      "Restam X vagas este mês" — CTA direto para WhatsApp/landing
-```
+- **SEO em inglês**: como a troca é client-side, o Google não indexa a versão EN como página separada. Pra ranquear no Google.com em inglês, precisaria rota `/en` (próximo passo, se quiser depois).
+- **Conteúdo dinâmico (formulário, toasts)**: também traduzido.
+- **Cotação USD fixa em 5,00**: se o dólar mudar muito, você me chama e eu atualizo a constante (1 linha).
 
-## Estrutura padrão de cada post
-- **Gancho (1 linha)**: provocação, número ou contradição. Sem "Você sabia que…".
-- **Contexto (2–4 linhas)**: dor concreta com vocabulário da persona ("não bati meta", "churn no Q2", "ticket caiu").
-- **Conteúdo (corpo)**: 1 ideia só, bullets curtos, números reais.
-- **Fechamento**: aprendizado em 1 frase.
-- **CTA**: rotacionar — comentar palavra-chave, salvar, "manda DM 'MENTORIA'", link na bio. Só 1 CTA por post.
+## Arquivos que vou criar/editar
 
-## CTAs e funil
-- **Posts de atração (semanas 1–3)**: CTA fraco → salvar / comentar / seguir.
-- **Posts de conversão (semana 4 + 1 por semana nas anteriores)**: CTA forte → "comenta MENTORIA que te mando o link" ou link direto para `/mentoria-profissional`.
-- Toda DM recebida → resposta padrão com link da landing + pergunta qualificadora ("qual sua área hoje?").
-- Bio do LinkedIn: trocar para "Mentoria 1:1 para vendas e CS · R$197/mês · link abaixo" com link para `/mentoria-profissional`.
+Criar:
+- `src/contexts/LocaleContext.tsx`
+- `src/locales/pt.json`
+- `src/locales/en.json`
+- `src/components/LanguageSwitcher.tsx`
+- `src/lib/i18n.ts` (helpers)
 
-## Métricas para acompanhar (semanal)
-- Impressões e taxa de engajamento por pilar (descobrir qual converte).
-- Comentários com palavra-chave (proxy de lead).
-- DMs recebidas → conversas → cliques no link → leads no formulário.
-- Meta do sprint: 60–80 conversas iniciadas, 15–25 leads no form, 5–8 vagas fechadas.
+Editar:
+- `src/App.tsx` (wrap com LocaleProvider)
+- `src/pages/Index.tsx`
+- `src/pages/MentoriaProfissional.tsx`
+- `src/pages/NotFound.tsx`
+- `src/components/LeadFormDialog.tsx`
 
-## Entregáveis que posso preparar depois (não fazem parte deste plano)
-- Os 16 textos finais prontos para colar no LinkedIn.
-- Templates de carrossel (estrutura slide a slide).
-- Roteiros dos 4 vídeos (45–60s, fala a fala).
-- Sequência de DM de qualificação.
-
-## Próximo passo
-Aprovar este plano. Depois posso, em uma próxima etapa, escrever os 16 posts da Semana 1 já no tom da marca, ou começar pelos 4 roteiros de vídeo — você escolhe.
+Quer que eu siga?
