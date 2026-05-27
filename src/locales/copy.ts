@@ -223,6 +223,12 @@ export const indexCopy = {
     ctaContact: "Get in touch",
     ctaOpenCalendar: "Open calendar",
 
+    reviewsEyebrow: "Social proof",
+    reviewsHeading: "Real client reviews on Google",
+    reviewsDesc: "Clients who went through the diagnostic and consulting shared their experience directly on my Google profile. Read it from the source.",
+    reviewsCta: "See reviews on Google",
+    reviewsStarsLabel: "5 stars",
+
     footerAriaWhatsapp: "WhatsApp of Gabriel Vieira",
     footerAriaLinkedin: "LinkedIn of Gabriel Vieira",
     footerAriaInstagram: "Instagram of Gabriel Vieira",
