@@ -111,7 +111,7 @@ export const indexCopy = {
     reviewsStarsLabel: "5 estrelas",
     reviewsRatingLabel: "Nota 5 de 5",
     reviewsCount: "(12 avaliações)",
-    reviewsSource: "Fonte: Perfil do Google · atualizado manualmente",
+    reviewsSource: "Fonte: Perfil do Google",
     reviewsOn: "Avaliação no",
     reviewsList: [
       {
@@ -256,7 +256,7 @@ export const indexCopy = {
     reviewsStarsLabel: "5 stars",
     reviewsRatingLabel: "Rating 5 out of 5",
     reviewsCount: "(12 reviews)",
-    reviewsSource: "Source: Google profile · manually updated",
+    reviewsSource: "Source: Google profile",
     reviewsOn: "Review on",
     reviewsList: [
       {
