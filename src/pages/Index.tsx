@@ -449,47 +449,82 @@ const Index = () => {
 
       {/* Google Reviews */}
       <section id="avaliacoes" className="section-padding">
-        <div className="container max-w-3xl">
+        <div className="container max-w-6xl">
           <motion.div
             variants={fadeUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             custom={0}
-            className="relative bg-card border border-primary/30 rounded-2xl p-8 md:p-10 text-center overflow-hidden"
+            className="text-center mb-12"
           >
-            <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-            <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium relative">
+            <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
               {c.reviewsEyebrow}
             </span>
-            <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4 relative">
+            <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4">
               {c.reviewsHeading}
             </h2>
-            <div
-              className="flex items-center justify-center gap-1 mb-4 relative"
-              aria-label={c.reviewsStarsLabel}
-            >
-              {[0, 1, 2, 3, 4].map((i) => (
-                <Star key={i} className="text-primary fill-primary" size={22} strokeWidth={1.5} />
-              ))}
+            <div className="flex items-center justify-center gap-3 mb-3" aria-label={c.reviewsRatingLabel}>
+              <span className="font-serif text-3xl font-bold text-foreground">5,0</span>
+              <div className="flex items-center gap-1">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <Star key={i} className="text-primary fill-primary" size={20} strokeWidth={1.5} />
+                ))}
+              </div>
+              <span className="text-muted-foreground text-sm">{c.reviewsCount}</span>
             </div>
-            <p className="text-muted-foreground leading-relaxed max-w-xl mx-auto mb-8 relative">
-              {c.reviewsDesc}
-            </p>
+            <p className="text-muted-foreground text-sm">{c.reviewsSource}</p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {c.reviewsList.map((r, i) => (
+              <motion.article
+                key={r.author}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                custom={i}
+                className="card-hover bg-card border border-border rounded-xl p-6 flex flex-col"
+              >
+                <div className="flex items-center gap-1 mb-3">
+                  {[0, 1, 2, 3, 4].map((s) => (
+                    <Star key={s} className="text-primary fill-primary" size={14} strokeWidth={1.5} />
+                  ))}
+                </div>
+                <p className="text-foreground/90 text-sm leading-relaxed flex-1 mb-5">
+                  "{r.text}"
+                </p>
+                <div className="flex items-center gap-3 pt-4 border-t border-border">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-serif font-semibold text-sm">
+                    {r.author.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-foreground text-sm font-medium truncate">{r.author}</p>
+                    <p className="text-muted-foreground text-xs">{c.reviewsOn} Google</p>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+
+          <div className="text-center mt-10">
             <a
               href={GOOGLE_PROFILE_URL}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackClick("cta", "open_google_reviews")}
-              className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-7 py-3.5 rounded-md relative"
+              className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-3.5 rounded-md hover:bg-primary/10 transition-colors"
             >
               <MapPin size={16} />
               {c.reviewsCta}
               <ArrowRight size={16} />
             </a>
-          </motion.div>
+          </div>
         </div>
       </section>
+
+
 
       <div className="gold-divider" />
 
