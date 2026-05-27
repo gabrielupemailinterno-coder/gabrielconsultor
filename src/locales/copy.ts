@@ -104,6 +104,12 @@ export const indexCopy = {
     ctaContact: "Entrar em contato",
     ctaOpenCalendar: "Abrir agenda",
 
+    reviewsEyebrow: "Prova social",
+    reviewsHeading: "Avaliações reais de clientes no Google",
+    reviewsDesc: "Quem já passou pelo diagnóstico e pela consultoria compartilhou a experiência direto no meu perfil do Google. Leia na fonte.",
+    reviewsCta: "Ver avaliações no Google",
+    reviewsStarsLabel: "5 estrelas",
+
     footerAriaWhatsapp: "WhatsApp de Gabriel Vieira",
     footerAriaLinkedin: "LinkedIn de Gabriel Vieira",
     footerAriaInstagram: "Instagram de Gabriel Vieira",
