@@ -17,9 +17,11 @@ import {
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
+import { useLocale } from "@/contexts/LocaleContext";
+import { mentoriaCopy } from "@/locales/copy";
 
 const WHATSAPP_URL =
-  "https://api.whatsapp.com/send?phone=5532998316501&text=Ol%C3%A1%2C%20quero%20saber%20mais%20sobre%20a%20Mentoria%20Profissional%20de%20R%24197%2Fm%C3%AAs";
+  "https://api.whatsapp.com/send?phone=5532998316501&text=Ol%C3%A1%2C%20quero%20saber%20mais%20sobre%20a%20Mentoria%20Profissional";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -30,117 +32,55 @@ const fadeUp = {
   }),
 };
 
-const paraQuem = [
-  {
-    icon: Target,
-    title: "Vendedores e SDRs",
-    desc: "Que precisam bater meta com previsibilidade e não dependem de sorte ou de leads quentes.",
-  },
-  {
-    icon: Headphones,
-    title: "Suporte e Customer Success",
-    desc: "Que querem se posicionar como consultivo, reduzir churn e abrir novas oportunidades dentro da carteira.",
-  },
-  {
-    icon: Users,
-    title: "Líderes de Operação",
-    desc: "Coordenadores e gestores que precisam estruturar rotina, indicadores e cobrança de time com método.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Profissionais em Transição",
-    desc: "Que estão saindo do operacional e querem dar o salto para cargos consultivos e estratégicos.",
-  },
-];
-
-const beneficios = [
-  {
-    title: "Sessões mensais ao vivo",
-    desc: "2 encontros por mês de 60 minutos, individuais, focados nos seus desafios reais de carreira.",
-  },
-  {
-    title: "Plano de evolução pessoal",
-    desc: "Mapeamento dos seus KPIs pessoais, metas trimestrais e ajustes de rota baseados em dados, não em achismo.",
-  },
-  {
-    title: "Acesso direto via WhatsApp",
-    desc: "Suporte assíncrono para tirar dúvidas pontuais, revisar abordagens, propostas e e-mails antes de enviar.",
-  },
-  {
-    title: "Templates e playbooks",
-    desc: "Biblioteca de cadências, scripts, modelos de proposta e checklists usados na minha consultoria executiva.",
-  },
-  {
-    title: "Revisão de pipeline",
-    desc: "Diagnóstico mensal das suas oportunidades em aberto com plano tático para acelerar o fechamento.",
-  },
-  {
-    title: "Comunidade fechada",
-    desc: "Networking com outros profissionais comerciais e de CS em evolução, com troca real de cases.",
-  },
-];
-
-const resultados = [
-  "Bater meta com método, parar de depender de pico de motivação",
-  "Aumentar ticket médio e taxa de conversão das suas oportunidades",
-  "Se tornar referência interna em organização, dados e processo",
-  "Negociar promoção e aumento com argumentos concretos de performance",
-  "Reduzir o tempo gasto com tarefas operacionais e ganhar foco estratégico",
-];
+const paraQuemIcons = [Target, Headphones, Users, TrendingUp];
 
 const MentoriaProfissional = () => {
   const [formOpen, setFormOpen] = useState(false);
+  const { locale, formatPrice } = useLocale();
+  const c = mentoriaCopy[locale];
   useAnalytics("/mentoria-profissional");
 
   useEffect(() => {
-    document.title = "Mentoria Profissional · Gabriel Vieira";
-  }, []);
+    document.title = c.metaTitle;
+  }, [c.metaTitle]);
 
   const openForm = () => {
     trackClick("cta", "mp_open_lead_form");
     setFormOpen(true);
   };
 
-  const pageUrl = "https://gabrielconsultor.lovable.app/mentoria-profissional";
-  const pageTitle = "Mentoria Profissional 1:1 para Vendas e CS · R$197/mês | Gabriel Vieira";
-  const pageDesc = "Mentoria individual mensal para vendedores, SDRs e profissionais de customer success que querem bater meta, evoluir na carreira e destravar performance pessoal com método.";
+  const pageUrl = "https://gabrielconsultor.com/mentoria-profissional";
 
   return (
     <main className="min-h-screen bg-background text-foreground font-sans">
       <Helmet>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDesc} />
+        <html lang={locale === "pt" ? "pt-BR" : "en"} />
+        <title>{c.metaTitle}</title>
+        <meta name="description" content={c.metaDesc} />
         <link rel="canonical" href={pageUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={pageUrl} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDesc} />
-        <meta name="twitter:title" content={pageTitle} />
-        <meta name="twitter:description" content={pageDesc} />
+        <meta property="og:title" content={c.metaTitle} />
+        <meta property="og:description" content={c.metaDesc} />
+        <meta name="twitter:title" content={c.metaTitle} />
+        <meta name="twitter:description" content={c.metaDesc} />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Service",
           name: "Mentoria Profissional 1:1",
-          serviceType: "Mentoria de carreira para profissionais comerciais e CS",
-          description: pageDesc,
+          serviceType: "Mentoring for sales and CS professionals",
+          description: c.metaDesc,
           url: pageUrl,
-          areaServed: "BR",
+          areaServed: locale === "pt" ? "BR" : "Worldwide",
           provider: {
             "@type": "Person",
             name: "Gabriel Vieira",
-            url: "https://gabrielconsultor.lovable.app/",
+            url: "https://gabrielconsultor.com/",
           },
           offers: {
             "@type": "Offer",
-            price: "197.00",
-            priceCurrency: "BRL",
-            priceSpecification: {
-              "@type": "UnitPriceSpecification",
-              price: "197.00",
-              priceCurrency: "BRL",
-              unitCode: "MON",
-              billingDuration: "P1M",
-            },
+            price: locale === "pt" ? "197.00" : "39.00",
+            priceCurrency: locale === "pt" ? "BRL" : "USD",
             availability: "https://schema.org/InStock",
           },
         })}</script>
@@ -155,7 +95,7 @@ const MentoriaProfissional = () => {
           className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm"
         >
           <ArrowLeft size={16} />
-          Voltar para a página inicial
+          {c.backHome}
         </Link>
       </div>
 
@@ -169,7 +109,7 @@ const MentoriaProfissional = () => {
             className="inline-flex items-center gap-2 border border-primary/40 bg-primary/10 text-primary text-xs font-medium tracking-wide uppercase px-4 py-1.5 rounded-full mb-8"
           >
             <Sparkles size={14} strokeWidth={2} />
-            Mentoria 1:1 · Mensal
+            {c.badge}
           </motion.div>
 
           <motion.h1
@@ -178,8 +118,8 @@ const MentoriaProfissional = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="font-serif text-3xl md:text-5xl leading-[1.1] font-bold mb-6"
           >
-            Mentoria Profissional para{" "}
-            <span className="text-primary">quem quer evoluir de verdade.</span>
+            {c.heroTitleA}{" "}
+            <span className="text-primary">{c.heroTitleB}</span>
           </motion.h1>
 
           <motion.p
@@ -188,10 +128,7 @@ const MentoriaProfissional = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed"
           >
-            Acompanhamento individual mensal para profissionais da área
-            comercial, suporte e customer success que querem destravar
-            performance pessoal com método, dados e execução — sem palestras
-            motivacionais.
+            {c.heroDesc}
           </motion.p>
 
           {/* Price card */}
@@ -202,17 +139,16 @@ const MentoriaProfissional = () => {
             className="inline-flex flex-col items-center bg-card border border-primary/40 rounded-2xl px-10 py-6 mb-10"
           >
             <span className="text-primary text-[10px] tracking-[0.3em] uppercase font-medium mb-2">
-              Investimento fixo
+              {c.priceLabel}
             </span>
-            <div className="flex items-baseline gap-1">
-              <span className="font-serif text-sm text-muted-foreground">R$</span>
+            <div className="flex items-baseline gap-2">
               <span className="font-serif text-5xl md:text-6xl font-bold text-foreground">
-                197
+                {formatPrice(197)}
               </span>
-              <span className="text-muted-foreground text-sm">/mês</span>
+              <span className="text-muted-foreground text-sm">{c.pricePeriod}</span>
             </div>
             <span className="text-muted-foreground text-xs mt-2">
-              Sem fidelidade · Cancele quando quiser
+              {c.priceFootnote}
             </span>
           </motion.div>
 
@@ -230,14 +166,14 @@ const MentoriaProfissional = () => {
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
             >
               <MessageCircle size={16} />
-              Quero entrar na mentoria
+              {c.ctaJoin}
             </a>
             <button
               onClick={openForm}
               className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
             >
               <Calendar size={16} />
-              Receber detalhes
+              {c.ctaDetails}
             </button>
           </motion.div>
         </div>
@@ -257,35 +193,37 @@ const MentoriaProfissional = () => {
             className="text-center mb-14"
           >
             <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
-              Para quem é
+              {c.paraQuemEyebrow}
             </span>
             <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4">
-              Profissionais que vivem de meta, atendimento e relacionamento.
+              {c.paraQuemHeading}
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Se você atua na linha de frente do cliente — vendendo, retendo ou
-              ampliando carteira — essa mentoria é para você.
+              {c.paraQuemSub}
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {paraQuem.map((item, i) => (
-              <motion.div
-                key={item.title}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i}
-                className="card-hover bg-card border border-border rounded-lg p-6"
-              >
-                <item.icon className="text-primary mb-4" size={28} strokeWidth={1.5} />
-                <h3 className="font-serif text-lg mb-2">{item.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {item.desc}
-                </p>
-              </motion.div>
-            ))}
+            {c.paraQuem.map((item, i) => {
+              const Icon = paraQuemIcons[i];
+              return (
+                <motion.div
+                  key={item.title}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  custom={i}
+                  className="card-hover bg-card border border-border rounded-lg p-6"
+                >
+                  <Icon className="text-primary mb-4" size={28} strokeWidth={1.5} />
+                  <h3 className="font-serif text-lg mb-2">{item.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    {item.desc}
+                  </p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -304,15 +242,15 @@ const MentoriaProfissional = () => {
             className="text-center mb-14"
           >
             <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
-              O que está incluso
+              {c.benefEyebrow}
             </span>
             <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4">
-              Tudo que você precisa para virar a chave em 90 dias.
+              {c.benefHeading}
             </h2>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {beneficios.map((b, i) => (
+            {c.beneficios.map((b, i) => (
               <motion.div
                 key={b.title}
                 variants={fadeUp}
@@ -347,15 +285,15 @@ const MentoriaProfissional = () => {
             className="text-center mb-12"
           >
             <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
-              Resultados esperados
+              {c.resultadosEyebrow}
             </span>
             <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4">
-              O que você vai colher do seu lado.
+              {c.resultadosHeading}
             </h2>
           </motion.div>
 
           <ul className="space-y-4">
-            {resultados.map((r, i) => (
+            {c.resultados.map((r, i) => (
               <motion.li
                 key={r}
                 variants={fadeUp}
@@ -387,19 +325,15 @@ const MentoriaProfissional = () => {
             className="text-center mb-12"
           >
             <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
-              Como funciona
+              {c.howEyebrow}
             </span>
             <h2 className="font-serif text-2xl md:text-3xl mt-3">
-              Simples, direto, mensurável.
+              {c.howHeading}
             </h2>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { n: "01", t: "Onboarding", d: "Diagnóstico inicial dos seus KPIs pessoais e desenho do seu plano de evolução." },
-              { n: "02", t: "Execução guiada", d: "Sessões quinzenais + acompanhamento contínuo via WhatsApp e materiais sob demanda." },
-              { n: "03", t: "Revisão de ciclo", d: "Análise mensal dos resultados, ajuste de metas e definição das próximas alavancas." },
-            ].map((s, i) => (
+            {c.howSteps.map((s, i) => (
               <motion.div
                 key={s.n}
                 variants={fadeUp}
@@ -425,7 +359,7 @@ const MentoriaProfissional = () => {
             className="flex items-center justify-center gap-2 mt-10 text-muted-foreground text-sm"
           >
             <Clock size={16} className="text-primary" />
-            Vagas limitadas a 15 mentorados ativos por mês.
+            {c.howFootnote}
           </motion.div>
         </div>
       </section>
@@ -443,8 +377,9 @@ const MentoriaProfissional = () => {
             custom={0}
             className="font-serif text-3xl md:text-4xl mb-6 leading-tight"
           >
-            R$197/mês para deixar de{" "}
-            <span className="text-primary">competir no escuro.</span>
+            {formatPrice(197)}
+            {c.pricePeriod} {c.finalHeadA}{" "}
+            <span className="text-primary">{c.finalHeadB}</span>
           </motion.h2>
           <motion.p
             variants={fadeUp}
@@ -454,8 +389,7 @@ const MentoriaProfissional = () => {
             custom={1}
             className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-10"
           >
-            Menos do que uma conta de celular para ter um mentor sênior te
-            puxando para o próximo nível, todo mês.
+            {c.finalDesc}
           </motion.p>
 
           <motion.div
@@ -474,13 +408,13 @@ const MentoriaProfissional = () => {
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
             >
               <MessageCircle size={16} />
-              Garantir minha vaga
+              {c.finalCta}
             </a>
             <button
               onClick={openForm}
               className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
             >
-              Receber proposta
+              {c.finalCtaAlt}
             </button>
           </motion.div>
         </div>

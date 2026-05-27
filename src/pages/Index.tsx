@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import gabrielPhoto from "@/assets/gabriel.jpg";
+import { useLocale } from "@/contexts/LocaleContext";
+import { indexCopy } from "@/locales/copy";
 
 const CALENDAR_URL = "https://calendar.app.google/1GgJUz3DD3KuznGMA";
 const WHATSAPP_URL = "https://api.whatsapp.com/send?phone=5532998316501&text=Ol%C3%A1%2C%20gostaria%20de%20saber%20como%20funciona%20o%20diagn%C3%B3stico";
@@ -40,63 +42,14 @@ const fadeUp = {
   }),
 };
 
-const painPoints = [
-  { icon: Target, title: "Falta de Leads Qualificados", desc: "Pipeline vazio e dependência de indicações para gerar novas oportunidades." },
-  { icon: TrendingDown, title: "Baixa Taxa de Conversão", desc: "Propostas enviadas que não se transformam em contratos fechados." },
-  { icon: Workflow, title: "Ausência de Processos", desc: "Vendas sem método, sem funil definido e sem previsibilidade de receita." },
-  { icon: Users, title: "Time sem Ritmo", desc: "Equipe comercial desmotivada, sem metas claras e sem rotina de execução." },
-];
-
-const services = [
-  {
-    icon: Workflow,
-    title: "Estruturação Comercial",
-    desc: "Desenho de funil inbound/outbound, playbooks, cadências e SLA entre marketing, pré-vendas e vendas.",
-  },
-  {
-    icon: Database,
-    title: "Auditoria de CRM",
-    desc: "Diagnóstico técnico do seu CRM, limpeza de pipeline, automações e padronização de dados para decisões reais.",
-  },
-  {
-    icon: Sparkles,
-    title: "Painéis e MVPs com IA",
-    desc: "Dashboards de receita e MVPs com Inteligência Artificial para acelerar operações sem depender de TI.",
-  },
-  {
-    icon: GraduationCap,
-    title: "Mentoria Comercial",
-    desc: "Acompanhamento contínuo do líder e do time comercial, com revisão de KPIs e ajustes de rota a cada ciclo.",
-  },
-];
-
-const packages = [
-  {
-    icon: Briefcase,
-    tag: "Consultoria Operacional",
-    duration: "4 a 8 semanas",
-    headline: "Ajuste a engrenagem que segura sua margem.",
-    bullets: [
-      { title: "Ajuste de fluxo", desc: "Organização da engrenagem desde a compra de insumos até a venda final." },
-      { title: "Estancamento de gargalos", desc: "Auditoria para identificar onde o dinheiro está sumindo por falha técnica ou de gestão." },
-      { title: "Indicadores reais", desc: "Base de dados única para visualizar a margem real do negócio." },
-    ],
-  },
-  {
-    icon: Compass,
-    tag: "Mentoria Estratégica",
-    duration: "12 semanas",
-    headline: "Da decisão por feeling à gestão por processos.",
-    bullets: [
-      { title: "Cultura de gestão", desc: "Treinamento do olhar do dono para analisar o negócio via processos, não \"feeling\"." },
-      { title: "Tecnologia e IA", desc: "Implementação de ferramentas modernas para automação de tarefas e otimização do tempo." },
-      { title: "Conselho estratégico", desc: "Acompanhamento em decisões de investimento, expansão e sucessão." },
-    ],
-  },
-];
+const painIcons = [Target, TrendingDown, Workflow, Users];
+const serviceIcons = [Workflow, Database, Sparkles, GraduationCap];
+const packageIcons = [Briefcase, Compass];
 
 const Index = () => {
   const [formOpen, setFormOpen] = useState(false);
+  const { locale, formatPrice } = useLocale();
+  const c = indexCopy[locale];
   useAnalytics("/");
 
   useEffect(() => {
@@ -117,11 +70,12 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-background text-foreground font-sans">
       <Helmet>
-        <title>Gabriel Lincoln Vieira Passos | Consultor e Mentor Comercial — São João del Rei</title>
-        <meta name="description" content="Gabriel Lincoln Vieira Passos — consultor e mentor comercial em São João del Rei. Consultoria para o setor comercial, Sales Ops, CRM e mentoria 1:1. Cases com Grupo Ascenário, Imersol, Seara, Rivelli e BNI." />
+        <html lang={locale === "pt" ? "pt-BR" : "en"} />
+        <title>{c.metaTitle}</title>
+        <meta name="description" content={c.metaDesc} />
         <link rel="canonical" href="https://gabrielconsultor.com/" />
-        <meta property="og:title" content="Gabriel Lincoln Vieira Passos | Consultor e Mentor Comercial — São João del Rei" />
-        <meta property="og:description" content="Consultoria para o setor comercial e mentoria 1:1. Atuação com Grupo Ascenário, Imersol, Seara, Rivelli e BNI em São João del Rei." />
+        <meta property="og:title" content={c.metaTitle} />
+        <meta property="og:description" content={c.ogDesc} />
         <meta property="og:url" content="https://gabrielconsultor.com/" />
       </Helmet>
       <LeadFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
@@ -132,8 +86,7 @@ const Index = () => {
         <div
           className="absolute inset-0 opacity-[0.05] pointer-events-none"
           style={{
-            backgroundImage:
-              "radial-gradient(hsl(var(--primary)) 1px, transparent 1px)",
+            backgroundImage: "radial-gradient(hsl(var(--primary)) 1px, transparent 1px)",
             backgroundSize: "32px 32px",
           }}
         />
@@ -145,7 +98,7 @@ const Index = () => {
             className="inline-flex items-center gap-2 border border-primary/40 bg-primary/10 text-primary text-xs font-medium tracking-wide uppercase px-4 py-1.5 rounded-full mb-8"
           >
             <Trophy size={14} strokeWidth={2} />
-            Criador Platinum Lovable
+            {c.badge}
           </motion.div>
           <motion.p
             initial={{ opacity: 0 }}
@@ -153,7 +106,7 @@ const Index = () => {
             transition={{ duration: 0.8 }}
             className="text-primary tracking-[0.25em] uppercase text-xs font-sans font-medium mb-6"
           >
-            Gabriel Vieira · Consultoria & Estratégia
+            {c.eyebrow}
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
@@ -161,8 +114,7 @@ const Index = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="font-serif text-3xl md:text-5xl lg:text-[3.4rem] leading-[1.1] font-bold mb-6"
           >
-            Processos que escalam o lucro com{" "}
-            <span className="text-primary">organização.</span>
+            {c.heroTitleA} <span className="text-primary">{c.heroTitleB}</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -170,9 +122,7 @@ const Index = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed"
           >
-            Consultoria em Sales Operations, processos comerciais e MVPs com IA
-            para empresas e operações que precisam transformar intuição em
-            sistema previsível, guiado por dados.
+            {c.heroDesc}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -185,7 +135,7 @@ const Index = () => {
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
             >
               <Calendar size={16} />
-              Agendar Diagnóstico
+              {c.ctaScheduleDiag}
             </button>
             <a
               href={WHATSAPP_URL}
@@ -195,13 +145,13 @@ const Index = () => {
               className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
             >
               <MessageCircle size={16} />
-              Falar no WhatsApp
+              {c.ctaWhatsapp}
             </a>
             <button
               onClick={openForm}
               className="inline-flex items-center gap-2 text-foreground/80 font-sans font-medium text-sm tracking-wide uppercase px-3 py-4 hover:text-primary transition-colors"
             >
-              Receber proposta
+              {c.ctaProposal}
               <ArrowRight size={16} />
             </button>
           </motion.div>
@@ -221,7 +171,7 @@ const Index = () => {
             custom={0}
             className="font-serif text-2xl md:text-3xl text-center mb-4"
           >
-            Seu comercial enfrenta esses desafios?
+            {c.painHeading}
           </motion.h2>
           <motion.p
             variants={fadeUp}
@@ -231,24 +181,27 @@ const Index = () => {
             custom={1}
             className="text-muted-foreground text-center max-w-xl mx-auto mb-14"
           >
-            Identifique os gargalos que estão travando o crescimento da sua receita.
+            {c.painSubheading}
           </motion.p>
           <div className="grid md:grid-cols-2 gap-6">
-            {painPoints.map((item, i) => (
-              <motion.div
-                key={item.title}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i}
-                className="card-hover bg-card border border-border rounded-lg p-6"
-              >
-                <item.icon className="text-primary mb-4" size={28} strokeWidth={1.5} />
-                <h3 className="font-serif text-lg mb-2">{item.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
-              </motion.div>
-            ))}
+            {c.painPoints.map((item, i) => {
+              const Icon = painIcons[i];
+              return (
+                <motion.div
+                  key={item.title}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  custom={i}
+                  className="card-hover bg-card border border-border rounded-lg p-6"
+                >
+                  <Icon className="text-primary mb-4" size={28} strokeWidth={1.5} />
+                  <h3 className="font-serif text-lg mb-2">{item.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -267,37 +220,33 @@ const Index = () => {
             className="text-center mb-14"
           >
             <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
-              Serviços
+              {c.servicesEyebrow}
             </span>
-            <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4">
-              Soluções diretas ao ponto
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Da estratégia ao painel rodando. Sem burocracia, sem consultoria
-              de teoria.
-            </p>
+            <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4">{c.servicesHeading}</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">{c.servicesSubheading}</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {services.map((s, i) => (
-              <motion.div
-                key={s.title}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i}
-                className="card-hover group bg-card border border-border rounded-xl p-6 flex flex-col"
-              >
-                <div className="w-11 h-11 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
-                  <s.icon className="text-primary" size={22} strokeWidth={1.75} />
-                </div>
-                <h3 className="font-serif text-lg mb-2">{s.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed flex-1">
-                  {s.desc}
-                </p>
-              </motion.div>
-            ))}
+            {c.services.map((s, i) => {
+              const Icon = serviceIcons[i];
+              return (
+                <motion.div
+                  key={s.title}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  custom={i}
+                  className="card-hover group bg-card border border-border rounded-xl p-6 flex flex-col"
+                >
+                  <div className="w-11 h-11 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                    <Icon className="text-primary" size={22} strokeWidth={1.75} />
+                  </div>
+                  <h3 className="font-serif text-lg mb-2">{s.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed flex-1">{s.desc}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -316,67 +265,65 @@ const Index = () => {
             className="text-center mb-14"
           >
             <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
-              Pacotes & Investimento
+              {c.packagesEyebrow}
             </span>
-            <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4">
-              Dois caminhos para profissionalizar o jogo.
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Da auditoria operacional ao conselho estratégico de longo prazo —
-              escolha o formato que cabe no momento do seu negócio.
-            </p>
+            <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4">{c.packagesHeading}</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">{c.packagesSubheading}</p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-6 md:gap-8">
-            {packages.map((p, i) => (
-              <motion.div
-                key={p.tag}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i}
-                className="card-hover relative bg-card border border-primary/30 rounded-2xl p-8 md:p-10 flex flex-col"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
-                    <p.icon className="text-primary" size={24} strokeWidth={1.75} />
-                  </div>
-                  <span className="text-[10px] tracking-[0.2em] uppercase text-primary border border-primary/30 rounded-full px-3 py-1">
-                    {p.duration}
-                  </span>
-                </div>
-                <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
-                  {p.tag}
-                </span>
-                <h3 className="font-serif text-2xl mt-3 mb-6">{p.headline}</h3>
-                <ul className="space-y-4 mb-8 flex-1">
-                  {p.bullets.map((b) => (
-                    <li key={b.title} className="flex gap-3">
-                      <Check className="text-primary mt-0.5 shrink-0" size={18} strokeWidth={2} />
-                      <div>
-                        <p className="text-foreground font-medium text-sm">{b.title}</p>
-                        <p className="text-muted-foreground text-sm leading-relaxed">{b.desc}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={openForm}
-                  className="inline-flex items-center justify-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-6 py-3 rounded-md hover:bg-primary/10 transition-colors"
+            {c.packages.map((p, i) => {
+              const Icon = packageIcons[i];
+              return (
+                <motion.div
+                  key={p.tag}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  custom={i}
+                  className="card-hover relative bg-card border border-primary/30 rounded-2xl p-8 md:p-10 flex flex-col"
                 >
-                  Saber mais
-                  <ArrowRight size={16} />
-                </button>
-              </motion.div>
-            ))}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
+                      <Icon className="text-primary" size={24} strokeWidth={1.75} />
+                    </div>
+                    <span className="text-[10px] tracking-[0.2em] uppercase text-primary border border-primary/30 rounded-full px-3 py-1">
+                      {p.duration}
+                    </span>
+                  </div>
+                  <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
+                    {p.tag}
+                  </span>
+                  <h3 className="font-serif text-2xl mt-3 mb-6">{p.headline}</h3>
+                  <ul className="space-y-4 mb-8 flex-1">
+                    {p.bullets.map((b) => (
+                      <li key={b.title} className="flex gap-3">
+                        <Check className="text-primary mt-0.5 shrink-0" size={18} strokeWidth={2} />
+                        <div>
+                          <p className="text-foreground font-medium text-sm">{b.title}</p>
+                          <p className="text-muted-foreground text-sm leading-relaxed">{b.desc}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={openForm}
+                    className="inline-flex items-center justify-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-6 py-3 rounded-md hover:bg-primary/10 transition-colors"
+                  >
+                    {c.packageCta}
+                    <ArrowRight size={16} />
+                  </button>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       <div className="gold-divider" />
 
-      {/* Mentoria Profissional - Plano Individual */}
+      {/* Mentoria Profissional */}
       <section id="mentoria-profissional" className="section-padding">
         <div className="container max-w-5xl">
           <motion.div
@@ -391,24 +338,12 @@ const Index = () => {
             <div className="grid md:grid-cols-[1fr_auto] gap-10 items-center relative">
               <div>
                 <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
-                  Plano individual · Mensalidade fixa
+                  {c.mpEyebrow}
                 </span>
-                <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4">
-                  Mentoria Profissional para vendas, suporte e CS.
-                </h2>
-                <p className="text-muted-foreground leading-relaxed mb-6 max-w-2xl">
-                  Acompanhamento mensal para profissionais da linha de frente
-                  que querem bater meta com método, evoluir na carreira e parar
-                  de depender de motivação para performar. Sessões 1:1, plano
-                  de evolução pessoal e suporte direto via WhatsApp.
-                </p>
+                <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4">{c.mpHeading}</h2>
+                <p className="text-muted-foreground leading-relaxed mb-6 max-w-2xl">{c.mpDesc}</p>
                 <ul className="grid sm:grid-cols-2 gap-3 mb-8">
-                  {[
-                    "2 sessões 1:1 por mês",
-                    "Plano de evolução pessoal",
-                    "Suporte por WhatsApp",
-                    "Templates e playbooks",
-                  ].map((f) => (
+                  {c.mpFeatures.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-foreground/90">
                       <Check className="text-primary shrink-0" size={16} strokeWidth={2.5} />
                       {f}
@@ -420,22 +355,23 @@ const Index = () => {
                   onClick={() => trackClick("cta", "mp_section_cta")}
                   className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-7 py-3.5 rounded-md"
                 >
-                  Conhecer a mentoria
+                  {c.mpCta}
                   <ArrowRight size={16} />
                 </Link>
               </div>
 
               <div className="flex flex-col items-center justify-center bg-background/60 border border-primary/30 rounded-2xl px-8 py-6 md:min-w-[220px]">
                 <span className="text-primary text-[10px] tracking-[0.3em] uppercase font-medium mb-2">
-                  A partir de
+                  {c.mpPriceFrom}
                 </span>
-                <div className="flex items-baseline gap-1">
-                  <span className="font-serif text-sm text-muted-foreground">R$</span>
-                  <span className="font-serif text-5xl font-bold text-foreground">197</span>
+                <div className="flex items-baseline">
+                  <span className="font-serif text-4xl md:text-5xl font-bold text-foreground">
+                    {formatPrice(197)}
+                  </span>
                 </div>
-                <span className="text-muted-foreground text-xs mt-1">por mês</span>
+                <span className="text-muted-foreground text-xs mt-1">{c.mpPriceSuffix}</span>
                 <span className="text-[10px] tracking-wide uppercase text-primary mt-3">
-                  Sem fidelidade
+                  {c.mpNoLockin}
                 </span>
               </div>
             </div>
@@ -461,7 +397,7 @@ const Index = () => {
                 <div className="absolute -inset-2 rounded-full bg-primary/10 blur-2xl" />
                 <img
                   src={gabrielPhoto}
-                  alt="Gabriel Vieira, consultor em Sales Ops e MVPs com IA"
+                  alt={c.aboutPhotoAlt}
                   loading="lazy"
                   className="relative w-full h-full object-cover object-[center_15%] rounded-full border-2 border-primary/40 shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.4)]"
                 />
@@ -476,36 +412,32 @@ const Index = () => {
               custom={1}
             >
               <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
-                Quem é Gabriel
+                {c.aboutEyebrow}
               </span>
-              <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-5">
-                Estratégia, execução e tecnologia no mesmo lugar.
-              </h2>
+              <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-5">{c.aboutHeading}</h2>
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  Sou <strong className="text-foreground">Zootecnista (CRMV-MG 2742)</strong>{" "}
-                  e atuo na intersecção exata entre o rigor técnico do campo e a{" "}
-                  <strong className="text-foreground">alta performance executiva</strong>.
-                  Com passagens estratégicas por grupos como{" "}
-                  <strong className="text-foreground">Seara</strong>,{" "}
-                  <strong className="text-foreground">Rivelli Alimentos</strong> e{" "}
-                  <strong className="text-foreground">Grupo Ascenario</strong>,
-                  moldei uma consultoria que não aceita estagnação nem
-                  ineficiência operacional.
+                  {c.aboutPreposicao}{" "}
+                  <strong className="text-foreground">{c.aboutP1Strong1}</strong>
+                  {c.aboutP1Mid}
+                  <strong className="text-foreground">{c.aboutP1Strong2}</strong>
+                  {c.aboutP1End}
+                  <strong className="text-foreground">{c.aboutP1Brand1}</strong>,{" "}
+                  <strong className="text-foreground">{c.aboutP1Brand2}</strong>{" "}
+                  {locale === "pt" ? "e" : "and"}{" "}
+                  <strong className="text-foreground">{c.aboutP1Brand3}</strong>
+                  {c.aboutP1Tail}
                 </p>
                 <p>
-                  Minha formação pelo <strong className="text-foreground">G4 Educação</strong>{" "}
-                  me permite aplicar no agronegócio e em empresas o que há de mais
-                  avançado em <strong className="text-foreground">Growth</strong> e{" "}
-                  <strong className="text-foreground">gestão de alta performance</strong>.
-                  Não me limito ao operacional: leio o campo e o escritório com visão
-                  de <em>big picture</em>, focando em estratégia e automação para que o
-                  negócio não dependa da memória das pessoas.
+                  {c.aboutP2Pre}
+                  <strong className="text-foreground">{c.aboutP2Brand}</strong>
+                  {c.aboutP2Mid}
+                  <strong className="text-foreground">{c.aboutP2Strong1}</strong>
+                  {c.aboutP2AndIn}
+                  <strong className="text-foreground">{c.aboutP2Strong2}</strong>
+                  {c.aboutP2Tail}
                 </p>
-                <p>
-                  Meu compromisso é simples: processo claro, dado limpo e execução
-                  previsível — guiada por sistema, não por intuição.
-                </p>
+                <p>{c.aboutP3}</p>
               </div>
             </motion.div>
           </div>
@@ -526,11 +458,10 @@ const Index = () => {
             className="border-l-2 border-primary pl-6 md:pl-10"
           >
             <p className="font-serif text-xl md:text-2xl italic leading-relaxed text-foreground/90">
-              "Eu forneço o mapa e a bússola; seu time domina o território.
-              Consultoria focada em processos, não apenas em teoria."
+              {c.quote}
             </p>
             <footer className="mt-4 text-primary text-sm font-sans tracking-wide">
-              — Gabriel
+              {c.quoteBy}
             </footer>
           </motion.blockquote>
         </div>
@@ -549,21 +480,17 @@ const Index = () => {
             custom={0}
           >
             <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium">
-              Próximo passo
+              {c.closingEyebrow}
             </span>
             <h2 className="font-serif text-3xl md:text-5xl mt-3 mb-6 leading-tight">
-              Será um prazer{" "}
-              <span className="text-primary">potencializar seus resultados.</span>
+              {c.closingHeadingA}{" "}
+              <span className="text-primary">{c.closingHeadingB}</span>
             </h2>
             <p className="text-muted-foreground text-base md:text-lg leading-relaxed max-w-2xl mx-auto mb-4">
-              Faço um diagnóstico detalhado da sua operação para identificar os
-              gargalos que estão drenando sua margem e desenhar o caminho para a
-              escalabilidade do seu negócio.
+              {c.closingP1}
             </p>
             <p className="text-muted-foreground text-base md:text-lg leading-relaxed max-w-2xl mx-auto mb-10">
-              O objetivo é transformar sua empresa ou fazenda em um sistema
-              previsível, onde cada decisão é guiada por dados e processos — e não
-              por intuição. Vamos profissionalizar o jogo.
+              {c.closingP2}
             </p>
           </motion.div>
 
@@ -583,14 +510,14 @@ const Index = () => {
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
             >
               <MessageCircle size={16} />
-              Entrar em contato
+              {c.ctaContact}
             </a>
             <button
               onClick={openCalendar}
               className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
             >
               <Calendar size={16} />
-              Abrir agenda
+              {c.ctaOpenCalendar}
             </button>
           </motion.div>
         </div>
@@ -600,45 +527,21 @@ const Index = () => {
       <footer className="py-10 border-t border-border">
         <div className="container max-w-5xl flex flex-col items-center gap-6">
           <div className="flex items-center gap-3">
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="WhatsApp de Gabriel Vieira"
-              className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-            >
+            <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaWhatsapp} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
               <MessageCircle size={16} />
             </a>
-            <a
-              href={LINKEDIN_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn de Gabriel Vieira"
-              className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-            >
+            <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaLinkedin} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
               <Linkedin size={16} />
             </a>
-            <a
-              href={INSTAGRAM_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram de Gabriel Vieira"
-              className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-            >
+            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaInstagram} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
               <Instagram size={16} />
             </a>
-            <a
-              href={GOOGLE_PROFILE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Perfil do Google de Gabriel Vieira"
-              className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
-            >
+            <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaGoogle} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
               <MapPin size={16} />
             </a>
           </div>
           <p className="text-center text-muted-foreground text-xs tracking-wide">
-            © {new Date().getFullYear()} Gabriel Vieira · Consultoria & Estratégia · CRMV-MG 2742 · CNPJ 66.956.549/0001-62
+            © {new Date().getFullYear()} {c.footerTagline}
           </p>
         </div>
       </footer>

@@ -1,20 +1,20 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, CheckCircle } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { trackClick } from "@/hooks/useAnalytics";
+import { useLocale } from "@/contexts/LocaleContext";
+import { leadFormCopy } from "@/locales/copy";
 
-const leadSchema = z.object({
-  name: z.string().trim().min(1, "Preencha seu nome").max(100),
-  phone: z.string().trim().min(1, "Preencha seu telefone").max(30),
-  email: z.string().trim().email("Email inválido").max(255),
-  companyName: z.string().trim().max(100).optional(),
-  revenue: z.string().trim().max(100).optional(),
-  mainPain: z.string().trim().max(1000).optional(),
-});
-
-type LeadData = z.infer<typeof leadSchema>;
+type LeadData = {
+  name: string;
+  phone: string;
+  email: string;
+  companyName?: string;
+  revenue?: string;
+  mainPain?: string;
+};
 
 interface LeadFormDialogProps {
   open: boolean;
@@ -22,6 +22,22 @@ interface LeadFormDialogProps {
 }
 
 const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
+  const { locale } = useLocale();
+  const c = leadFormCopy[locale];
+
+  const leadSchema = useMemo(
+    () =>
+      z.object({
+        name: z.string().trim().min(1, c.errors.name).max(100),
+        phone: z.string().trim().min(1, c.errors.phone).max(30),
+        email: z.string().trim().email(c.errors.email).max(255),
+        companyName: z.string().trim().max(100).optional(),
+        revenue: z.string().trim().max(100).optional(),
+        mainPain: z.string().trim().max(1000).optional(),
+      }),
+    [c]
+  );
+
   const [form, setForm] = useState<LeadData>({
     name: "",
     phone: "",
@@ -72,7 +88,7 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
       }, 2500);
     } catch (err) {
       setStatus("idle");
-      alert("Erro ao enviar. Tente novamente.");
+      alert(c.submitError);
     }
   };
 
@@ -98,7 +114,7 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
           >
             <button
               onClick={onClose}
-              aria-label="Fechar formulário"
+              aria-label={c.closeAria}
               className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
             >
               <X size={20} />
@@ -107,23 +123,21 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
             {status === "success" ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <CheckCircle className="text-primary mb-4" size={48} strokeWidth={1.5} />
-                <h3 className="font-serif text-xl mb-2">Dados enviados com sucesso!</h3>
-                <p className="text-muted-foreground text-sm">Entraremos em contato em breve.</p>
+                <h3 className="font-serif text-xl mb-2">{c.successTitle}</h3>
+                <p className="text-muted-foreground text-sm">{c.successBody}</p>
               </div>
             ) : (
               <>
-                <h3 className="font-serif text-xl md:text-2xl mb-1">Agende seu Diagnóstico</h3>
-                <p className="text-muted-foreground text-sm mb-6">
-                  Preencha os dados abaixo e entraremos em contato.
-                </p>
+                <h3 className="font-serif text-xl md:text-2xl mb-1">{c.title}</h3>
+                <p className="text-muted-foreground text-sm mb-6">{c.subtitle}</p>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label htmlFor="lead-name" className="sr-only">Seu nome</label>
+                    <label htmlFor="lead-name" className="sr-only">{c.placeholders.name}</label>
                     <input
                       id="lead-name"
                       type="text"
-                      placeholder="Seu nome *"
-                      aria-label="Seu nome"
+                      placeholder={c.placeholders.name}
+                      aria-label={c.placeholders.name}
                       value={form.name}
                       onChange={(e) => handleChange("name", e.target.value)}
                       className={inputClass}
@@ -131,12 +145,12 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
                     {errors.name && <p className="text-destructive text-xs mt-1">{errors.name}</p>}
                   </div>
                   <div>
-                    <label htmlFor="lead-phone" className="sr-only">Telefone</label>
+                    <label htmlFor="lead-phone" className="sr-only">{c.placeholders.phone}</label>
                     <input
                       id="lead-phone"
                       type="tel"
-                      placeholder="Telefone *"
-                      aria-label="Telefone"
+                      placeholder={c.placeholders.phone}
+                      aria-label={c.placeholders.phone}
                       value={form.phone}
                       onChange={(e) => handleChange("phone", e.target.value)}
                       className={inputClass}
@@ -144,12 +158,12 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
                     {errors.phone && <p className="text-destructive text-xs mt-1">{errors.phone}</p>}
                   </div>
                   <div>
-                    <label htmlFor="lead-email" className="sr-only">Email</label>
+                    <label htmlFor="lead-email" className="sr-only">{c.placeholders.email}</label>
                     <input
                       id="lead-email"
                       type="email"
-                      placeholder="Email *"
-                      aria-label="Email"
+                      placeholder={c.placeholders.email}
+                      aria-label={c.placeholders.email}
                       value={form.email}
                       onChange={(e) => handleChange("email", e.target.value)}
                       className={inputClass}
@@ -157,35 +171,35 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
                     {errors.email && <p className="text-destructive text-xs mt-1">{errors.email}</p>}
                   </div>
                   <div>
-                    <label htmlFor="lead-company" className="sr-only">Nome da empresa</label>
+                    <label htmlFor="lead-company" className="sr-only">{c.placeholders.company}</label>
                     <input
                       id="lead-company"
                       type="text"
-                      placeholder="Nome da Empresa"
-                      aria-label="Nome da empresa"
+                      placeholder={c.placeholders.company}
+                      aria-label={c.placeholders.company}
                       value={form.companyName}
                       onChange={(e) => handleChange("companyName", e.target.value)}
                       className={inputClass}
                     />
                   </div>
                   <div>
-                    <label htmlFor="lead-revenue" className="sr-only">Faturamento mensal aproximado</label>
+                    <label htmlFor="lead-revenue" className="sr-only">{c.placeholders.revenue}</label>
                     <input
                       id="lead-revenue"
                       type="text"
-                      placeholder="Faturamento mensal aproximado"
-                      aria-label="Faturamento mensal aproximado"
+                      placeholder={c.placeholders.revenue}
+                      aria-label={c.placeholders.revenue}
                       value={form.revenue}
                       onChange={(e) => handleChange("revenue", e.target.value)}
                       className={inputClass}
                     />
                   </div>
                   <div>
-                    <label htmlFor="lead-pain" className="sr-only">Qual sua maior dor atualmente?</label>
+                    <label htmlFor="lead-pain" className="sr-only">{c.placeholders.pain}</label>
                     <textarea
                       id="lead-pain"
-                      placeholder="Qual sua maior dor atualmente?"
-                      aria-label="Qual sua maior dor atualmente?"
+                      placeholder={c.placeholders.pain}
+                      aria-label={c.placeholders.pain}
                       value={form.mainPain}
                       onChange={(e) => handleChange("mainPain", e.target.value)}
                       rows={3}
@@ -200,10 +214,10 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
                     {status === "loading" ? (
                       <>
                         <Loader2 className="animate-spin" size={16} />
-                        Enviando...
+                        {c.submitting}
                       </>
                     ) : (
-                      "Solicitar Diagnóstico"
+                      c.submit
                     )}
                   </button>
                 </form>
