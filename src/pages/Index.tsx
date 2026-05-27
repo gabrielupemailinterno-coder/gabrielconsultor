@@ -116,6 +116,14 @@ const Index = () => {
 
   return (
     <main className="min-h-screen bg-background text-foreground font-sans">
+      <Helmet>
+        <title>Gabriel Lincoln Vieira Passos | Consultor e Mentor Comercial — São João del Rei</title>
+        <meta name="description" content="Gabriel Lincoln Vieira Passos — consultor e mentor comercial em São João del Rei. Consultoria para o setor comercial, Sales Ops, CRM e mentoria 1:1. Cases com Grupo Ascenário, Imersol, Seara, Rivelli e BNI." />
+        <link rel="canonical" href="https://gabrielconsultor.com/" />
+        <meta property="og:title" content="Gabriel Lincoln Vieira Passos | Consultor e Mentor Comercial — São João del Rei" />
+        <meta property="og:description" content="Consultoria para o setor comercial e mentoria 1:1. Atuação com Grupo Ascenário, Imersol, Seara, Rivelli e BNI em São João del Rei." />
+        <meta property="og:url" content="https://gabrielconsultor.com/" />
+      </Helmet>
       <LeadFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
 
       {/* Hero */}
