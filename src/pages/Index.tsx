@@ -21,6 +21,7 @@ import {
   Check,
   Briefcase,
   Compass,
+  Star,
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import gabrielPhoto from "@/assets/gabriel.jpg";
@@ -441,6 +442,52 @@ const Index = () => {
               </div>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      <div className="gold-divider" />
+
+      {/* Google Reviews */}
+      <section id="avaliacoes" className="section-padding">
+        <div className="container max-w-3xl">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            className="relative bg-card border border-primary/30 rounded-2xl p-8 md:p-10 text-center overflow-hidden"
+          >
+            <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+            <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium relative">
+              {c.reviewsEyebrow}
+            </span>
+            <h2 className="font-serif text-2xl md:text-3xl mt-3 mb-4 relative">
+              {c.reviewsHeading}
+            </h2>
+            <div
+              className="flex items-center justify-center gap-1 mb-4 relative"
+              aria-label={c.reviewsStarsLabel}
+            >
+              {[0, 1, 2, 3, 4].map((i) => (
+                <Star key={i} className="text-primary fill-primary" size={22} strokeWidth={1.5} />
+              ))}
+            </div>
+            <p className="text-muted-foreground leading-relaxed max-w-xl mx-auto mb-8 relative">
+              {c.reviewsDesc}
+            </p>
+            <a
+              href={GOOGLE_PROFILE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackClick("cta", "open_google_reviews")}
+              className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-7 py-3.5 rounded-md relative"
+            >
+              <MapPin size={16} />
+              {c.reviewsCta}
+              <ArrowRight size={16} />
+            </a>
+          </motion.div>
         </div>
       </section>
 

@@ -104,6 +104,12 @@ export const indexCopy = {
     ctaContact: "Entrar em contato",
     ctaOpenCalendar: "Abrir agenda",
 
+    reviewsEyebrow: "Prova social",
+    reviewsHeading: "Avaliações reais de clientes no Google",
+    reviewsDesc: "Quem já passou pelo diagnóstico e pela consultoria compartilhou a experiência direto no meu perfil do Google. Leia na fonte.",
+    reviewsCta: "Ver avaliações no Google",
+    reviewsStarsLabel: "5 estrelas",
+
     footerAriaWhatsapp: "WhatsApp de Gabriel Vieira",
     footerAriaLinkedin: "LinkedIn de Gabriel Vieira",
     footerAriaInstagram: "Instagram de Gabriel Vieira",
@@ -216,6 +222,12 @@ export const indexCopy = {
     closingP2: "The goal is to turn your company or farm into a predictable system, where every decision is driven by data and processes — not by intuition. Let's professionalize the game.",
     ctaContact: "Get in touch",
     ctaOpenCalendar: "Open calendar",
+
+    reviewsEyebrow: "Social proof",
+    reviewsHeading: "Real client reviews on Google",
+    reviewsDesc: "Clients who went through the diagnostic and consulting shared their experience directly on my Google profile. Read it from the source.",
+    reviewsCta: "See reviews on Google",
+    reviewsStarsLabel: "5 stars",
 
     footerAriaWhatsapp: "WhatsApp of Gabriel Vieira",
     footerAriaLinkedin: "LinkedIn of Gabriel Vieira",
