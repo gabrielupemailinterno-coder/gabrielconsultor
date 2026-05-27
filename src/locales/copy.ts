@@ -252,8 +252,34 @@ export const indexCopy = {
     reviewsEyebrow: "Social proof",
     reviewsHeading: "Real client reviews on Google",
     reviewsDesc: "Clients who went through the diagnostic and consulting shared their experience directly on my Google profile. Read it from the source.",
-    reviewsCta: "See reviews on Google",
+    reviewsCta: "See all on Google",
     reviewsStarsLabel: "5 stars",
+    reviewsRatingLabel: "Rating 5 out of 5",
+    reviewsCount: "(12 reviews)",
+    reviewsSource: "Source: Google profile · manually updated",
+    reviewsOn: "Review on",
+    reviewsList: [
+      {
+        author: "Stephanie Guilherme Ferreira",
+        text: "Excellent professional, committed to delivery, with strategies that actually work and bring real returns to the business. I recommend without hesitation.",
+      },
+      {
+        author: "Iara Souza",
+        text: "Excellent professional, with strong sales intelligence and strategic vision. Quality service and a clear focus on results. Recommended.",
+      },
+      {
+        author: "Yasmin Marinelli",
+        text: "Great professional, fast resolutions and real competence. I'd recommend him to anyone who wants to grow.",
+      },
+      {
+        author: "Mayara Vilas Bôas Martins",
+        text: "Outstanding professional. Flawless service, very respectful and always willing to help in the best possible way. You can see the care and dedication in the work. Highly recommended.",
+      },
+      {
+        author: "Marcella Almeida Pacheco",
+        text: "Excellent work, with great care and attention to detail.",
+      },
+    ],
 
     footerAriaWhatsapp: "WhatsApp of Gabriel Vieira",
     footerAriaLinkedin: "LinkedIn of Gabriel Vieira",
