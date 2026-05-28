@@ -88,6 +88,22 @@ const BlogPost = () => {
             );
           })}
         </div>
+
+        <div className="mt-10 border-t border-border pt-8">
+          <a
+            href={`https://api.whatsapp.com/send?phone=5532998316501&text=${encodeURIComponent(
+              `Olá, Gabriel! Estou respondendo ao desafio do post "${post.title}":\n\n`
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-md text-sm font-medium cta-glow"
+          >
+            Responder o desafio no WhatsApp →
+          </a>
+          <p className="text-xs text-muted-foreground mt-3">
+            Envie sua resposta e ganhe 1h de mentoria gratuita.
+          </p>
+        </div>
       </article>
     </div>
   );
