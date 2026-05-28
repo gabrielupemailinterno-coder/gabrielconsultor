@@ -104,4 +104,9 @@ const BlogPost = () => {
             Envie sua resposta e ganhe 1h de mentoria gratuita.
           </p>
         </div>
+      </article>
+    </div>
+  );
+};
+
 export default BlogPost;
