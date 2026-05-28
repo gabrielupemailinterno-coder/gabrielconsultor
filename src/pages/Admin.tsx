@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Users, MousePointerClick, Eye, Clock, LogOut, Trash2, Mail, Phone, Building2, FileText } from "lucide-react";
+import { Loader2, Users, MousePointerClick, Eye, Clock, LogOut, Trash2, Mail, Phone, Building2 } from "lucide-react";
 import BlogAdmin from "@/components/BlogAdmin";
 
 type Lead = {
