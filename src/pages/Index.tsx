@@ -47,12 +47,24 @@ const fadeUp = {
 const painIcons = [Target, TrendingDown, Workflow, Users];
 const serviceIcons = [Workflow, Database, Sparkles, GraduationCap];
 const packageIcons = [Briefcase, Compass];
-
 const Index = () => {
   const [formOpen, setFormOpen] = useState(false);
   const { locale, formatPrice } = useLocale();
   const c = indexCopy[locale];
   useAnalytics("/");
+  const [latestPosts, setLatestPosts] = useState<Array<{ id: string; title: string; slug: string; excerpt: string | null; cover_image_url: string | null; published_at: string | null }>>([]);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("blog_posts")
+        .select("id,title,slug,excerpt,cover_image_url,published_at")
+        .eq("published", true)
+        .order("published_at", { ascending: false })
+        .limit(3);
+      setLatestPosts(data || []);
+    })();
+  }, []);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
