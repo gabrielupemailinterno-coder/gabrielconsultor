@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Users, MousePointerClick, Eye, Clock, LogOut, Trash2, Mail, Phone, Building2 } from "lucide-react";
+import BlogAdmin from "@/components/BlogAdmin";
 
 type Lead = {
   id: string;
@@ -39,7 +40,7 @@ const Admin = () => {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [clicks, setClicks] = useState<Click[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [tab, setTab] = useState<"leads" | "visits" | "clicks" | "sessions">("leads");
+  const [tab, setTab] = useState<"leads" | "visits" | "clicks" | "sessions" | "blog">("leads");
 
   useEffect(() => {
     (async () => {
@@ -131,6 +132,7 @@ const Admin = () => {
             { id: "visits", label: `Visitas (${visits.length})` },
             { id: "clicks", label: `Cliques (${clicks.length})` },
             { id: "sessions", label: `Sessões (${sessions.length})` },
+            { id: "blog", label: "Blog" },
           ].map(t => (
             <button
               key={t.id}
@@ -227,6 +229,9 @@ const Admin = () => {
             </table>
           </div>
         )}
+
+        {tab === "blog" && <BlogAdmin />}
+
       </main>
     </div>
   );
