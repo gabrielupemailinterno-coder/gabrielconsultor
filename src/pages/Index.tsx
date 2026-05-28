@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Target,
   TrendingDown,
@@ -46,12 +47,24 @@ const fadeUp = {
 const painIcons = [Target, TrendingDown, Workflow, Users];
 const serviceIcons = [Workflow, Database, Sparkles, GraduationCap];
 const packageIcons = [Briefcase, Compass];
-
 const Index = () => {
   const [formOpen, setFormOpen] = useState(false);
   const { locale, formatPrice } = useLocale();
   const c = indexCopy[locale];
   useAnalytics("/");
+  const [latestPosts, setLatestPosts] = useState<Array<{ id: string; title: string; slug: string; excerpt: string | null; cover_image_url: string | null; published_at: string | null }>>([]);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("blog_posts")
+        .select("id,title,slug,excerpt,cover_image_url,published_at")
+        .eq("published", true)
+        .order("published_at", { ascending: false })
+        .limit(3);
+      setLatestPosts(data || []);
+    })();
+  }, []);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -605,6 +618,51 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Blog */}
+      {latestPosts.length > 0 && (
+        <section className="section-padding border-t border-border">
+          <div className="container max-w-5xl">
+            <div className="flex items-end justify-between mb-10">
+              <div>
+                <p className="text-primary text-xs font-medium tracking-widest uppercase mb-2">
+                  {locale === "pt" ? "Conteúdo" : "Content"}
+                </p>
+                <h2 className="font-serif text-3xl md:text-4xl">
+                  {locale === "pt" ? "Últimas publicações" : "Latest posts"}
+                </h2>
+              </div>
+              <Link to="/blog" className="text-sm text-primary hover:underline inline-flex items-center gap-1">
+                {locale === "pt" ? "Ver todas" : "View all"} <ArrowRight size={14} />
+              </Link>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {latestPosts.map((p) => (
+                <Link
+                  key={p.id}
+                  to={`/blog/${p.slug}`}
+                  className="group block bg-card border border-border rounded-lg overflow-hidden hover:border-primary transition-colors"
+                >
+                  {p.cover_image_url && (
+                    <div className="aspect-video overflow-hidden bg-secondary">
+                      <img src={p.cover_image_url} alt={p.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    {p.published_at && (
+                      <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                        {new Date(p.published_at).toLocaleDateString(locale === "pt" ? "pt-BR" : "en-US", { day: "2-digit", month: "short", year: "numeric" })}
+                      </p>
+                    )}
+                    <h3 className="font-serif text-xl mb-2 group-hover:text-primary transition-colors">{p.title}</h3>
+                    {p.excerpt && <p className="text-sm text-muted-foreground line-clamp-3">{p.excerpt}</p>}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Footer */}
       <footer className="py-10 border-t border-border">
         <div className="container max-w-5xl flex flex-col items-center gap-6">
@@ -622,6 +680,9 @@ const Index = () => {
               <MapPin size={16} />
             </a>
           </div>
+          <Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            Blog
+          </Link>
           <p className="text-center text-muted-foreground text-xs tracking-wide">
             © {new Date().getFullYear()} {c.footerTagline}
           </p>
