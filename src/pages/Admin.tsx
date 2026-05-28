@@ -229,6 +229,9 @@ const Admin = () => {
             </table>
           </div>
         )}
+
+        {tab === "blog" && <BlogAdmin />}
+
       </main>
     </div>
   );
