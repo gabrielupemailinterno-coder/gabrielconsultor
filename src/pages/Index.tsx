@@ -680,6 +680,9 @@ const Index = () => {
               <MapPin size={16} />
             </a>
           </div>
+          <Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            Blog
+          </Link>
           <p className="text-center text-muted-foreground text-xs tracking-wide">
             © {new Date().getFullYear()} {c.footerTagline}
           </p>
