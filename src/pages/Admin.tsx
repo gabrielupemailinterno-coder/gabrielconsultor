@@ -132,6 +132,7 @@ const Admin = () => {
             { id: "visits", label: `Visitas (${visits.length})` },
             { id: "clicks", label: `Cliques (${clicks.length})` },
             { id: "sessions", label: `Sessões (${sessions.length})` },
+            { id: "blog", label: "Blog" },
           ].map(t => (
             <button
               key={t.id}
