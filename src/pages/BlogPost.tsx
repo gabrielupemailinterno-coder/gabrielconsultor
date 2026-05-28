@@ -79,5 +79,19 @@ const BlogPost = () => {
     </div>
   );
 };
-
-export default BlogPost;
+        <div className="prose prose-invert max-w-none text-foreground/90 leading-relaxed space-y-4">
+          {post.content.split(/\n\n+/).map((para, i) => {
+            const parts = para.split(/(\*\*[^*]+\*\*)/g);
+            return (
+              <p key={i} className="whitespace-pre-wrap">
+                {parts.map((part, j) =>
+                  part.startsWith("**") && part.endsWith("**") ? (
+                    <strong key={j} className="font-semibold text-foreground">{part.slice(2, -2)}</strong>
+                  ) : (
+                    <span key={j}>{part}</span>
+                  )
+                )}
+              </p>
+            );
+          })}
+        </div>
