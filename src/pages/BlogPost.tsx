@@ -72,13 +72,6 @@ const BlogPost = () => {
           <img src={post.cover_image_url} alt={post.title} className="w-full rounded-lg mb-10 aspect-video object-cover" />
         )}
 
-        <div className="prose prose-invert max-w-none whitespace-pre-wrap text-foreground/90 leading-relaxed">
-          {post.content}
-        </div>
-      </article>
-    </div>
-  );
-};
         <div className="prose prose-invert max-w-none text-foreground/90 leading-relaxed space-y-4">
           {post.content.split(/\n\n+/).map((para, i) => {
             const parts = para.split(/(\*\*[^*]+\*\*)/g);
@@ -95,3 +88,9 @@ const BlogPost = () => {
             );
           })}
         </div>
+      </article>
+    </div>
+  );
+};
+
+export default BlogPost;
