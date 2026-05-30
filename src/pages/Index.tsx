@@ -19,6 +19,7 @@ import {
   Instagram,
   MapPin,
   MessageCircle,
+  Mail,
   Check,
   Briefcase,
   Compass,
