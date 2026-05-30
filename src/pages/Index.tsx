@@ -615,6 +615,14 @@ const Index = () => {
               <Calendar size={16} />
               {c.ctaOpenCalendar}
             </button>
+            <a
+              href="mailto:gabriel@gabrielconsultor.com"
+              onClick={() => trackClick("cta", "open_email_closing")}
+              className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
+            >
+              <Mail size={16} />
+              Email
+            </a>
           </motion.div>
         </div>
       </section>
