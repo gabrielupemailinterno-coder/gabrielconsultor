@@ -19,6 +19,7 @@ import {
   Instagram,
   MapPin,
   MessageCircle,
+  Mail,
   Check,
   Briefcase,
   Compass,
@@ -614,6 +615,14 @@ const Index = () => {
               <Calendar size={16} />
               {c.ctaOpenCalendar}
             </button>
+            <a
+              href="mailto:gabriel@gabrielconsultor.com"
+              onClick={() => trackClick("cta", "open_email_closing")}
+              className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
+            >
+              <Mail size={16} />
+              Email
+            </a>
           </motion.div>
         </div>
       </section>
@@ -679,7 +688,13 @@ const Index = () => {
             <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaGoogle} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
               <MapPin size={16} />
             </a>
+            <a href="mailto:gabriel@gabrielconsultor.com" aria-label="Email" className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+              <Mail size={16} />
+            </a>
           </div>
+          <a href="mailto:gabriel@gabrielconsultor.com" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            gabriel@gabrielconsultor.com
+          </a>
           <Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
             Blog
           </Link>
