@@ -680,7 +680,13 @@ const Index = () => {
             <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaGoogle} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
               <MapPin size={16} />
             </a>
+            <a href="mailto:gabriel@gabrielconsultor.com" aria-label="Email" className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+              <Mail size={16} />
+            </a>
           </div>
+          <a href="mailto:gabriel@gabrielconsultor.com" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            gabriel@gabrielconsultor.com
+          </a>
           <Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
             Blog
           </Link>
