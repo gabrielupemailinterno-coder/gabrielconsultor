@@ -152,3 +152,44 @@
     -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
   }
 }
+
+/* ========== Portal do Mentorado — tema SaaS executivo ========== */
+.portal-theme {
+  --background: 220 45% 10%;
+  --foreground: 210 20% 96%;
+  --card: 220 35% 14%;
+  --card-foreground: 210 20% 96%;
+  --popover: 220 35% 14%;
+  --popover-foreground: 210 20% 96%;
+  --primary: 8 100% 68%;
+  --primary-foreground: 220 45% 10%;
+  --secondary: 220 25% 22%;
+  --secondary-foreground: 210 20% 96%;
+  --muted: 220 25% 18%;
+  --muted-foreground: 215 15% 70%;
+  --accent: 220 25% 22%;
+  --accent-foreground: 210 20% 96%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 20% 24%;
+  --input: 220 25% 18%;
+  --ring: 8 100% 68%;
+  --radius: 0.625rem;
+  --sidebar-background: 222 50% 8%;
+  --sidebar-foreground: 210 20% 92%;
+  --sidebar-primary: 8 100% 68%;
+  --sidebar-primary-foreground: 220 45% 10%;
+  --sidebar-accent: 220 30% 16%;
+  --sidebar-accent-foreground: 210 20% 96%;
+  --sidebar-border: 220 25% 18%;
+  --sidebar-ring: 8 100% 68%;
+  font-family: var(--font-sans);
+}
+.portal-theme .font-mono-data {
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-feature-settings: "tnum";
+}
+.portal-theme h1, .portal-theme h2, .portal-theme h3, .portal-theme h4 {
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+}
