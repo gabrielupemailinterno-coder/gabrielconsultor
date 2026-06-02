@@ -96,3 +96,22 @@
     box-shadow: 0 12px 40px -12px hsl(var(--primary) / 0.25);
   }
 }
+
+
+@layer utilities {
+  @keyframes marquee-x {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .marquee-track {
+    animation: marquee-x 50s linear infinite;
+    will-change: transform;
+  }
+  .marquee-mask:hover .marquee-track {
+    animation-play-state: paused;
+  }
+  .marquee-mask {
+    mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  }
+}

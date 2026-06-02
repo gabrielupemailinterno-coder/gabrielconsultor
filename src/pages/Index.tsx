@@ -594,36 +594,33 @@ const Index = () => {
             <p className="text-muted-foreground text-sm">{c.reviewsSource}</p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {c.reviewsList.map((r, i) => (
-              <motion.article
-                key={r.author}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i}
-                className="card-hover bg-card border border-border rounded-xl p-6 flex flex-col"
-              >
-                <div className="flex items-center gap-1 mb-3">
-                  {[0, 1, 2, 3, 4].map((s) => (
-                    <Star key={s} className="text-primary fill-primary" size={14} strokeWidth={1.5} />
-                  ))}
-                </div>
-                <p className="text-foreground/90 text-sm leading-relaxed flex-1 mb-5">
-                  "{r.text}"
-                </p>
-                <div className="flex items-center gap-3 pt-4 border-t border-border">
-                  <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-serif font-semibold text-sm">
-                    {r.author.charAt(0)}
+          <div className="marquee-mask overflow-hidden">
+            <div className="marquee-track flex gap-5 w-max">
+              {[...c.reviewsList, ...c.reviewsList].map((r, i) => (
+                <article
+                  key={i}
+                  className="bg-card border border-border rounded-xl p-6 flex flex-col w-[320px] md:w-[360px] shrink-0"
+                >
+                  <div className="flex items-center gap-1 mb-3">
+                    {[0, 1, 2, 3, 4].map((s) => (
+                      <Star key={s} className="text-primary fill-primary" size={14} strokeWidth={1.5} />
+                    ))}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-foreground text-sm font-medium truncate">{r.author}</p>
-                    <p className="text-muted-foreground text-xs">{c.reviewsOn} Google</p>
+                  <p className="text-foreground/90 text-sm leading-relaxed flex-1 mb-5 line-clamp-5">
+                    "{r.text}"
+                  </p>
+                  <div className="flex items-center gap-3 pt-4 border-t border-border">
+                    <div className="w-9 h-9 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-serif font-semibold text-sm shrink-0">
+                      {r.author.charAt(0)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-foreground text-sm font-medium truncate">{r.author}</p>
+                      <p className="text-muted-foreground text-xs">{c.reviewsOn} Google</p>
+                    </div>
                   </div>
-                </div>
-              </motion.article>
-            ))}
+                </article>
+              ))}
+            </div>
           </div>
 
           <div className="text-center mt-10">
