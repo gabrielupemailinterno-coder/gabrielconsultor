@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import SiteHeader from "@/components/SiteHeader";
 
 type Post = {
   id: string;
@@ -33,6 +34,7 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SiteHeader />
       <Helmet>
         <title>Blog | Gabriel Vieira — Processos comerciais e execução</title>
         <meta name="description" content="Conteúdos práticos sobre processos comerciais, gestão de funil, CRM e execução. Cases reais e métodos aplicáveis." />

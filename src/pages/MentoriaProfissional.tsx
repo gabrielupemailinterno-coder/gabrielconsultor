@@ -16,6 +16,7 @@ import {
   Clock,
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
+import SiteHeader from "@/components/SiteHeader";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import { useLocale } from "@/contexts/LocaleContext";
 import { mentoriaCopy } from "@/locales/copy";
@@ -53,6 +54,7 @@ const MentoriaProfissional = () => {
 
   return (
     <main className="min-h-screen bg-background text-foreground font-sans">
+      <SiteHeader />
       <Helmet>
         <html lang={locale === "pt" ? "pt-BR" : "en"} />
         <title>{c.metaTitle}</title>

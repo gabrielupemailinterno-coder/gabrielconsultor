@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import SiteHeader from "@/components/SiteHeader";
 
 type Post = {
   id: string;
@@ -49,6 +50,7 @@ const BlogPost = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SiteHeader />
       <Helmet>
         <title>{post.title} | Gabriel Vieira</title>
         {post.excerpt && <meta name="description" content={post.excerpt} />}
