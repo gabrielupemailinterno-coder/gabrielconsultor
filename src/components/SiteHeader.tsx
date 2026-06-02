@@ -92,6 +92,14 @@ const SiteHeader = () => {
   };
 
   return (
+    <>
+    <LeadFormDialog
+      open={formOpen}
+      onClose={() => setFormOpen(false)}
+      onSuccess={goToCalendar}
+      successTitle={locale === "pt" ? "Tudo certo. Abrindo a agenda…" : "All set. Opening calendar…"}
+      successBody={locale === "pt" ? "Recebi seus contatos. Escolha um horário pra gente conversar." : "Got your contacts. Pick a time to talk."}
+    />
     <header
       className={`sticky top-0 z-50 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
         hidden ? "-translate-y-full" : "translate-y-0"
