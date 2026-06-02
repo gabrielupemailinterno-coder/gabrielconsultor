@@ -959,38 +959,47 @@ const Index = () => {
       )}
 
       {/* Footer */}
-      <footer className="py-10 border-t border-border">
-        <div className="container max-w-5xl flex flex-col items-center gap-6">
-          <img
-            src={monogramaFull.url}
-            alt="Gabriel Consultor — Processos Comerciais | Sales Ops"
-            loading="lazy"
-            className="w-44 md:w-56 h-auto opacity-90"
-          />
-          <div className="flex items-center gap-3">
-            <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaWhatsapp} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
-              <MessageCircle size={16} />
-            </a>
-            <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaLinkedin} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
-              <Linkedin size={16} />
-            </a>
-            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaInstagram} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
-              <Instagram size={16} />
-            </a>
-            <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaGoogle} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
-              <MapPin size={16} />
-            </a>
-            <a href="mailto:gabriel@gabrielconsultor.com" aria-label="Email" className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
-              <Mail size={16} />
-            </a>
+      <footer className="py-14 border-t border-border">
+        <div className="container max-w-6xl">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-10">
+            <div className="flex flex-col items-start gap-5 md:max-w-sm">
+              <img
+                src={monogramaFull.url}
+                alt="Gabriel Consultor — Processos Comerciais | Sales Ops"
+                loading="lazy"
+                className="w-44 md:w-56 h-auto opacity-95"
+              />
+              <a
+                href="mailto:gabriel@gabrielconsultor.com"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                gabriel@gabrielconsultor.com
+              </a>
+            </div>
+            <div className="flex flex-col items-start md:items-end gap-5">
+              <div className="flex items-center gap-3">
+                <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaWhatsapp} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+                  <MessageCircle size={16} />
+                </a>
+                <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaLinkedin} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+                  <Linkedin size={16} />
+                </a>
+                <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaInstagram} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+                  <Instagram size={16} />
+                </a>
+                <a href={GOOGLE_PROFILE_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaGoogle} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+                  <MapPin size={16} />
+                </a>
+                <a href="mailto:gabriel@gabrielconsultor.com" aria-label="Email" className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
+                  <Mail size={16} />
+                </a>
+              </div>
+              <Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                Blog
+              </Link>
+            </div>
           </div>
-          <a href="mailto:gabriel@gabrielconsultor.com" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            gabriel@gabrielconsultor.com
-          </a>
-          <Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            Blog
-          </Link>
-          <p className="text-center text-muted-foreground text-xs tracking-wide">
+          <p className="mt-10 pt-6 border-t border-border/60 text-muted-foreground text-xs tracking-wide">
             © {new Date().getFullYear()} {c.footerTagline}
           </p>
         </div>
