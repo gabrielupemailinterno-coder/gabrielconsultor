@@ -130,8 +130,8 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
             {status === "success" ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <CheckCircle className="text-primary mb-4" size={48} strokeWidth={1.5} />
-                <h3 className="font-serif text-xl mb-2">{c.successTitle}</h3>
-                <p className="text-muted-foreground text-sm">{c.successBody}</p>
+                <h3 className="font-serif text-xl mb-2">{successTitle || c.successTitle}</h3>
+                <p className="text-muted-foreground text-sm">{successBody || c.successBody}</p>
               </div>
             ) : (
               <>
