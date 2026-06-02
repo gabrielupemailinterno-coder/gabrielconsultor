@@ -176,6 +176,7 @@ const SiteHeader = () => {
         </div>
       </div>
     </header>
+    </>
   );
 };
 
