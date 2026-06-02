@@ -38,6 +38,7 @@ const paraQuemIcons = [Target, Headphones, Users, TrendingUp];
 
 const MentoriaProfissional = () => {
   const [formOpen, setFormOpen] = useState(false);
+  const [waOpen, setWaOpen] = useState(false);
   const { locale, formatPrice } = useLocale();
   const c = mentoriaCopy[locale];
   useAnalytics("/mentoria-profissional");
@@ -49,6 +50,13 @@ const MentoriaProfissional = () => {
   const openForm = () => {
     trackClick("cta", "mp_open_lead_form");
     setFormOpen(true);
+  };
+  const openWhatsapp = (label: string) => {
+    trackClick("cta", label);
+    setWaOpen(true);
+  };
+  const goToWhatsapp = () => {
+    window.open(WHATSAPP_URL, "_blank", "noopener,noreferrer");
   };
 
   const pageUrl = "https://gabrielconsultor.com/mentoria-profissional";
