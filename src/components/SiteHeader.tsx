@@ -68,7 +68,10 @@ const SiteHeader = () => {
 
   const ctaLabel = locale === "pt" ? "Agendar diagnóstico" : "Book a diagnostic";
   const openCalendar = () => {
-    trackClick("cta", "header_calendar");
+    trackClick("cta", "header_calendar_open_form");
+    setFormOpen(true);
+  };
+  const goToCalendar = () => {
     window.open(CALENDAR_URL, "_blank", "noopener,noreferrer");
   };
 
