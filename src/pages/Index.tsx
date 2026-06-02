@@ -123,15 +123,6 @@ const Index = () => {
             transition={{ duration: 0.9, ease: "easeOut" }}
             className="mx-auto h-48 md:h-64 w-auto mb-8"
           />
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-flex items-center gap-2 border border-primary/40 bg-primary/10 text-primary text-xs font-medium tracking-wide uppercase px-4 py-1.5 rounded-full mb-8"
-          >
-            <Trophy size={14} strokeWidth={2} />
-            {c.badge}
-          </motion.div>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -490,8 +481,12 @@ const Index = () => {
             custom={0}
             className="max-w-3xl mb-12"
           >
-            <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium font-mono">
-              {locale === "pt" ? "Formação contínua · G4 Educação" : "Continuous training · G4 Educação"}
+            <div className="inline-flex items-center gap-2 border border-primary/40 bg-primary/10 text-primary text-xs font-medium tracking-wide uppercase px-4 py-1.5 rounded-full mb-5">
+              <Trophy size={14} strokeWidth={2} />
+              {c.badge}
+            </div>
+            <span className="block text-primary text-xs tracking-[0.25em] uppercase font-medium font-mono">
+              {locale === "pt" ? "Capacitações · Formação contínua · G4 Educação" : "Training · Continuous education · G4 Educação"}
             </span>
             <h2 className="font-serif text-3xl md:text-4xl mt-3 mb-4 leading-tight">
               {locale === "pt" ? (
