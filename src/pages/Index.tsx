@@ -55,6 +55,7 @@ const serviceIcons = [Workflow, Database, Sparkles, GraduationCap];
 const packageIcons = [Briefcase, Compass];
 const Index = () => {
   const [formOpen, setFormOpen] = useState(false);
+  const [qualifyingType, setQualifyingType] = useState<Exclude<FormType, "contato"> | null>(null);
   const { locale, formatPrice } = useLocale();
   const c = indexCopy[locale];
   useAnalytics("/");
