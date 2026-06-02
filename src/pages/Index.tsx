@@ -26,6 +26,7 @@ import {
   Star,
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
+import QuickContactDialog from "@/components/QuickContactDialog";
 import QualifyingForm from "@/components/QualifyingForm";
 import type { FormType } from "@/lib/qualifying-forms";
 import SiteHeader from "@/components/SiteHeader";
