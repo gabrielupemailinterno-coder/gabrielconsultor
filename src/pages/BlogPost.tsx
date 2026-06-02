@@ -50,10 +50,36 @@ const BlogPost = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet>
-        <title>{post.title} | Blog Gabriel Vieira</title>
+        <title>{post.title} | Gabriel Vieira</title>
         {post.excerpt && <meta name="description" content={post.excerpt} />}
         <link rel="canonical" href={`https://gabrielconsultor.com/blog/${post.slug}`} />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={post.title} />
+        {post.excerpt && <meta property="og:description" content={post.excerpt} />}
+        <meta property="og:url" content={`https://gabrielconsultor.com/blog/${post.slug}`} />
+        {post.cover_image_url && <meta property="og:image" content={post.cover_image_url} />}
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: post.title,
+          description: post.excerpt || undefined,
+          image: post.cover_image_url || undefined,
+          datePublished: post.published_at || undefined,
+          author: { "@type": "Person", name: "Gabriel Lincoln Vieira Passos", url: "https://gabrielconsultor.com/" },
+          publisher: { "@type": "Organization", name: "Gabriel Vieira Consultoria" },
+          mainEntityOfPage: `https://gabrielconsultor.com/blog/${post.slug}`,
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Início", item: "https://gabrielconsultor.com/" },
+            { "@type": "ListItem", position: 2, name: "Blog", item: "https://gabrielconsultor.com/blog" },
+            { "@type": "ListItem", position: 3, name: post.title, item: `https://gabrielconsultor.com/blog/${post.slug}` },
+          ],
+        })}</script>
       </Helmet>
+
 
       <article className="max-w-3xl mx-auto px-6 py-12">
         <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground transition">← Blog</Link>
