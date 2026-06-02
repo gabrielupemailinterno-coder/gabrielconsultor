@@ -86,6 +86,10 @@ const Index = () => {
   }, []);
 
   const openForm = () => { trackClick("cta", "open_lead_form"); setFormOpen(true); };
+  const openQualifying = (t: Exclude<FormType, "contato">) => {
+    trackClick("cta", `open_form_${t}`);
+    setQualifyingType(t);
+  };
   const openCalendar = () => { trackClick("cta", "open_calendar"); window.open(CALENDAR_URL, "_blank", "noopener,noreferrer"); };
 
   return (
