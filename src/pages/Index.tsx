@@ -121,7 +121,7 @@ const Index = () => {
             initial={{ opacity: 0, y: -8, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.9, ease: "easeOut" }}
-            className="mx-auto h-24 md:h-32 w-auto mb-8"
+            className="mx-auto h-48 md:h-64 w-auto mb-8"
           />
           <motion.div
             initial={{ opacity: 0, y: -10 }}
