@@ -77,6 +77,7 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
         revenue: result.data.revenue || null,
         main_pain: result.data.mainPain || null,
         source: window.location.pathname,
+        form_type: "contato",
       });
       if (error) throw error;
       trackClick("form_submit", "lead_form_submitted");
