@@ -304,6 +304,33 @@ export type Database = {
           },
         ]
       }
+      mentee_admin_notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          mentee_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          id?: string
+          mentee_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          mentee_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       mentees: {
         Row: {
           asaas_customer_id: string | null

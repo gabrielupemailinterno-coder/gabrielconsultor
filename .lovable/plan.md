@@ -1,60 +1,45 @@
-## O que muda
+## Escopo
 
-Hoje o "modo admin" está enxertado dentro do portal do próprio mentorado (form de upload aparece dentro da aba Repositório quando você loga). Vou separar: **você gerencia tudo a partir do seu admin**, e o mentorado só **recebe** o que está liberado para o encontro atual dele.
+Combina o pedido anterior (anotações por mentorado + personalização dos encontros + sinalização no portal) **+** o bug "não adiciona mais de um material".
 
-## 1. Novo painel admin de mentorados (`/admin` → aba "Mentorados")
+## 1. Fix do bug "adicionar material"
 
-Adicionar uma aba "Mentorados" em `src/pages/Admin.tsx` ao lado de Leads/Blog. Layout:
+Investigação: nos logs de rede só vejo GETs em `meeting_resources` — nenhum POST foi disparado. Sinal de que o botão "Adicionar link" não chama o handler na maioria dos cenários (provável: usuário tenta adicionar via URL e o validador silencia, ou o form está cortado fora da viewport e o usuário só vê o upload).
 
-```text
-┌─ Mentorados ──────────────────────────────────────────┐
-│ [busca por nome/email]                                │
-│                                                       │
-│ Lista (esquerda)         │ Detalhe (direita)          │
-│ • João Silva  ▸ 3/6      │ Cronograma do mentorado    │
-│ • Maria Souza ▸ 1/6      │  [encontro 1 ✓] [2 ▶] ...  │
-│ • ...                    │                            │
-│                          │ Tarefas do encontro X      │
-│                          │  + adicionar tarefa extra  │
-│                          │                            │
-│                          │ Materiais do encontro X    │
-│                          │  + adicionar material      │
-│                          │  (URL ou upload PDF)       │
-└───────────────────────────────────────────────────────┘
-```
+Vou fazer:
+- Reorganizar o form de material em **2 modos lado a lado**: "Link" (URL) e "Upload" (arquivo), cada um com botão próprio claro.
+- Feedback de erro explícito (`toast.error` com mensagem do Postgres se houver), e log do retorno no `console.error`.
+- Remover a checagem boba `if (!activeMeetingId)` que pode passar despercebida — bloquear o botão (`disabled`) com tooltip.
+- Após sucesso: refazer o `loadDetail` (já fazia) **e** manter o form aberto pronto para o próximo, sem trocar de aba.
 
-O que dá pra fazer pelo detalhe de cada mentorado:
-- Ver status de cada encontro, marcar manualmente como concluído/desbloquear próximo
-- Adicionar **tarefa extra** (`homework_tasks`) ligada a um encontro específico
-- Adicionar **material extra** (`meeting_resources`) ligado a um encontro específico — link ou upload (bucket `mentee-evidence`)
-- Remover qualquer material/tarefa que você mesmo criou
+## 2. Anotações privadas do mentor (admin)
 
-Tudo isso já é permitido pelas RLS atuais (admin tem `ALL` em meetings/resources/homework).
+- **Nova tabela** `mentee_admin_notes (id, mentee_id unique, content text, updated_at, updated_by)` — RLS exclusiva para admin (SELECT/INSERT/UPDATE/DELETE com `has_role('admin')`). GRANTs para `authenticated` + `service_role`. **Mentorado não vê.**
+- Trigger `touch_updated_at` para `updated_at`.
+- UI: card "Anotações privadas" no topo do detalhe do mentorado, `Textarea` grande, auto-save com debounce 800ms, label "Salvo às HH:MM".
 
-## 2. Liberação progressiva no portal do mentorado
+## 3. Personalização dos próximos encontros (admin)
 
-Hoje a aba **Tarefas** mostra tudo de uma vez, e o **Repositório** mostra todos os materiais. Vou trancar pela mesma regra do Cronograma (`meeting.status`):
+- Editar título/descrição direto na tabela `meetings` (já existe, RLS admin tem `ALL` via has_role — preciso conferir; hoje há policies de UPDATE só para "Mentee updates own meetings" com OR has_role admin, ok).
+- UI: dentro do detalhe do encontro selecionado, botão **"Editar conteúdo"** → troca título e descrição por inputs + textarea → Salvar/Cancelar.
+- Edição liberada em qualquer status.
 
-- **Tarefas**: só aparecem tarefas de encontros com status `available`, `scheduled` ou `completed`. Encontro `blocked` = tarefas escondidas.
-- **Repositório**: mesmo filtro — material de encontro `blocked` não aparece (já é o caso hoje, mas vou reforçar).
-- Quando o encontro fica `completed`, libera o próximo automaticamente (lógica já existe em `markCompleted`).
+## 4. Sinalização no portal do mentorado
 
-O livro SPIN Selling continua aparecendo em todos os encontros que já estão liberados, então o mentorado tem o livro desde o Onboarding e vai vendo materiais/tarefas extras conforme avança.
-
-## 3. Remover o painel admin de dentro do portal
-
-Tirar de `RepositorioTab.tsx` o formulário de "adicionar material" e o botão de deletar — o portal volta a ser **só leitura** para o mentorado. Você gerencia tudo do `/admin`.
+- No topo da aba **Cronograma**, banner curto:
+  > "Seu cronograma é adaptado ao longo da jornada. O mentor pode ajustar conteúdo, materiais e tarefas com base na sua evolução."
+- Em cada card de encontro cujo título/descrição diverge do template padrão, badge sutil **"Adaptado para você"**.
+- Detecção: carregar `meeting_templates` do `plan_id` no `CronogramaTab` e comparar por `sequence`.
 
 ## Detalhes técnicos
 
-- Novo componente `src/components/admin/MenteesAdmin.tsx` com lista de mentorados (join `mentees` + `mentorship_plans` + count de meetings completed) e detalhe (meetings + homework_tasks + meeting_resources do mentorado selecionado).
-- Form de adicionar material: select de encontro, tipo (pdf/video/link), título, URL **ou** upload pro bucket `mentee-evidence` (caminho `admin/{mentee_id}/{filename}`, depois insere o `publicUrl` ou um signed URL em `meeting_resources`).
-- Form de adicionar tarefa extra: select de encontro + título + descrição → insert em `homework_tasks` com `mentee_id` e `meeting_id`.
-- `TarefasTab.tsx`: query passa a filtrar `meeting.status != 'blocked'` (join via `meetings`).
-- `RepositorioTab.tsx`: remover estado `isAdmin`, formulário, handlers de add/delete.
-- Sem migração de schema necessária — só código.
+- **Migração**: `CREATE TABLE mentee_admin_notes` + GRANTs + RLS + trigger.
+- **`MenteesAdmin.tsx`**: novo card de Anotações (`AdminNotesCard`), refatorar form de materiais, adicionar modo "Editar conteúdo" no encontro.
+- **`CronogramaTab.tsx`** (portal): banner + badge "Adaptado para você" (precisa carregar templates).
+- Sem mudança em RLS de `meetings` ou `meeting_resources` (já cobre admin).
 
 ## Fora do escopo
 
-- Não vou criar templates "por segmento" automáticos — material extra continua manual via seu admin.
-- Não vou mexer no fluxo de agendamento (Google Meet) nem em métricas.
+- Sem histórico de versões das anotações.
+- Sem reordenar/adicionar encontros novos — só editar os 7 existentes.
+- Sem notificar mentorado por email quando algo for personalizado.
