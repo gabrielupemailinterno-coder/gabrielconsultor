@@ -48,9 +48,17 @@ export default function TarefasTab({ menteeId }: { menteeId: string }) {
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div>;
 
+  const visibleMeetings = meetings.filter((m) => m.status !== "blocked");
+  const hasAny = visibleMeetings.some((m) => tasks.some((t) => t.meeting_id === m.id));
+
   return (
     <div className="space-y-6">
-      {meetings.map((m) => {
+      {!hasAny && (
+        <div className="border border-dashed border-border/60 rounded-lg p-8 text-center text-sm text-muted-foreground">
+          Suas tarefas serão liberadas conforme você avança no cronograma.
+        </div>
+      )}
+      {visibleMeetings.map((m) => {
         const items = tasks.filter((t) => t.meeting_id === m.id);
         if (items.length === 0) return null;
         return (
