@@ -97,6 +97,13 @@ const MentoriaProfissional = () => {
         })}</script>
       </Helmet>
       <QualifyingForm open={formOpen} onClose={() => setFormOpen(false)} formType="mentoria_1a1_vendedores" />
+      <LeadFormDialog
+        open={waOpen}
+        onClose={() => setWaOpen(false)}
+        onSuccess={goToWhatsapp}
+        successTitle={locale === "pt" ? "Tudo certo. Abrindo o WhatsApp…" : "All set. Opening WhatsApp…"}
+        successBody={locale === "pt" ? "Recebi seus contatos. Te chamo no WhatsApp em instantes." : "Got your contacts. Talk to you on WhatsApp shortly."}
+      />
 
       {/* Back link */}
       <div className="container max-w-5xl pt-8">
