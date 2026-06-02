@@ -132,10 +132,10 @@ const Index = () => {
       </Helmet>
       <LeadFormDialog
         open={formOpen}
-        onClose={() => { setFormOpen(false); setCalendarGate(false); }}
-        onSuccess={calendarGate ? goToCalendar : undefined}
-        successTitle={calendarGate ? (locale === "pt" ? "Tudo certo. Abrindo a agenda…" : "All set. Opening calendar…") : undefined}
-        successBody={calendarGate ? (locale === "pt" ? "Recebi seus contatos. Escolha um horário pra gente conversar." : "Got your contacts. Pick a time to talk.") : undefined}
+        onClose={() => { setFormOpen(false); setGate(null); }}
+        onSuccess={onGateSuccess}
+        successTitle={gateTitle}
+        successBody={gateBody}
       />
       {qualifyingType && (
         <QualifyingForm
