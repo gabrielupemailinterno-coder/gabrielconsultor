@@ -16,6 +16,7 @@ import {
   Clock,
 } from "lucide-react";
 import QualifyingForm from "@/components/QualifyingForm";
+import LeadFormDialog from "@/components/LeadFormDialog";
 import SiteHeader from "@/components/SiteHeader";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import { useLocale } from "@/contexts/LocaleContext";
