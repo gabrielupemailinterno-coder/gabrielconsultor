@@ -360,15 +360,15 @@ const Index = () => {
             </span>
             <h2 className="font-serif text-3xl md:text-4xl mt-3 mb-4 leading-tight">
               {locale === "pt" ? (
-                <>Resultados que <span className="text-primary">aconteceram</span> — não que poderiam acontecer</>
+                <>Número fechado. <span className="text-primary">Processo por trás.</span></>
               ) : (
-                <>Results that <span className="text-primary">happened</span> — not that could happen</>
+                <>Closed number. <span className="text-primary">Process behind it.</span></>
               )}
             </h2>
             <p className="text-muted-foreground leading-relaxed">
               {locale === "pt"
-                ? "Três operações comerciais reais, três métricas duras. Sem vaidade — número auditável, contexto e o que destravou."
-                : "Three real sales operations, three hard metrics. No vanity — auditable numbers, context and what unlocked them."}
+                ? "Três operações que passaram pela minha mão. Métrica dura, contexto curto e o que destravou — pra você comparar com o seu cenário."
+                : "Three operations that came across my desk. Hard metric, short context and what unlocked it — so you can benchmark against your scenario."}
             </p>
           </motion.div>
 
