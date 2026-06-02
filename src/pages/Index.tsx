@@ -417,7 +417,7 @@ const Index = () => {
               <div className="relative mx-auto md:mx-0 w-56 h-56 md:w-64 md:h-64">
                 <div className="absolute -inset-2 rounded-full bg-primary/10 blur-2xl" />
                 <img
-                  src={gabrielPhoto}
+                  src={gabrielPhoto.url}
                   alt={c.aboutPhotoAlt}
                   loading="lazy"
                   className="relative w-full h-full object-cover object-[center_15%] rounded-full border-2 border-primary/40 shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.4)]"
