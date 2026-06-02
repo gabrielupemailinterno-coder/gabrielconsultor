@@ -87,7 +87,7 @@ const MentoriaProfissional = () => {
           },
         })}</script>
       </Helmet>
-      <LeadFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
+      <QualifyingForm open={formOpen} onClose={() => setFormOpen(false)} formType="mentoria_1a1_vendedores" />
 
       {/* Back link */}
       <div className="container max-w-5xl pt-8">
