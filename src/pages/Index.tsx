@@ -24,7 +24,9 @@ import {
   Briefcase,
   Compass,
   Star,
+  Menu,
 } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetTitle } from "@/components/ui/sheet";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import gabrielPhoto from "@/assets/gabriel-g4-hero.jpg.asset.json";
 import monogramaFull from "@/assets/monograma-gv-full-tpn.png.asset.json";
