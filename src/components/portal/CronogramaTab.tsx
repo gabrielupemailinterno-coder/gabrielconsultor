@@ -30,6 +30,7 @@ const statusMeta: Record<Meeting["status"], { label: string; cls: string }> = {
 export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { menteeId: string; menteeEmail: string; onChange: () => void }) {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
+  const [templates, setTemplates] = useState<Record<number, { title: string; description: string | null }>>({});
   const [loading, setLoading] = useState(true);
   const [scheduleFor, setScheduleFor] = useState<Meeting | null>(null);
   const [scheduledAt, setScheduledAt] = useState("");
@@ -37,12 +38,18 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
 
   const load = async () => {
     setLoading(true);
-    const [m, r] = await Promise.all([
+    const { data: menteeRow } = await supabase.from("mentees").select("plan_id").eq("id", menteeId).maybeSingle();
+    const planId = (menteeRow as any)?.plan_id;
+    const [m, r, tpl] = await Promise.all([
       supabase.from("meetings").select("*").eq("mentee_id", menteeId).order("sequence"),
       supabase.from("meeting_resources").select("*"),
+      planId ? supabase.from("meeting_templates").select("sequence,title,description").eq("plan_id", planId) : Promise.resolve({ data: [] as any[] }),
     ]);
     setMeetings((m.data as Meeting[]) ?? []);
     setResources((r.data as Resource[]) ?? []);
+    const tplMap: Record<number, { title: string; description: string | null }> = {};
+    ((tpl.data as any[]) ?? []).forEach((t) => { tplMap[t.sequence] = { title: t.title, description: t.description }; });
+    setTemplates(tplMap);
     setLoading(false);
   };
   useEffect(() => { load(); }, [menteeId]);
