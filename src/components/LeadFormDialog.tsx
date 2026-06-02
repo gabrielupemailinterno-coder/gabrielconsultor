@@ -85,6 +85,9 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
       if (error) throw error;
       trackClick("form_submit", "lead_form_submitted");
       setStatus("success");
+      if (onSuccess) {
+        setTimeout(() => onSuccess(), 600);
+      }
       setTimeout(() => {
         onClose();
         setStatus("idle");
