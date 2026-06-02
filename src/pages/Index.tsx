@@ -26,6 +26,8 @@ import {
   Star,
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
+import QualifyingForm from "@/components/QualifyingForm";
+import type { FormType } from "@/lib/qualifying-forms";
 import SiteHeader from "@/components/SiteHeader";
 import gabrielPhoto from "@/assets/gabriel-g4-hero.jpg.asset.json";
 import monogramaFull from "@/assets/monograma-gv-full-tpn.png.asset.json";
