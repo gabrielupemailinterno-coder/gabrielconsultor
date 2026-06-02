@@ -85,12 +85,20 @@ const Index = () => {
     return () => document.removeEventListener("click", handler);
   }, []);
 
-  const openForm = () => { trackClick("cta", "open_lead_form"); setFormOpen(true); };
+  const [calendarGate, setCalendarGate] = useState(false);
+  const openForm = () => { trackClick("cta", "open_lead_form"); setCalendarGate(false); setFormOpen(true); };
   const openQualifying = (t: Exclude<FormType, "contato">) => {
     trackClick("cta", `open_form_${t}`);
     setQualifyingType(t);
   };
-  const openCalendar = () => { trackClick("cta", "open_calendar"); window.open(CALENDAR_URL, "_blank", "noopener,noreferrer"); };
+  const openCalendar = () => {
+    trackClick("cta", "open_calendar_gate");
+    setCalendarGate(true);
+    setFormOpen(true);
+  };
+  const goToCalendar = () => {
+    window.open(CALENDAR_URL, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <main className="min-h-screen bg-background text-foreground font-sans">
