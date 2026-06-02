@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Users, MousePointerClick, Eye, Clock, LogOut, Trash2, Mail, Phone, Building2 } from "lucide-react";
 import BlogAdmin from "@/components/BlogAdmin";
+import { FORM_LABELS, type FormType } from "@/lib/qualifying-forms";
 
 type Lead = {
   id: string;
@@ -13,6 +14,8 @@ type Lead = {
   revenue: string | null;
   main_pain: string | null;
   created_at: string;
+  form_type: FormType;
+  answers: Record<string, string | string[]> | null;
 };
 
 type Visit = { id: string; session_id: string; path: string; referrer: string | null; user_agent: string | null; created_at: string };
