@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Trash2, Upload, CheckCircle2, Unlock } from "lucide-react";
+import { Loader2, Plus, Trash2, Upload, CheckCircle2, Unlock, Pencil, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import AdminNotesCard from "./AdminNotesCard";
 
 type Mentee = { id: string; full_name: string; email: string; status: string; plan_id: string; plan_name?: string };
-type Meeting = { id: string; sequence: number; title: string; status: string; scheduled_at: string | null };
+type Meeting = { id: string; sequence: number; title: string; description: string | null; status: string; scheduled_at: string | null };
 type Task = { id: string; title: string; description: string | null; meeting_id: string | null; completed: boolean };
 type Resource = { id: string; title: string; kind: string; url: string; meeting_id: string };
 
@@ -32,10 +33,13 @@ export default function MenteesAdmin() {
   const [activeMeetingId, setActiveMeetingId] = useState<string | null>(null);
   const [meetingsDone, setMeetingsDone] = useState<Record<string, number>>({});
 
-  // forms
   const [taskForm, setTaskForm] = useState({ title: "", description: "" });
-  const [resForm, setResForm] = useState({ kind: "pdf", title: "", url: "" });
+  const [linkForm, setLinkForm] = useState({ kind: "pdf", title: "", url: "" });
+  const [savingLink, setSavingLink] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  const [editingMeeting, setEditingMeeting] = useState(false);
+  const [meetingDraft, setMeetingDraft] = useState({ title: "", description: "" });
 
   const loadMentees = async () => {
     setLoading(true);
@@ -45,8 +49,6 @@ export default function MenteesAdmin() {
       .order("created_at", { ascending: false });
     const list = (data ?? []).map((m: any) => ({ ...m, plan_name: m.mentorship_plans?.name }));
     setMentees(list);
-
-    // counts of completed meetings per mentee
     if (list.length) {
       const { data: ms } = await supabase
         .from("meetings")
@@ -63,7 +65,7 @@ export default function MenteesAdmin() {
 
   const loadDetail = async (menteeId: string) => {
     const [m, t, r] = await Promise.all([
-      supabase.from("meetings").select("id,sequence,title,status,scheduled_at").eq("mentee_id", menteeId).order("sequence"),
+      supabase.from("meetings").select("id,sequence,title,description,status,scheduled_at").eq("mentee_id", menteeId).order("sequence"),
       supabase.from("homework_tasks").select("id,title,description,meeting_id,completed").eq("mentee_id", menteeId),
       supabase.from("meeting_resources").select("id,title,kind,url,meeting_id,meetings!inner(mentee_id)").eq("meetings.mentee_id", menteeId),
     ]);
@@ -71,15 +73,12 @@ export default function MenteesAdmin() {
     setMeetings(meetingList);
     setTasks((t.data as Task[]) ?? []);
     setResources(((r.data as any[]) ?? []).map((x) => ({ id: x.id, title: x.title, kind: x.kind, url: x.url, meeting_id: x.meeting_id })));
-    if (!activeMeetingId && meetingList.length) setActiveMeetingId(meetingList[0].id);
+    setActiveMeetingId((cur) => cur && meetingList.some((mm) => mm.id === cur) ? cur : (meetingList[0]?.id ?? null));
   };
 
   useEffect(() => { loadMentees(); }, []);
   useEffect(() => {
-    if (selectedId) {
-      setActiveMeetingId(null);
-      loadDetail(selectedId);
-    }
+    if (selectedId) loadDetail(selectedId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
 
@@ -102,8 +101,26 @@ export default function MenteesAdmin() {
     loadDetail(selectedId!);
   };
 
+  const startEditMeeting = (mt: Meeting) => {
+    setMeetingDraft({ title: mt.title, description: mt.description ?? "" });
+    setEditingMeeting(true);
+  };
+
+  const saveMeeting = async () => {
+    if (!activeMeetingId) return;
+    if (!meetingDraft.title.trim()) return toast.error("Título obrigatório.");
+    const { error } = await supabase.from("meetings").update({
+      title: meetingDraft.title,
+      description: meetingDraft.description || null,
+    }).eq("id", activeMeetingId);
+    if (error) return toast.error("Falha ao salvar.");
+    toast.success("Encontro atualizado.");
+    setEditingMeeting(false);
+    loadDetail(selectedId!);
+  };
+
   const addTask = async () => {
-    if (!activeMeetingId || !taskForm.title) return toast.error("Selecione um encontro e título.");
+    if (!activeMeetingId || !taskForm.title) return toast.error("Selecione encontro e título.");
     const { error } = await supabase.from("homework_tasks").insert({
       mentee_id: selectedId,
       meeting_id: activeMeetingId,
@@ -122,17 +139,25 @@ export default function MenteesAdmin() {
     loadDetail(selectedId!);
   };
 
-  const addResource = async () => {
-    if (!activeMeetingId || !resForm.title || !resForm.url) return toast.error("Preencha título e URL.");
+  const addLinkResource = async () => {
+    if (!activeMeetingId) return toast.error("Selecione um encontro.");
+    const title = linkForm.title.trim();
+    const url = linkForm.url.trim();
+    if (!title || !url) return toast.error("Preencha título e URL.");
+    setSavingLink(true);
     const { error } = await supabase.from("meeting_resources").insert({
       meeting_id: activeMeetingId,
-      kind: resForm.kind,
-      title: resForm.title,
-      url: resForm.url,
+      kind: linkForm.kind,
+      title,
+      url,
     });
-    if (error) return toast.error("Falha ao adicionar.");
+    setSavingLink(false);
+    if (error) {
+      console.error("addLinkResource error", error);
+      return toast.error(`Falha: ${error.message}`);
+    }
     toast.success("Material adicionado.");
-    setResForm({ kind: "pdf", title: "", url: "" });
+    setLinkForm({ kind: linkForm.kind, title: "", url: "" });
     loadDetail(selectedId!);
   };
 
@@ -141,16 +166,17 @@ export default function MenteesAdmin() {
     setUploading(true);
     const path = `admin/${selectedId}/${Date.now()}-${file.name}`;
     const up = await supabase.storage.from("mentee-evidence").upload(path, file, { upsert: true });
-    if (up.error) { setUploading(false); return toast.error("Falha no upload."); }
+    if (up.error) { setUploading(false); console.error(up.error); return toast.error(`Upload: ${up.error.message}`); }
     const { data: signed } = await supabase.storage.from("mentee-evidence").createSignedUrl(path, 60 * 60 * 24 * 365);
     const url = signed?.signedUrl ?? path;
-    await supabase.from("meeting_resources").insert({
+    const { error } = await supabase.from("meeting_resources").insert({
       meeting_id: activeMeetingId,
       kind: file.type.includes("pdf") ? "pdf" : file.type.startsWith("video") ? "video" : "link",
       title: file.name,
       url,
     });
     setUploading(false);
+    if (error) { console.error(error); return toast.error(`Falha: ${error.message}`); }
     toast.success("Material enviado.");
     loadDetail(selectedId!);
   };
@@ -177,7 +203,7 @@ export default function MenteesAdmin() {
       {/* List */}
       <div className="space-y-3">
         <Input placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} />
-        <div className="border border-border rounded-lg divide-y divide-border max-h-[600px] overflow-y-auto">
+        <div className="border border-border rounded-lg divide-y divide-border max-h-[700px] overflow-y-auto">
           {filteredMentees.length === 0 && <p className="p-4 text-sm text-muted-foreground">Nenhum mentorado.</p>}
           {filteredMentees.map((m) => (
             <button
@@ -208,6 +234,8 @@ export default function MenteesAdmin() {
               <p className="text-sm text-muted-foreground">{selected.email} · {selected.plan_name}</p>
             </div>
 
+            <AdminNotesCard menteeId={selected.id} />
+
             {/* Meetings */}
             <div>
               <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Cronograma</h3>
@@ -215,7 +243,7 @@ export default function MenteesAdmin() {
                 {meetings.map((mt) => (
                   <button
                     key={mt.id}
-                    onClick={() => setActiveMeetingId(mt.id)}
+                    onClick={() => { setActiveMeetingId(mt.id); setEditingMeeting(false); }}
                     className={`p-3 border rounded-lg text-left transition ${activeMeetingId === mt.id ? "border-primary bg-primary/10" : "border-border hover:bg-secondary/50"}`}
                   >
                     <p className="text-xs font-mono text-muted-foreground">#{mt.sequence}</p>
@@ -228,27 +256,52 @@ export default function MenteesAdmin() {
 
             {activeMeeting && (
               <>
-                <div className="border border-border rounded-lg p-4">
-                  <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
-                    <h3 className="font-semibold">Encontro {activeMeeting.sequence}: {activeMeeting.title}</h3>
-                    <div className="flex gap-2">
-                      {activeMeeting.status === "blocked" && (
-                        <Button size="sm" variant="outline" onClick={() => unlockMeeting(activeMeeting)} className="gap-1.5">
-                          <Unlock size={14} /> Liberar
-                        </Button>
-                      )}
-                      {activeMeeting.status !== "completed" && (
-                        <Button size="sm" variant="outline" onClick={() => toggleMeetingStatus(activeMeeting, "completed")} className="gap-1.5">
-                          <CheckCircle2 size={14} /> Marcar concluído
-                        </Button>
-                      )}
-                      {activeMeeting.status === "completed" && (
-                        <Button size="sm" variant="outline" onClick={() => toggleMeetingStatus(activeMeeting, "available")}>
-                          Reabrir
-                        </Button>
-                      )}
+                {/* Meeting header / edit */}
+                <div className="border border-border rounded-lg p-4 space-y-3">
+                  {!editingMeeting ? (
+                    <>
+                      <div className="flex items-start justify-between gap-2 flex-wrap">
+                        <div className="min-w-0">
+                          <p className="text-xs font-mono text-muted-foreground">ENCONTRO {activeMeeting.sequence}</p>
+                          <h3 className="font-semibold">{activeMeeting.title}</h3>
+                          {activeMeeting.description && (
+                            <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{activeMeeting.description}</p>
+                          )}
+                        </div>
+                        <div className="flex gap-2 flex-wrap">
+                          <Button size="sm" variant="outline" onClick={() => startEditMeeting(activeMeeting)} className="gap-1.5">
+                            <Pencil size={14} /> Editar conteúdo
+                          </Button>
+                          {activeMeeting.status === "blocked" && (
+                            <Button size="sm" variant="outline" onClick={() => unlockMeeting(activeMeeting)} className="gap-1.5">
+                              <Unlock size={14} /> Liberar
+                            </Button>
+                          )}
+                          {activeMeeting.status !== "completed" && (
+                            <Button size="sm" variant="outline" onClick={() => toggleMeetingStatus(activeMeeting, "completed")} className="gap-1.5">
+                              <CheckCircle2 size={14} /> Concluído
+                            </Button>
+                          )}
+                          {activeMeeting.status === "completed" && (
+                            <Button size="sm" variant="outline" onClick={() => toggleMeetingStatus(activeMeeting, "available")}>
+                              Reabrir
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-xs font-mono text-muted-foreground">ENCONTRO {activeMeeting.sequence} — editando</p>
+                      <Input value={meetingDraft.title} onChange={(e) => setMeetingDraft({ ...meetingDraft, title: e.target.value })} placeholder="Título" />
+                      <Textarea value={meetingDraft.description} onChange={(e) => setMeetingDraft({ ...meetingDraft, description: e.target.value })} placeholder="Descrição (o mentorado vê)" rows={4} />
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={saveMeeting}>Salvar</Button>
+                        <Button size="sm" variant="outline" onClick={() => setEditingMeeting(false)}>Cancelar</Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Esta personalização aparece no portal do mentorado como "Adaptado para você".</p>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Tasks */}
@@ -276,7 +329,7 @@ export default function MenteesAdmin() {
                 </div>
 
                 {/* Resources */}
-                <div className="border border-border rounded-lg p-4 space-y-3">
+                <div className="border border-border rounded-lg p-4 space-y-4">
                   <h4 className="text-sm font-semibold">Materiais ({meetingResources.length})</h4>
                   <ul className="space-y-2">
                     {meetingResources.map((r) => (
@@ -291,25 +344,57 @@ export default function MenteesAdmin() {
                     ))}
                     {meetingResources.length === 0 && <p className="text-xs text-muted-foreground">Nenhum material.</p>}
                   </ul>
-                  <div className="border-t border-border pt-3 space-y-2">
-                    <div className="grid grid-cols-3 gap-2">
-                      <Select value={resForm.kind} onValueChange={(v) => setResForm({ ...resForm, kind: v })}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pdf">PDF</SelectItem>
-                          <SelectItem value="video">Vídeo</SelectItem>
-                          <SelectItem value="link">Link</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Input className="col-span-2" placeholder="Título" value={resForm.title} onChange={(e) => setResForm({ ...resForm, title: e.target.value })} />
+
+                  <div className="grid md:grid-cols-2 gap-4 border-t border-border pt-4">
+                    {/* Link */}
+                    <div className="space-y-2">
+                      <p className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5"><Link2 size={12} /> Adicionar via link</p>
+                      <div className="flex gap-2">
+                        <Select value={linkForm.kind} onValueChange={(v) => setLinkForm({ ...linkForm, kind: v })}>
+                          <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pdf">PDF</SelectItem>
+                            <SelectItem value="video">Vídeo</SelectItem>
+                            <SelectItem value="link">Link</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Input placeholder="Título" value={linkForm.title} onChange={(e) => setLinkForm({ ...linkForm, title: e.target.value })} />
+                      </div>
+                      <Input placeholder="URL (https://...)" value={linkForm.url} onChange={(e) => setLinkForm({ ...linkForm, url: e.target.value })} />
+                      <Button
+                        size="sm"
+                        onClick={addLinkResource}
+                        disabled={savingLink || !linkForm.title.trim() || !linkForm.url.trim()}
+                        className="gap-1.5 w-full"
+                      >
+                        {savingLink ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                        Adicionar link
+                      </Button>
                     </div>
-                    <Input placeholder="URL (https://...)" value={resForm.url} onChange={(e) => setResForm({ ...resForm, url: e.target.value })} />
-                    <div className="flex flex-wrap gap-2">
-                      <Button size="sm" onClick={addResource} className="gap-1.5"><Plus size={14} /> Adicionar link</Button>
-                      <label className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 border border-border rounded cursor-pointer hover:bg-secondary">
-                        {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-                        Upload de arquivo
-                        <input type="file" className="hidden" onChange={(e) => e.target.files?.[0] && uploadResource(e.target.files[0])} />
+
+                    {/* Upload */}
+                    <div className="space-y-2">
+                      <p className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-1.5"><Upload size={12} /> Upload de arquivo</p>
+                      <label className="block border border-dashed border-border rounded p-6 text-center cursor-pointer hover:bg-secondary/40 transition">
+                        {uploading ? (
+                          <span className="text-sm text-muted-foreground inline-flex items-center gap-1.5"><Loader2 size={14} className="animate-spin" /> enviando…</span>
+                        ) : (
+                          <>
+                            <Upload size={20} className="mx-auto text-muted-foreground mb-1" />
+                            <p className="text-sm">Selecionar arquivo</p>
+                            <p className="text-xs text-muted-foreground">PDF, vídeo, qualquer formato</p>
+                          </>
+                        )}
+                        <input
+                          type="file"
+                          className="hidden"
+                          disabled={uploading}
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) uploadResource(f);
+                            e.currentTarget.value = "";
+                          }}
+                        />
                       </label>
                     </div>
                   </div>

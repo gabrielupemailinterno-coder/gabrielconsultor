@@ -30,6 +30,7 @@ const statusMeta: Record<Meeting["status"], { label: string; cls: string }> = {
 export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { menteeId: string; menteeEmail: string; onChange: () => void }) {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
+  const [templates, setTemplates] = useState<Record<number, { title: string; description: string | null }>>({});
   const [loading, setLoading] = useState(true);
   const [scheduleFor, setScheduleFor] = useState<Meeting | null>(null);
   const [scheduledAt, setScheduledAt] = useState("");
@@ -37,12 +38,18 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
 
   const load = async () => {
     setLoading(true);
-    const [m, r] = await Promise.all([
+    const { data: menteeRow } = await supabase.from("mentees").select("plan_id").eq("id", menteeId).maybeSingle();
+    const planId = (menteeRow as any)?.plan_id;
+    const [m, r, tpl] = await Promise.all([
       supabase.from("meetings").select("*").eq("mentee_id", menteeId).order("sequence"),
       supabase.from("meeting_resources").select("*"),
+      planId ? supabase.from("meeting_templates").select("sequence,title,description").eq("plan_id", planId) : Promise.resolve({ data: [] as any[] }),
     ]);
     setMeetings((m.data as Meeting[]) ?? []);
     setResources((r.data as Resource[]) ?? []);
+    const tplMap: Record<number, { title: string; description: string | null }> = {};
+    ((tpl.data as any[]) ?? []).forEach((t) => { tplMap[t.sequence] = { title: t.title, description: t.description }; });
+    setTemplates(tplMap);
     setLoading(false);
   };
   useEffect(() => { load(); }, [menteeId]);
@@ -81,6 +88,12 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
   const months = [1, 2, 3];
   return (
     <div className="space-y-8">
+      <Card className="p-4 border-primary/30 bg-primary/5">
+        <p className="text-sm text-foreground">
+          <span className="font-semibold text-primary">Cronograma adaptado.</span>{" "}
+          O conteúdo dos próximos encontros, tarefas e materiais pode ser ajustado pelo mentor ao longo da jornada, de acordo com sua evolução.
+        </p>
+      </Card>
       {months.map((month) => {
         const monthMeetings = meetings.filter((m) => m.sequence === month * 2 - 1 || m.sequence === month * 2);
         return (
@@ -91,12 +104,19 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
                 const meta = statusMeta[m.status];
                 const isLocked = m.status === "blocked";
                 const meetingResources = resources.filter((r) => r.meeting_id === m.id);
+                const tpl = templates[m.sequence];
+                const isCustomized = tpl ? (tpl.title !== m.title || (tpl.description ?? "") !== (m.description ?? "")) : false;
                 return (
                   <Card key={m.id} className={`p-5 border-border/60 ${isLocked ? "opacity-60" : ""}`}>
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="min-w-0">
                         <p className="text-xs text-muted-foreground font-mono-data">ENCONTRO {m.sequence}</p>
                         <h4 className="font-semibold mt-0.5">{m.title}</h4>
+                        {isCustomized && (
+                          <span className="inline-block mt-1 text-[10px] font-semibold uppercase tracking-wider bg-primary/15 text-primary px-1.5 py-0.5 rounded">
+                            Adaptado para você
+                          </span>
+                        )}
                       </div>
                       <Badge variant="outline" className={meta.cls}>{meta.label}</Badge>
                     </div>
