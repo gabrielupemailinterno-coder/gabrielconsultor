@@ -111,7 +111,13 @@ const Index = () => {
         <meta property="og:description" content={c.ogDesc} />
         <meta property="og:url" content="https://gabrielconsultor.com/" />
       </Helmet>
-      <LeadFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
+      <LeadFormDialog
+        open={formOpen}
+        onClose={() => { setFormOpen(false); setCalendarGate(false); }}
+        onSuccess={calendarGate ? goToCalendar : undefined}
+        successTitle={calendarGate ? (locale === "pt" ? "Tudo certo. Abrindo a agenda…" : "All set. Opening calendar…") : undefined}
+        successBody={calendarGate ? (locale === "pt" ? "Recebi seus contatos. Escolha um horário pra gente conversar." : "Got your contacts. Pick a time to talk.") : undefined}
+      />
       {qualifyingType && (
         <QualifyingForm
           open={!!qualifyingType}
