@@ -85,20 +85,39 @@ const Index = () => {
     return () => document.removeEventListener("click", handler);
   }, []);
 
-  const [calendarGate, setCalendarGate] = useState(false);
-  const openForm = () => { trackClick("cta", "open_lead_form"); setCalendarGate(false); setFormOpen(true); };
+  const [gate, setGate] = useState<null | "calendar" | "whatsapp">(null);
+  const openForm = () => { trackClick("cta", "open_lead_form"); setGate(null); setFormOpen(true); };
   const openQualifying = (t: Exclude<FormType, "contato">) => {
     trackClick("cta", `open_form_${t}`);
     setQualifyingType(t);
   };
   const openCalendar = () => {
     trackClick("cta", "open_calendar_gate");
-    setCalendarGate(true);
+    setGate("calendar");
+    setFormOpen(true);
+  };
+  const openWhatsapp = (label: string) => {
+    trackClick("cta", label);
+    setGate("whatsapp");
     setFormOpen(true);
   };
   const goToCalendar = () => {
     window.open(CALENDAR_URL, "_blank", "noopener,noreferrer");
   };
+  const goToWhatsapp = () => {
+    window.open(WHATSAPP_URL, "_blank", "noopener,noreferrer");
+  };
+  const onGateSuccess = gate === "calendar" ? goToCalendar : gate === "whatsapp" ? goToWhatsapp : undefined;
+  const gateTitle = gate === "calendar"
+    ? (locale === "pt" ? "Tudo certo. Abrindo a agenda…" : "All set. Opening calendar…")
+    : gate === "whatsapp"
+    ? (locale === "pt" ? "Tudo certo. Abrindo o WhatsApp…" : "All set. Opening WhatsApp…")
+    : undefined;
+  const gateBody = gate === "calendar"
+    ? (locale === "pt" ? "Recebi seus contatos. Escolha um horário pra gente conversar." : "Got your contacts. Pick a time to talk.")
+    : gate === "whatsapp"
+    ? (locale === "pt" ? "Recebi seus contatos. Te chamo no WhatsApp em instantes." : "Got your contacts. Talk to you on WhatsApp shortly.")
+    : undefined;
 
   return (
     <main className="min-h-screen bg-background text-foreground font-sans">
@@ -113,10 +132,10 @@ const Index = () => {
       </Helmet>
       <LeadFormDialog
         open={formOpen}
-        onClose={() => { setFormOpen(false); setCalendarGate(false); }}
-        onSuccess={calendarGate ? goToCalendar : undefined}
-        successTitle={calendarGate ? (locale === "pt" ? "Tudo certo. Abrindo a agenda…" : "All set. Opening calendar…") : undefined}
-        successBody={calendarGate ? (locale === "pt" ? "Recebi seus contatos. Escolha um horário pra gente conversar." : "Got your contacts. Pick a time to talk.") : undefined}
+        onClose={() => { setFormOpen(false); setGate(null); }}
+        onSuccess={onGateSuccess}
+        successTitle={gateTitle}
+        successBody={gateBody}
       />
       {qualifyingType && (
         <QualifyingForm
@@ -188,16 +207,13 @@ const Index = () => {
               <Calendar size={16} />
               {c.ctaScheduleDiag}
             </button>
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackClick("cta", "open_whatsapp_hero")}
+            <button
+              onClick={() => openWhatsapp("open_whatsapp_hero")}
               className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
             >
               <MessageCircle size={16} />
               {c.ctaWhatsapp}
-            </a>
+            </button>
             <button
               onClick={openForm}
               className="inline-flex items-center gap-2 text-foreground/80 font-sans font-medium text-sm tracking-wide uppercase px-3 py-4 hover:text-primary transition-colors"
@@ -911,16 +927,13 @@ const Index = () => {
             custom={1}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackClick("cta", "open_whatsapp_closing")}
+            <button
+              onClick={() => openWhatsapp("open_whatsapp_closing")}
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
             >
               <MessageCircle size={16} />
               {c.ctaContact}
-            </a>
+            </button>
             <button
               onClick={openCalendar}
               className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"

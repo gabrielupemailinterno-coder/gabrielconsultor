@@ -16,6 +16,7 @@ import {
   Clock,
 } from "lucide-react";
 import QualifyingForm from "@/components/QualifyingForm";
+import LeadFormDialog from "@/components/LeadFormDialog";
 import SiteHeader from "@/components/SiteHeader";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import { useLocale } from "@/contexts/LocaleContext";
@@ -37,6 +38,7 @@ const paraQuemIcons = [Target, Headphones, Users, TrendingUp];
 
 const MentoriaProfissional = () => {
   const [formOpen, setFormOpen] = useState(false);
+  const [waOpen, setWaOpen] = useState(false);
   const { locale, formatPrice } = useLocale();
   const c = mentoriaCopy[locale];
   useAnalytics("/mentoria-profissional");
@@ -48,6 +50,13 @@ const MentoriaProfissional = () => {
   const openForm = () => {
     trackClick("cta", "mp_open_lead_form");
     setFormOpen(true);
+  };
+  const openWhatsapp = (label: string) => {
+    trackClick("cta", label);
+    setWaOpen(true);
+  };
+  const goToWhatsapp = () => {
+    window.open(WHATSAPP_URL, "_blank", "noopener,noreferrer");
   };
 
   const pageUrl = "https://gabrielconsultor.com/mentoria-profissional";
@@ -88,6 +97,13 @@ const MentoriaProfissional = () => {
         })}</script>
       </Helmet>
       <QualifyingForm open={formOpen} onClose={() => setFormOpen(false)} formType="mentoria_1a1_vendedores" />
+      <LeadFormDialog
+        open={waOpen}
+        onClose={() => setWaOpen(false)}
+        onSuccess={goToWhatsapp}
+        successTitle={locale === "pt" ? "Tudo certo. Abrindo o WhatsApp…" : "All set. Opening WhatsApp…"}
+        successBody={locale === "pt" ? "Recebi seus contatos. Te chamo no WhatsApp em instantes." : "Got your contacts. Talk to you on WhatsApp shortly."}
+      />
 
       {/* Back link */}
       <div className="container max-w-5xl pt-8">
@@ -160,16 +176,13 @@ const MentoriaProfissional = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackClick("cta", "mp_whatsapp_hero")}
+            <button
+              onClick={() => openWhatsapp("mp_whatsapp_hero")}
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
             >
               <MessageCircle size={16} />
               {c.ctaJoin}
-            </a>
+            </button>
             <button
               onClick={openForm}
               className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
@@ -402,16 +415,13 @@ const MentoriaProfissional = () => {
             custom={2}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackClick("cta", "mp_whatsapp_final")}
+            <button
+              onClick={() => openWhatsapp("mp_whatsapp_final")}
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
             >
               <MessageCircle size={16} />
               {c.finalCta}
-            </a>
+            </button>
             <button
               onClick={openForm}
               className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
