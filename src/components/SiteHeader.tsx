@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import { useLocale } from "@/contexts/LocaleContext";
 import { trackClick } from "@/hooks/useAnalytics";
+import LeadFormDialog from "@/components/LeadFormDialog";
 import monogramaFull from "@/assets/monograma-gv-full-tpn.png.asset.json";
 
 const CALENDAR_URL = "https://calendar.app.google/1GgJUz3DD3KuznGMA";
@@ -21,6 +22,7 @@ const SiteHeader = () => {
   const { pathname } = useLocation();
   const onHome = pathname === "/";
   const [hidden, setHidden] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
   const lastY = useRef(0);
 
   useEffect(() => {
@@ -66,7 +68,10 @@ const SiteHeader = () => {
 
   const ctaLabel = locale === "pt" ? "Agendar diagnóstico" : "Book a diagnostic";
   const openCalendar = () => {
-    trackClick("cta", "header_calendar");
+    trackClick("cta", "header_calendar_open_form");
+    setFormOpen(true);
+  };
+  const goToCalendar = () => {
     window.open(CALENDAR_URL, "_blank", "noopener,noreferrer");
   };
 
@@ -87,6 +92,14 @@ const SiteHeader = () => {
   };
 
   return (
+    <>
+    <LeadFormDialog
+      open={formOpen}
+      onClose={() => setFormOpen(false)}
+      onSuccess={goToCalendar}
+      successTitle={locale === "pt" ? "Tudo certo. Abrindo a agenda…" : "All set. Opening calendar…"}
+      successBody={locale === "pt" ? "Recebi seus contatos. Escolha um horário pra gente conversar." : "Got your contacts. Pick a time to talk."}
+    />
     <header
       className={`sticky top-0 z-50 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
         hidden ? "-translate-y-full" : "translate-y-0"
@@ -163,6 +176,7 @@ const SiteHeader = () => {
         </div>
       </div>
     </header>
+    </>
   );
 };
 

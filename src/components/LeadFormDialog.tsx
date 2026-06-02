@@ -19,9 +19,12 @@ type LeadData = {
 interface LeadFormDialogProps {
   open: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
+  successTitle?: string;
+  successBody?: string;
 }
 
-const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
+const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }: LeadFormDialogProps) => {
   const { locale } = useLocale();
   const c = leadFormCopy[locale];
 
@@ -82,6 +85,9 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
       if (error) throw error;
       trackClick("form_submit", "lead_form_submitted");
       setStatus("success");
+      if (onSuccess) {
+        setTimeout(() => onSuccess(), 600);
+      }
       setTimeout(() => {
         onClose();
         setStatus("idle");
@@ -124,8 +130,8 @@ const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
             {status === "success" ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <CheckCircle className="text-primary mb-4" size={48} strokeWidth={1.5} />
-                <h3 className="font-serif text-xl mb-2">{c.successTitle}</h3>
-                <p className="text-muted-foreground text-sm">{c.successBody}</p>
+                <h3 className="font-serif text-xl mb-2">{successTitle || c.successTitle}</h3>
+                <p className="text-muted-foreground text-sm">{successBody || c.successBody}</p>
               </div>
             ) : (
               <>
