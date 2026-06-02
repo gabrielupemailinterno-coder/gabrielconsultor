@@ -26,6 +26,7 @@ import {
   Star,
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
+import QuickContactDialog from "@/components/QuickContactDialog";
 import QualifyingForm from "@/components/QualifyingForm";
 import type { FormType } from "@/lib/qualifying-forms";
 import SiteHeader from "@/components/SiteHeader";
@@ -85,21 +86,21 @@ const Index = () => {
     return () => document.removeEventListener("click", handler);
   }, []);
 
-  const [gate, setGate] = useState<null | "calendar" | "whatsapp">(null);
-  const openForm = () => { trackClick("cta", "open_lead_form"); setGate(null); setFormOpen(true); };
+  const [calendarGate, setCalendarGate] = useState(false);
+  const [waOpen, setWaOpen] = useState(false);
+  const openForm = () => { trackClick("cta", "open_lead_form"); setCalendarGate(false); setFormOpen(true); };
   const openQualifying = (t: Exclude<FormType, "contato">) => {
     trackClick("cta", `open_form_${t}`);
     setQualifyingType(t);
   };
   const openCalendar = () => {
     trackClick("cta", "open_calendar_gate");
-    setGate("calendar");
+    setCalendarGate(true);
     setFormOpen(true);
   };
   const openWhatsapp = (label: string) => {
     trackClick("cta", label);
-    setGate("whatsapp");
-    setFormOpen(true);
+    setWaOpen(true);
   };
   const goToCalendar = () => {
     window.open(CALENDAR_URL, "_blank", "noopener,noreferrer");
@@ -107,17 +108,6 @@ const Index = () => {
   const goToWhatsapp = () => {
     window.open(WHATSAPP_URL, "_blank", "noopener,noreferrer");
   };
-  const onGateSuccess = gate === "calendar" ? goToCalendar : gate === "whatsapp" ? goToWhatsapp : undefined;
-  const gateTitle = gate === "calendar"
-    ? (locale === "pt" ? "Tudo certo. Abrindo a agenda…" : "All set. Opening calendar…")
-    : gate === "whatsapp"
-    ? (locale === "pt" ? "Tudo certo. Abrindo o WhatsApp…" : "All set. Opening WhatsApp…")
-    : undefined;
-  const gateBody = gate === "calendar"
-    ? (locale === "pt" ? "Recebi seus contatos. Escolha um horário pra gente conversar." : "Got your contacts. Pick a time to talk.")
-    : gate === "whatsapp"
-    ? (locale === "pt" ? "Recebi seus contatos. Te chamo no WhatsApp em instantes." : "Got your contacts. Talk to you on WhatsApp shortly.")
-    : undefined;
 
   return (
     <main className="min-h-screen bg-background text-foreground font-sans">
@@ -132,10 +122,15 @@ const Index = () => {
       </Helmet>
       <LeadFormDialog
         open={formOpen}
-        onClose={() => { setFormOpen(false); setGate(null); }}
-        onSuccess={onGateSuccess}
-        successTitle={gateTitle}
-        successBody={gateBody}
+        onClose={() => { setFormOpen(false); setCalendarGate(false); }}
+        onSuccess={calendarGate ? goToCalendar : undefined}
+        successTitle={calendarGate ? (locale === "pt" ? "Tudo certo. Abrindo a agenda…" : "All set. Opening calendar…") : undefined}
+        successBody={calendarGate ? (locale === "pt" ? "Recebi seus contatos. Escolha um horário pra gente conversar." : "Got your contacts. Pick a time to talk.") : undefined}
+      />
+      <QuickContactDialog
+        open={waOpen}
+        onClose={() => setWaOpen(false)}
+        onSuccess={goToWhatsapp}
       />
       {qualifyingType && (
         <QualifyingForm
