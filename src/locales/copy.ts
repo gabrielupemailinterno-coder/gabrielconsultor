@@ -387,7 +387,7 @@ export const mentoriaCopy = {
       { title: "Direct WhatsApp access", desc: "Asynchronous support to clear specific questions, review approaches, proposals and emails before you send them." },
       { title: "Templates and playbooks", desc: "Library of cadences, scripts, proposal templates and checklists used in my executive consultancy." },
       { title: "Pipeline review", desc: "Monthly diagnostic of your open opportunities with a tactical plan to accelerate close." },
-      { title: "Private community", desc: "Networking with other evolving sales and CS pros, with real case-sharing." },
+      
     ],
 
     resultadosEyebrow: "Expected results",
