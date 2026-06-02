@@ -53,6 +53,92 @@ export type Database = {
         }
         Relationships: []
       }
+      homework_tasks: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          evidence_url: string | null
+          id: string
+          meeting_id: string | null
+          mentee_id: string
+          title: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          evidence_url?: string | null
+          id?: string
+          meeting_id?: string | null
+          mentee_id: string
+          title: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          evidence_url?: string | null
+          id?: string
+          meeting_id?: string | null
+          mentee_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "homework_tasks_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "homework_tasks_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "mentees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      homework_templates: {
+        Row: {
+          description: string | null
+          id: string
+          meeting_sequence: number
+          plan_id: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          meeting_sequence: number
+          plan_id: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          meeting_sequence?: number
+          plan_id?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "homework_templates_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "mentorship_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           answers: Json | null
@@ -94,6 +180,280 @@ export type Database = {
           source?: string | null
         }
         Relationships: []
+      }
+      meeting_resources: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          meeting_id: string
+          title: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          meeting_id: string
+          title: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          meeting_id?: string
+          title?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_resources_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meeting_templates: {
+        Row: {
+          description: string | null
+          id: string
+          plan_id: string
+          sequence: number
+          title: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          plan_id: string
+          sequence: number
+          title: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          plan_id?: string
+          sequence?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_templates_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "mentorship_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meetings: {
+        Row: {
+          created_at: string
+          description: string | null
+          google_event_id: string | null
+          id: string
+          meet_link: string | null
+          mentee_id: string
+          notes: string | null
+          scheduled_at: string | null
+          sequence: number
+          status: string
+          title: string
+          unlocks_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          google_event_id?: string | null
+          id?: string
+          meet_link?: string | null
+          mentee_id: string
+          notes?: string | null
+          scheduled_at?: string | null
+          sequence: number
+          status?: string
+          title: string
+          unlocks_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          google_event_id?: string | null
+          id?: string
+          meet_link?: string | null
+          mentee_id?: string
+          notes?: string | null
+          scheduled_at?: string | null
+          sequence?: number
+          status?: string
+          title?: string
+          unlocks_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetings_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "mentees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentees: {
+        Row: {
+          asaas_customer_id: string | null
+          asaas_payment_id: string | null
+          cpf: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          phone: string | null
+          plan_id: string
+          started_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          asaas_customer_id?: string | null
+          asaas_payment_id?: string | null
+          cpf?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          plan_id: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          asaas_customer_id?: string | null
+          asaas_payment_id?: string | null
+          cpf?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          plan_id?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentees_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "mentorship_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentorship_plans: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          duration_months: number
+          id: string
+          installments: number
+          name: string
+          price_cents: number
+          slug: string
+          total_meetings: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          duration_months?: number
+          id?: string
+          installments?: number
+          name: string
+          price_cents: number
+          slug: string
+          total_meetings?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          duration_months?: number
+          id?: string
+          installments?: number
+          name?: string
+          price_cents?: number
+          slug?: string
+          total_meetings?: number
+        }
+        Relationships: []
+      }
+      metrics_checkpoints: {
+        Row: {
+          connection_rate: number
+          created_at: string
+          id: string
+          leads_inbound: number
+          leads_outbound: number
+          meetings_held: number
+          meetings_scheduled: number
+          mentee_id: string
+          notes: string | null
+          period_start: string
+          revenue_cents: number
+          sales_count: number
+          updated_at: string
+        }
+        Insert: {
+          connection_rate?: number
+          created_at?: string
+          id?: string
+          leads_inbound?: number
+          leads_outbound?: number
+          meetings_held?: number
+          meetings_scheduled?: number
+          mentee_id: string
+          notes?: string | null
+          period_start: string
+          revenue_cents?: number
+          sales_count?: number
+          updated_at?: string
+        }
+        Update: {
+          connection_rate?: number
+          created_at?: string
+          id?: string
+          leads_inbound?: number
+          leads_outbound?: number
+          meetings_held?: number
+          meetings_scheduled?: number
+          mentee_id?: string
+          notes?: string | null
+          period_start?: string
+          revenue_cents?: number
+          sales_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metrics_checkpoints_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "mentees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       page_clicks: {
         Row: {
@@ -218,9 +578,21 @@ export type Database = {
         }
         Returns: boolean
       }
+      provision_mentee: {
+        Args: {
+          _asaas_customer_id: string
+          _asaas_payment_id: string
+          _email: string
+          _full_name: string
+          _phone: string
+          _plan_id: string
+          _user_id: string
+        }
+        Returns: string
+      }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "mentee"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -348,7 +720,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "mentee"],
     },
   },
 } as const
