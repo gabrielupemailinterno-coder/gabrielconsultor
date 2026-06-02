@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import { useLocale } from "@/contexts/LocaleContext";
 import { trackClick } from "@/hooks/useAnalytics";
+import LeadFormDialog from "@/components/LeadFormDialog";
 import monogramaFull from "@/assets/monograma-gv-full-tpn.png.asset.json";
 
 const CALENDAR_URL = "https://calendar.app.google/1GgJUz3DD3KuznGMA";
