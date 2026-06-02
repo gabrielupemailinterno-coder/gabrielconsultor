@@ -55,9 +55,11 @@ export type Database = {
       }
       leads: {
         Row: {
+          answers: Json | null
           company_name: string | null
           created_at: string
           email: string
+          form_type: string
           id: string
           main_pain: string | null
           name: string
@@ -66,9 +68,11 @@ export type Database = {
           source: string | null
         }
         Insert: {
+          answers?: Json | null
           company_name?: string | null
           created_at?: string
           email: string
+          form_type?: string
           id?: string
           main_pain?: string | null
           name: string
@@ -77,9 +81,11 @@ export type Database = {
           source?: string | null
         }
         Update: {
+          answers?: Json | null
           company_name?: string | null
           created_at?: string
           email?: string
+          form_type?: string
           id?: string
           main_pain?: string | null
           name?: string
