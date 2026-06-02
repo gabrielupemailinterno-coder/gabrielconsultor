@@ -789,7 +789,9 @@ const Index = () => {
                     ))}
                   </ul>
                   <button
-                    onClick={openForm}
+                    onClick={() =>
+                      openQualifying(i === 0 ? "consultoria_operacional" : "mentoria_estrategica")
+                    }
                     className="inline-flex items-center justify-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-6 py-3 rounded-md hover:bg-primary/10 transition-colors"
                   >
                     {c.packageCta}
