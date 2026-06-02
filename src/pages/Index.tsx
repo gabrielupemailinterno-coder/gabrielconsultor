@@ -763,6 +763,12 @@ const Index = () => {
       {/* Footer */}
       <footer className="py-10 border-t border-border">
         <div className="container max-w-5xl flex flex-col items-center gap-6">
+          <img
+            src={monogramaFull.url}
+            alt="Gabriel Consultor — Processos Comerciais | Sales Ops"
+            loading="lazy"
+            className="w-44 md:w-56 h-auto opacity-90"
+          />
           <div className="flex items-center gap-3">
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaWhatsapp} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
               <MessageCircle size={16} />
