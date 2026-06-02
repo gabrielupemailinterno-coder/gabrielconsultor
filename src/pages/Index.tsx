@@ -29,6 +29,7 @@ import LeadFormDialog from "@/components/LeadFormDialog";
 import SiteHeader from "@/components/SiteHeader";
 import gabrielPhoto from "@/assets/gabriel-g4-hero.jpg.asset.json";
 import monogramaFull from "@/assets/monograma-gv-full-tpn.png.asset.json";
+import monogramaMark from "@/assets/monograma-gv-tpn.png.asset.json";
 import { useLocale } from "@/contexts/LocaleContext";
 import { indexCopy } from "@/locales/copy";
 
@@ -114,10 +115,18 @@ const Index = () => {
           }}
         />
         <div className="container max-w-4xl text-center relative z-10">
+          <motion.img
+            src={monogramaMark.url}
+            alt="Gabriel Vieira — monograma GV"
+            initial={{ opacity: 0, y: -8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+            className="mx-auto h-24 md:h-32 w-auto mb-8"
+          />
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-flex items-center gap-2 border border-primary/40 bg-primary/10 text-primary text-xs font-medium tracking-wide uppercase px-4 py-1.5 rounded-full mb-8"
           >
             <Trophy size={14} strokeWidth={2} />
