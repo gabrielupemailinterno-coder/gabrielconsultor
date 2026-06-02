@@ -1,0 +1,121 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Loader2, LogOut, CalendarDays, ListChecks, FolderOpen, BarChart3 } from "lucide-react";
+import { useMentee } from "@/hooks/useMentee";
+import CronogramaTab from "@/components/portal/CronogramaTab";
+import TarefasTab from "@/components/portal/TarefasTab";
+import RepositorioTab from "@/components/portal/RepositorioTab";
+import MetricasTab from "@/components/portal/MetricasTab";
+
+export default function PortalDashboard() {
+  const navigate = useNavigate();
+  const { mentee, loading, error } = useMentee();
+  const [meetingsDone, setMeetingsDone] = useState(0);
+  const [meetingsTotal, setMeetingsTotal] = useState(6);
+
+  useEffect(() => {
+    document.documentElement.classList.add("portal-theme");
+    return () => document.documentElement.classList.remove("portal-theme");
+  }, []);
+
+  useEffect(() => {
+    if (error === "unauth") navigate("/mentorados/login", { replace: true });
+  }, [error, navigate]);
+
+  useEffect(() => {
+    if (!mentee) return;
+    setMeetingsTotal(mentee.plan?.total_meetings ?? 6);
+    supabase.from("meetings").select("id,status").eq("mentee_id", mentee.id).then(({ data }) => {
+      setMeetingsDone((data ?? []).filter((m: any) => m.status === "completed").length);
+    });
+  }, [mentee]);
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    navigate("/mentorados/login", { replace: true });
+  };
+
+  if (loading) {
+    return (
+      <main className="portal-theme min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="animate-spin text-primary" />
+      </main>
+    );
+  }
+
+  if (!mentee) {
+    return (
+      <main className="portal-theme min-h-screen bg-background text-foreground flex items-center justify-center p-6">
+        <Card className="max-w-md p-8 text-center space-y-3">
+          <h2 className="text-xl font-semibold">Sua mentoria ainda não está ativa</h2>
+          <p className="text-sm text-muted-foreground">
+            Assim que o pagamento for confirmado, seu acesso ao portal é liberado automaticamente.
+          </p>
+          <Button variant="outline" onClick={logout} className="mt-3">Sair</Button>
+        </Card>
+      </main>
+    );
+  }
+
+  const progress = meetingsTotal ? Math.round((meetingsDone / meetingsTotal) * 100) : 0;
+
+  return (
+    <main className="portal-theme min-h-screen bg-background text-foreground">
+      <header className="border-b border-border/60 bg-sidebar">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground">Portal do Mentorado</p>
+            <h1 className="text-xl md:text-2xl font-semibold truncate">
+              Bem-vindo de volta, {mentee.full_name.split(" ")[0]}
+            </h1>
+          </div>
+          <Button variant="ghost" size="sm" onClick={logout} className="gap-2">
+            <LogOut size={16} /> Sair
+          </Button>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 pb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+            <div>
+              <p className="text-sm text-muted-foreground">Plano ativo</p>
+              <p className="font-medium">{mentee.plan?.name ?? "Mentoria"}</p>
+            </div>
+            <div className="text-left md:text-right">
+              <p className="text-sm text-muted-foreground">Progresso da jornada</p>
+              <p className="font-mono-data text-lg">
+                {meetingsDone}/{meetingsTotal} <span className="text-muted-foreground text-sm">({progress}%)</span>
+              </p>
+            </div>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
+        <Tabs defaultValue="cronograma" className="w-full">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full h-auto p-1 bg-muted">
+            <TabsTrigger value="cronograma" className="gap-2 py-2.5"><CalendarDays size={15} /><span className="hidden sm:inline">Cronograma</span></TabsTrigger>
+            <TabsTrigger value="tarefas" className="gap-2 py-2.5"><ListChecks size={15} /><span className="hidden sm:inline">Tarefas</span></TabsTrigger>
+            <TabsTrigger value="repositorio" className="gap-2 py-2.5"><FolderOpen size={15} /><span className="hidden sm:inline">Repositório</span></TabsTrigger>
+            <TabsTrigger value="metricas" className="gap-2 py-2.5"><BarChart3 size={15} /><span className="hidden sm:inline">Métricas</span></TabsTrigger>
+          </TabsList>
+          <TabsContent value="cronograma" className="mt-6">
+            <CronogramaTab menteeId={mentee.id} menteeEmail={mentee.email} onChange={() => {
+              supabase.from("meetings").select("id,status").eq("mentee_id", mentee.id).then(({ data }) => {
+                setMeetingsDone((data ?? []).filter((m: any) => m.status === "completed").length);
+              });
+            }} />
+          </TabsContent>
+          <TabsContent value="tarefas" className="mt-6"><TarefasTab menteeId={mentee.id} /></TabsContent>
+          <TabsContent value="repositorio" className="mt-6"><RepositorioTab menteeId={mentee.id} /></TabsContent>
+          <TabsContent value="metricas" className="mt-6"><MetricasTab menteeId={mentee.id} /></TabsContent>
+        </Tabs>
+      </div>
+    </main>
+  );
+}
