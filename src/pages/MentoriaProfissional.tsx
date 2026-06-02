@@ -265,12 +265,19 @@ const MentoriaProfissional = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 md:gap-5">
             {c.beneficios.map((b, i) => {
               const total = c.beneficios.length;
-              // Bento: distribute spans so the last row fills evenly on lg (cols=6) and md (cols=2).
               const topCount = Math.ceil(total / 2);
               const bottomCount = total - topCount;
               const isTop = i < topCount;
-              const lgSpan = isTop ? Math.floor(6 / topCount) : Math.floor(6 / Math.max(bottomCount, 1));
-              const lgSpanClass = `lg:col-span-${lgSpan}`;
+              // Map span numbers to literal Tailwind classes so JIT picks them up.
+              const lgSpanMap: Record<number, string> = {
+                1: "lg:col-span-6",
+                2: "lg:col-span-3",
+                3: "lg:col-span-2",
+                6: "lg:col-span-1",
+              };
+              const lgSpanClass = isTop
+                ? lgSpanMap[topCount] ?? "lg:col-span-2"
+                : lgSpanMap[Math.max(bottomCount, 1)] ?? "lg:col-span-3";
               const mdSpanClass = !isTop && bottomCount === 1 ? "md:col-span-2" : "";
               return (
                 <motion.div
@@ -284,7 +291,7 @@ const MentoriaProfissional = () => {
                 >
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="flex items-start gap-3 md:gap-4">
-                    <div className="shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-xl bg-primary/12 border border-primary/25 flex items-center justify-center">
+                    <div className="shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-xl bg-primary/10 border border-primary/25 flex items-center justify-center">
                       <Check className="text-primary" size={18} strokeWidth={2.25} />
                     </div>
                     <div className="min-w-0">
