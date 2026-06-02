@@ -7,7 +7,7 @@ import { Loader2, Upload, FileCheck2 } from "lucide-react";
 import { toast } from "sonner";
 
 type Task = { id: string; title: string; description: string | null; completed: boolean; completed_at: string | null; evidence_url: string | null; meeting_id: string | null };
-type Meeting = { id: string; sequence: number; title: string };
+type Meeting = { id: string; sequence: number; title: string; status: string };
 
 export default function TarefasTab({ menteeId }: { menteeId: string }) {
   const [tasks, setTasks] = useState<Task[]>([]);
