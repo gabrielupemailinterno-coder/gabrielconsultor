@@ -19,9 +19,12 @@ type LeadData = {
 interface LeadFormDialogProps {
   open: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
+  successTitle?: string;
+  successBody?: string;
 }
 
-const LeadFormDialog = ({ open, onClose }: LeadFormDialogProps) => {
+const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }: LeadFormDialogProps) => {
   const { locale } = useLocale();
   const c = leadFormCopy[locale];
 
