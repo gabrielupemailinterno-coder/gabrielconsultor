@@ -327,7 +327,6 @@ export const mentoriaCopy = {
       { title: "Acesso direto via WhatsApp", desc: "Suporte assíncrono para tirar dúvidas pontuais, revisar abordagens, propostas e e-mails antes de enviar." },
       { title: "Templates e playbooks", desc: "Biblioteca de cadências, scripts, modelos de proposta e checklists usados na minha consultoria executiva." },
       { title: "Revisão de pipeline", desc: "Diagnóstico mensal das suas oportunidades em aberto com plano tático para acelerar o fechamento." },
-      { title: "Comunidade fechada", desc: "Networking com outros profissionais comerciais e de CS em evolução, com troca real de cases." },
     ],
 
     resultadosEyebrow: "Resultados esperados",
