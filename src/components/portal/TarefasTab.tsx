@@ -7,7 +7,7 @@ import { Loader2, Upload, FileCheck2 } from "lucide-react";
 import { toast } from "sonner";
 
 type Task = { id: string; title: string; description: string | null; completed: boolean; completed_at: string | null; evidence_url: string | null; meeting_id: string | null };
-type Meeting = { id: string; sequence: number; title: string };
+type Meeting = { id: string; sequence: number; title: string; status: string };
 
 export default function TarefasTab({ menteeId }: { menteeId: string }) {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -19,7 +19,7 @@ export default function TarefasTab({ menteeId }: { menteeId: string }) {
     setLoading(true);
     const [t, m] = await Promise.all([
       supabase.from("homework_tasks").select("*").eq("mentee_id", menteeId),
-      supabase.from("meetings").select("id,sequence,title").eq("mentee_id", menteeId).order("sequence"),
+      supabase.from("meetings").select("id,sequence,title,status").eq("mentee_id", menteeId).order("sequence"),
     ]);
     setTasks((t.data as Task[]) ?? []);
     setMeetings((m.data as Meeting[]) ?? []);
@@ -48,9 +48,17 @@ export default function TarefasTab({ menteeId }: { menteeId: string }) {
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div>;
 
+  const visibleMeetings = meetings.filter((m) => m.status !== "blocked");
+  const hasAny = visibleMeetings.some((m) => tasks.some((t) => t.meeting_id === m.id));
+
   return (
     <div className="space-y-6">
-      {meetings.map((m) => {
+      {!hasAny && (
+        <div className="border border-dashed border-border/60 rounded-lg p-8 text-center text-sm text-muted-foreground">
+          Suas tarefas serão liberadas conforme você avança no cronograma.
+        </div>
+      )}
+      {visibleMeetings.map((m) => {
         const items = tasks.filter((t) => t.meeting_id === m.id);
         if (items.length === 0) return null;
         return (
