@@ -123,15 +123,6 @@ const Index = () => {
             transition={{ duration: 0.9, ease: "easeOut" }}
             className="mx-auto h-48 md:h-64 w-auto mb-8"
           />
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-flex items-center gap-2 border border-primary/40 bg-primary/10 text-primary text-xs font-medium tracking-wide uppercase px-4 py-1.5 rounded-full mb-8"
-          >
-            <Trophy size={14} strokeWidth={2} />
-            {c.badge}
-          </motion.div>
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
