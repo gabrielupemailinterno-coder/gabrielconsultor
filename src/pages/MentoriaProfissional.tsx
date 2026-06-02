@@ -262,24 +262,41 @@ const MentoriaProfissional = () => {
             </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {c.beneficios.map((b, i) => (
-              <motion.div
-                key={b.title}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i}
-                className="card-hover bg-card border border-border rounded-xl p-6"
-              >
-                <Check className="text-primary mb-4" size={22} strokeWidth={2} />
-                <h3 className="font-serif text-lg mb-2">{b.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {b.desc}
-                </p>
-              </motion.div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 md:gap-5">
+            {c.beneficios.map((b, i) => {
+              const total = c.beneficios.length;
+              // Bento: distribute spans so the last row fills evenly on lg (cols=6) and md (cols=2).
+              const topCount = Math.ceil(total / 2);
+              const bottomCount = total - topCount;
+              const isTop = i < topCount;
+              const lgSpan = isTop ? Math.floor(6 / topCount) : Math.floor(6 / Math.max(bottomCount, 1));
+              const lgSpanClass = `lg:col-span-${lgSpan}`;
+              const mdSpanClass = !isTop && bottomCount === 1 ? "md:col-span-2" : "";
+              return (
+                <motion.div
+                  key={b.title}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  custom={i}
+                  className={`group relative overflow-hidden bg-gradient-to-br from-card to-card/40 border border-border/60 rounded-2xl p-5 md:p-6 transition-all duration-300 hover:border-primary/40 hover:-translate-y-0.5 active:scale-[0.99] ${lgSpanClass} ${mdSpanClass}`}
+                >
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex items-start gap-3 md:gap-4">
+                    <div className="shrink-0 w-9 h-9 md:w-10 md:h-10 rounded-xl bg-primary/12 border border-primary/25 flex items-center justify-center">
+                      <Check className="text-primary" size={18} strokeWidth={2.25} />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-serif text-base md:text-lg leading-snug mb-1.5">{b.title}</h3>
+                      <p className="text-muted-foreground text-[13px] md:text-sm leading-relaxed">
+                        {b.desc}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
