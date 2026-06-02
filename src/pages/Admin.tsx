@@ -150,6 +150,8 @@ const Admin = () => {
           ))}
         </div>
 
+        {tab === "mentees" && <MenteesAdmin />}
+
         {tab === "leads" && (() => {
           const types: Array<FormType | "all"> = ["all", "contato", "mentoria_1a1_vendedores", "consultoria_operacional", "mentoria_estrategica"];
           const counts: Record<string, number> = leads.reduce((acc, l) => {
