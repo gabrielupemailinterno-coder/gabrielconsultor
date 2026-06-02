@@ -26,7 +26,13 @@ import {
   Star,
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
-import gabrielPhoto from "@/assets/gabriel.jpg";
+import gabrielPhoto from "@/assets/gabriel-g4-hero.jpg.asset.json";
+import monogramaFull from "@/assets/monograma-gv-full.png.asset.json";
+import g4Photo1 from "@/assets/g4-01.jpg.asset.json";
+import g4Photo2 from "@/assets/g4-02.jpg.asset.json";
+import g4Photo3 from "@/assets/g4-03.jpg.asset.json";
+import g4Photo4 from "@/assets/g4-04.jpg.asset.json";
+import g4Photo5 from "@/assets/g4-05.jpg.asset.json";
 import { useLocale } from "@/contexts/LocaleContext";
 import { indexCopy } from "@/locales/copy";
 
