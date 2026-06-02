@@ -19,7 +19,7 @@ export default function TarefasTab({ menteeId }: { menteeId: string }) {
     setLoading(true);
     const [t, m] = await Promise.all([
       supabase.from("homework_tasks").select("*").eq("mentee_id", menteeId),
-      supabase.from("meetings").select("id,sequence,title").eq("mentee_id", menteeId).order("sequence"),
+      supabase.from("meetings").select("id,sequence,title,status").eq("mentee_id", menteeId).order("sequence"),
     ]);
     setTasks((t.data as Task[]) ?? []);
     setMeetings((m.data as Meeting[]) ?? []);
