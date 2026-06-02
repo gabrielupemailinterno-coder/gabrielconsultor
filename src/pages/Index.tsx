@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import gabrielPhoto from "@/assets/gabriel-g4-hero.jpg.asset.json";
-import monogramaFull from "@/assets/monograma-gv-full.png.asset.json";
+import monogramaFull from "@/assets/monograma-gv-full-tpn.png.asset.json";
 import { useLocale } from "@/contexts/LocaleContext";
 import { indexCopy } from "@/locales/copy";
 
