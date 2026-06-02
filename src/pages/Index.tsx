@@ -26,7 +26,13 @@ import {
   Star,
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
-import gabrielPhoto from "@/assets/gabriel.jpg";
+import gabrielPhoto from "@/assets/gabriel-g4-hero.jpg.asset.json";
+import monogramaFull from "@/assets/monograma-gv-full.png.asset.json";
+import g4Photo1 from "@/assets/g4-01.jpg.asset.json";
+import g4Photo2 from "@/assets/g4-02.jpg.asset.json";
+import g4Photo3 from "@/assets/g4-03.jpg.asset.json";
+import g4Photo4 from "@/assets/g4-04.jpg.asset.json";
+import g4Photo5 from "@/assets/g4-05.jpg.asset.json";
 import { useLocale } from "@/contexts/LocaleContext";
 import { indexCopy } from "@/locales/copy";
 
@@ -411,7 +417,7 @@ const Index = () => {
               <div className="relative mx-auto md:mx-0 w-56 h-56 md:w-64 md:h-64">
                 <div className="absolute -inset-2 rounded-full bg-primary/10 blur-2xl" />
                 <img
-                  src={gabrielPhoto}
+                  src={gabrielPhoto.url}
                   alt={c.aboutPhotoAlt}
                   loading="lazy"
                   className="relative w-full h-full object-cover object-[center_15%] rounded-full border-2 border-primary/40 shadow-[0_8px_40px_-12px_hsl(var(--primary)/0.4)]"
@@ -627,6 +633,88 @@ const Index = () => {
         </div>
       </section>
 
+      <div className="gold-divider" />
+
+      {/* G4 Educação — Formação contínua */}
+      <section id="formacao" className="section-padding bg-secondary/30">
+        <div className="container max-w-6xl">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={0}
+            className="max-w-2xl mb-10"
+          >
+            <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium font-mono">
+              {locale === "pt" ? "Formação contínua" : "Continuous training"}
+            </span>
+            <h2 className="font-serif text-3xl md:text-4xl mt-3 mb-4 leading-tight">
+              {locale === "pt" ? (
+                <>Atualização constante no <span className="text-primary">G4 Educação</span></>
+              ) : (
+                <>Constant updates at <span className="text-primary">G4 Educação</span></>
+              )}
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              {locale === "pt"
+                ? "Bancada ao lado de operadores que tocam o comercial de empresas que faturam de R$ 10MI a R$ 1BI. O que aplico nos meus clientes vem da linha de frente — não da teoria."
+                : "Sitting with operators running sales for companies from $2M to $200M in revenue. What I apply with my clients comes from the front line — not from theory."}
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              custom={1}
+              className="col-span-2 row-span-2 aspect-square md:aspect-auto overflow-hidden rounded-md border border-border group"
+            >
+              <img
+                src={g4Photo2.url}
+                alt="Gabriel Vieira no G4 Educação — painel oficial"
+                loading="lazy"
+                className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+              />
+            </motion.div>
+            {[g4Photo1, g4Photo3, g4Photo4, g4Photo5].map((p, i) => (
+              <motion.div
+                key={i}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                custom={i + 2}
+                className="aspect-square overflow-hidden rounded-md border border-border group"
+              >
+                <img
+                  src={p.url}
+                  alt={`Gabriel Vieira no G4 Educação — ${i + 1}`}
+                  loading="lazy"
+                  className="w-full h-full object-cover group-hover:scale-105 transition duration-700"
+                />
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            custom={6}
+            className="mt-8 flex flex-wrap gap-x-8 gap-y-2 text-xs font-mono uppercase tracking-widest text-muted-foreground"
+          >
+            <span><span className="text-primary">·</span> Arquitetura de Receita</span>
+            <span><span className="text-primary">·</span> Comunicação & Qualificação</span>
+            <span><span className="text-primary">·</span> Gestão de Carteira</span>
+            <span><span className="text-primary">·</span> Atração & Conversão</span>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Blog */}
       {latestPosts.length > 0 && (
         <section className="section-padding border-t border-border">
@@ -675,6 +763,12 @@ const Index = () => {
       {/* Footer */}
       <footer className="py-10 border-t border-border">
         <div className="container max-w-5xl flex flex-col items-center gap-6">
+          <img
+            src={monogramaFull.url}
+            alt="Gabriel Consultor — Processos Comerciais | Sales Ops"
+            loading="lazy"
+            className="w-44 md:w-56 h-auto opacity-90"
+          />
           <div className="flex items-center gap-3">
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" aria-label={c.footerAriaWhatsapp} className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center text-primary hover:bg-primary hover:text-primary-foreground transition-colors">
               <MessageCircle size={16} />
