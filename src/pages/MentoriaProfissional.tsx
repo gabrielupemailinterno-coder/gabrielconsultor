@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import QualifyingForm from "@/components/QualifyingForm";
 import QuickContactDialog from "@/components/QuickContactDialog";
+import CheckoutDialog from "@/components/CheckoutDialog";
 import SiteHeader from "@/components/SiteHeader";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import { useLocale } from "@/contexts/LocaleContext";
@@ -39,6 +40,7 @@ const paraQuemIcons = [Target, Headphones, Users, TrendingUp];
 const MentoriaProfissional = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [waOpen, setWaOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const { locale, formatPrice } = useLocale();
   const c = mentoriaCopy[locale];
   useAnalytics("/mentoria-profissional");
@@ -175,22 +177,24 @@ const MentoriaProfissional = () => {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
             <button
-              onClick={() => openWhatsapp("mp_whatsapp_hero")}
+              onClick={() => { trackClick("cta", "mp_buy_hero"); setCheckoutOpen(true); }}
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
+            >
+              <Sparkles size={16} />
+              Comprar agora · 3x {formatPrice(197)}
+            </button>
+            <button
+              onClick={() => openWhatsapp("mp_whatsapp_hero")}
+              className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
             >
               <MessageCircle size={16} />
               {c.ctaJoin}
             </button>
-            <button
-              onClick={openForm}
-              className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
-            >
-              <Calendar size={16} />
-              {c.ctaDetails}
-            </button>
           </motion.div>
         </div>
       </section>
+
+      <CheckoutDialog open={checkoutOpen} onOpenChange={setCheckoutOpen} />
 
       <div className="gold-divider" />
 

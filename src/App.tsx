@@ -12,6 +12,8 @@ import Admin from "./pages/Admin";
 import MentoriaProfissional from "./pages/MentoriaProfissional";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import PortalLogin from "./pages/portal/PortalLogin";
+import PortalDashboard from "./pages/portal/PortalDashboard";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +32,10 @@ const App = () => (
             <Route path="/mentoria-profissional" element={<MentoriaProfissional />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/mentorados/login" element={<PortalLogin />} />
+            <Route path="/mentorados" element={<PortalDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </LocaleProvider>
@@ -39,4 +44,3 @@ const App = () => (
 );
 
 export default App;
-
