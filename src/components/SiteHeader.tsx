@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Calendar, Menu } from "lucide-react";
 import {
@@ -19,6 +20,27 @@ const SiteHeader = () => {
   const { locale } = useLocale();
   const { pathname } = useLocation();
   const onHome = pathname === "/";
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY.current;
+      if (y < 80) {
+        setHidden(false);
+      } else if (delta > 6) {
+        // scrolling down → hide
+        setHidden(true);
+      } else if (delta < -6) {
+        // scrolling up → show
+        setHidden(false);
+      }
+      lastY.current = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const sectionAnchor = (anchor: string) => (onHome ? `#${anchor}` : `/#${anchor}`);
 
@@ -65,12 +87,15 @@ const SiteHeader = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50">
-      {/* Liquid glass layer */}
+    <header
+      className={`sticky top-0 z-50 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        hidden ? "-translate-y-full" : "translate-y-0"
+      }`}
+    >
       <div className="relative">
         <div className="absolute inset-0 bg-background/55 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/[0.06]" />
         <div className="absolute inset-x-0 -bottom-px h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent opacity-60" />
-        <div className="container max-w-6xl relative flex items-center justify-between h-14 md:h-16">
+        <div className="container max-w-6xl relative flex items-center justify-between h-20 md:h-24">
           <Link
             to="/"
             aria-label="Gabriel Consultor"
@@ -79,7 +104,7 @@ const SiteHeader = () => {
             <img
               src={monogramaFull.url}
               alt="Gabriel Consultor"
-              className="h-9 md:h-10 w-auto"
+              className="h-14 md:h-16 w-auto"
             />
           </Link>
 
