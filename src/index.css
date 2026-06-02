@@ -103,6 +103,7 @@
     outline-offset: 3px;
     border-radius: 6px;
   }
+}
 
 @layer components {
   .gold-divider {
