@@ -115,7 +115,7 @@ const BlogPost = () => {
           })}
         </div>
 
-        <div className="mt-10 border-t border-border pt-8">
+        <div className="mt-10 border-t border-border pt-8 space-y-6">
           <a
             href={`https://api.whatsapp.com/send?phone=5532998316501&text=${encodeURIComponent(
               `Olá, Gabriel! Estou respondendo ao desafio do post "${post.title}":\n\n`
@@ -126,9 +126,30 @@ const BlogPost = () => {
           >
             Responder o desafio no WhatsApp →
           </a>
-          <p className="text-xs text-muted-foreground mt-3">
+          <p className="text-xs text-muted-foreground">
             Envie sua resposta e ganhe 1h de mentoria gratuita.
           </p>
+
+          <nav aria-label="Continue navegando" className="pt-6 border-t border-border">
+            <h2 className="font-serif text-xl mb-4">Continue por aqui</h2>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link to="/mentoria-profissional" className="text-primary hover:underline">
+                  Mentoria Comercial 1:1 — método aplicado à sua operação
+                </Link>
+              </li>
+              <li>
+                <Link to="/blog" className="text-primary hover:underline">
+                  Ver todos os conteúdos do blog
+                </Link>
+              </li>
+              <li>
+                <Link to="/" className="text-primary hover:underline">
+                  Conheça a consultoria comercial e os cases
+                </Link>
+              </li>
+            </ul>
+          </nav>
         </div>
       </article>
     </div>

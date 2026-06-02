@@ -34,9 +34,29 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet>
-        <title>Blog | Gabriel Vieira</title>
-        <meta name="description" content="Conteúdos sobre processos, execução e gestão prática." />
+        <title>Blog | Gabriel Vieira — Processos comerciais e execução</title>
+        <meta name="description" content="Conteúdos práticos sobre processos comerciais, gestão de funil, CRM e execução. Cases reais e métodos aplicáveis." />
         <link rel="canonical" href="https://gabrielconsultor.com/blog" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Blog | Gabriel Vieira" />
+        <meta property="og:description" content="Conteúdos práticos sobre processos comerciais, gestão de funil, CRM e execução." />
+        <meta property="og:url" content="https://gabrielconsultor.com/blog" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Blog",
+          name: "Blog | Gabriel Vieira",
+          url: "https://gabrielconsultor.com/blog",
+          inLanguage: "pt-BR",
+          author: { "@type": "Person", name: "Gabriel Lincoln Vieira Passos", url: "https://gabrielconsultor.com/" },
+          publisher: { "@type": "Organization", name: "Gabriel Vieira Consultoria" },
+          blogPost: posts.map((p) => ({
+            "@type": "BlogPosting",
+            headline: p.title,
+            url: `https://gabrielconsultor.com/blog/${p.slug}`,
+            datePublished: p.published_at || undefined,
+            description: p.excerpt || undefined,
+          })),
+        })}</script>
       </Helmet>
 
       <header className="border-b border-border">
