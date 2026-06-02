@@ -88,6 +88,12 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
   const months = [1, 2, 3];
   return (
     <div className="space-y-8">
+      <Card className="p-4 border-primary/30 bg-primary/5">
+        <p className="text-sm text-foreground">
+          <span className="font-semibold text-primary">Cronograma adaptado.</span>{" "}
+          O conteúdo dos próximos encontros, tarefas e materiais pode ser ajustado pelo mentor ao longo da jornada, de acordo com sua evolução.
+        </p>
+      </Card>
       {months.map((month) => {
         const monthMeetings = meetings.filter((m) => m.sequence === month * 2 - 1 || m.sequence === month * 2);
         return (
@@ -98,12 +104,19 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
                 const meta = statusMeta[m.status];
                 const isLocked = m.status === "blocked";
                 const meetingResources = resources.filter((r) => r.meeting_id === m.id);
+                const tpl = templates[m.sequence];
+                const isCustomized = tpl ? (tpl.title !== m.title || (tpl.description ?? "") !== (m.description ?? "")) : false;
                 return (
                   <Card key={m.id} className={`p-5 border-border/60 ${isLocked ? "opacity-60" : ""}`}>
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="min-w-0">
                         <p className="text-xs text-muted-foreground font-mono-data">ENCONTRO {m.sequence}</p>
                         <h4 className="font-semibold mt-0.5">{m.title}</h4>
+                        {isCustomized && (
+                          <span className="inline-block mt-1 text-[10px] font-semibold uppercase tracking-wider bg-primary/15 text-primary px-1.5 py-0.5 rounded">
+                            Adaptado para você
+                          </span>
+                        )}
                       </div>
                       <Badge variant="outline" className={meta.cls}>{meta.label}</Badge>
                     </div>
