@@ -207,16 +207,13 @@ const Index = () => {
               <Calendar size={16} />
               {c.ctaScheduleDiag}
             </button>
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackClick("cta", "open_whatsapp_hero")}
+            <button
+              onClick={() => openWhatsapp("open_whatsapp_hero")}
               className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
             >
               <MessageCircle size={16} />
               {c.ctaWhatsapp}
-            </a>
+            </button>
             <button
               onClick={openForm}
               className="inline-flex items-center gap-2 text-foreground/80 font-sans font-medium text-sm tracking-wide uppercase px-3 py-4 hover:text-primary transition-colors"
