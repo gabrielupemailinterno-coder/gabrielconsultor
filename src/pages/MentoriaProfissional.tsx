@@ -415,16 +415,13 @@ const MentoriaProfissional = () => {
             custom={2}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => trackClick("cta", "mp_whatsapp_final")}
+            <button
+              onClick={() => openWhatsapp("mp_whatsapp_final")}
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
             >
               <MessageCircle size={16} />
               {c.finalCta}
-            </a>
+            </button>
             <button
               onClick={openForm}
               className="inline-flex items-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-7 py-4 rounded-md hover:bg-primary/10 transition-colors"
