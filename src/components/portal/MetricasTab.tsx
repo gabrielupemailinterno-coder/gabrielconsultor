@@ -141,9 +141,9 @@ const KPI = ({ label, value }: { label: string; value: string }) => (
   </Card>
 );
 
-const Field = ({ label, ...props }: { label: string } & React.ComponentProps<typeof Input>) => (
+const Field = ({ label, value, type = "text", onChange }: { label: string; value: string; type?: string; onChange: (v: string) => void }) => (
   <div className="space-y-1">
     <label className="text-xs text-muted-foreground">{label}</label>
-    <Input {...props} onChange={(e) => (props as any).onChange(e.target.value)} />
+    <Input type={type} value={value} onChange={(e) => onChange(e.target.value)} />
   </div>
 );
