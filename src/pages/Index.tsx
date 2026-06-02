@@ -104,6 +104,13 @@ const Index = () => {
         <meta property="og:url" content="https://gabrielconsultor.com/" />
       </Helmet>
       <LeadFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
+      {qualifyingType && (
+        <QualifyingForm
+          open={!!qualifyingType}
+          onClose={() => setQualifyingType(null)}
+          formType={qualifyingType}
+        />
+      )}
 
       <SiteHeader />
 
