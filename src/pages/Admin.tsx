@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Users, MousePointerClick, Eye, Clock, LogOut, Trash2, Mail, Phone, Building2 } from "lucide-react";
 import BlogAdmin from "@/components/BlogAdmin";
+import { FORM_LABELS, type FormType } from "@/lib/qualifying-forms";
 
 type Lead = {
   id: string;
@@ -13,6 +14,8 @@ type Lead = {
   revenue: string | null;
   main_pain: string | null;
   created_at: string;
+  form_type: FormType;
+  answers: Record<string, string | string[]> | null;
 };
 
 type Visit = { id: string; session_id: string; path: string; referrer: string | null; user_agent: string | null; created_at: string };
@@ -41,6 +44,7 @@ const Admin = () => {
   const [clicks, setClicks] = useState<Click[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [tab, setTab] = useState<"leads" | "visits" | "clicks" | "sessions" | "blog">("leads");
+  const [leadFilter, setLeadFilter] = useState<FormType | "all">("all");
 
   useEffect(() => {
     (async () => {
@@ -144,31 +148,74 @@ const Admin = () => {
           ))}
         </div>
 
-        {tab === "leads" && (
-          <div className="space-y-3">
-            {leads.length === 0 && <p className="text-muted-foreground text-sm">Nenhum cadastro ainda.</p>}
-            {leads.map(l => (
-              <div key={l.id} className="bg-card border border-border rounded-lg p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-baseline gap-3 flex-wrap">
-                      <h3 className="font-serif text-lg">{l.name}</h3>
-                      <span className="text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString("pt-BR")}</span>
-                    </div>
-                    <div className="grid md:grid-cols-3 gap-2 mt-3 text-sm">
-                      <a href={`mailto:${l.email}`} className="flex items-center gap-2 text-muted-foreground hover:text-primary"><Mail size={14} /> {l.email}</a>
-                      <a href={`tel:${l.phone}`} className="flex items-center gap-2 text-muted-foreground hover:text-primary"><Phone size={14} /> {l.phone}</a>
-                      {l.company_name && <span className="flex items-center gap-2 text-muted-foreground"><Building2 size={14} /> {l.company_name}</span>}
-                    </div>
-                    {l.revenue && <p className="text-sm mt-2"><span className="text-muted-foreground">Faturamento:</span> {l.revenue}</p>}
-                    {l.main_pain && <p className="text-sm mt-2 text-muted-foreground italic">"{l.main_pain}"</p>}
-                  </div>
-                  <button onClick={() => deleteLead(l.id)} className="text-muted-foreground hover:text-destructive transition"><Trash2 size={16} /></button>
-                </div>
+        {tab === "leads" && (() => {
+          const types: Array<FormType | "all"> = ["all", "contato", "mentoria_1a1_vendedores", "consultoria_operacional", "mentoria_estrategica"];
+          const counts: Record<string, number> = leads.reduce((acc, l) => {
+            acc[l.form_type] = (acc[l.form_type] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>);
+          const filtered = leadFilter === "all" ? leads : leads.filter(l => l.form_type === leadFilter);
+          const badgeColor: Record<FormType, string> = {
+            contato: "bg-muted text-muted-foreground border-border",
+            mentoria_1a1_vendedores: "bg-primary/15 text-primary border-primary/30",
+            consultoria_operacional: "bg-accent/15 text-accent border-accent/30",
+            mentoria_estrategica: "bg-secondary text-foreground border-border",
+          };
+          return (
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                {types.map(t => {
+                  const label = t === "all" ? "Todos" : FORM_LABELS[t];
+                  const count = t === "all" ? leads.length : (counts[t] || 0);
+                  const active = leadFilter === t;
+                  return (
+                    <button
+                      key={t}
+                      onClick={() => setLeadFilter(t)}
+                      className={`px-3.5 py-1.5 text-xs rounded-full border transition-colors ${active ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground hover:text-foreground hover:bg-secondary/50"}`}
+                    >
+                      {label} <span className="opacity-70">({count})</span>
+                    </button>
+                  );
+                })}
               </div>
-            ))}
-          </div>
-        )}
+              {filtered.length === 0 && <p className="text-muted-foreground text-sm">Nenhum cadastro neste filtro.</p>}
+              {filtered.map(l => (
+                <div key={l.id} className="bg-card border border-border rounded-lg p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline gap-3 flex-wrap">
+                        <h3 className="font-serif text-lg">{l.name}</h3>
+                        <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${badgeColor[l.form_type] || badgeColor.contato}`}>
+                          {FORM_LABELS[l.form_type] || l.form_type}
+                        </span>
+                        <span className="text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString("pt-BR")}</span>
+                      </div>
+                      <div className="grid md:grid-cols-3 gap-2 mt-3 text-sm">
+                        <a href={`mailto:${l.email}`} className="flex items-center gap-2 text-muted-foreground hover:text-primary"><Mail size={14} /> {l.email}</a>
+                        <a href={`tel:${l.phone}`} className="flex items-center gap-2 text-muted-foreground hover:text-primary"><Phone size={14} /> {l.phone}</a>
+                        {l.company_name && <span className="flex items-center gap-2 text-muted-foreground"><Building2 size={14} /> {l.company_name}</span>}
+                      </div>
+                      {l.answers && Object.keys(l.answers).length > 0 && (
+                        <div className="mt-3 grid sm:grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
+                          {Object.entries(l.answers).map(([k, v]) => (
+                            <div key={k} className="flex gap-2">
+                              <span className="text-muted-foreground capitalize">{k.replace(/_/g, " ")}:</span>
+                              <span className="text-foreground">{Array.isArray(v) ? v.join(", ") : String(v)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {l.revenue && <p className="text-sm mt-2"><span className="text-muted-foreground">Faturamento:</span> {l.revenue}</p>}
+                      {l.main_pain && !l.answers && <p className="text-sm mt-2 text-muted-foreground italic">"{l.main_pain}"</p>}
+                    </div>
+                    <button onClick={() => deleteLead(l.id)} className="text-muted-foreground hover:text-destructive transition"><Trash2 size={16} /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
 
         {tab === "visits" && (
           <div className="overflow-x-auto border border-border rounded-lg">

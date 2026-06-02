@@ -15,7 +15,7 @@ import {
   Sparkles,
   Clock,
 } from "lucide-react";
-import LeadFormDialog from "@/components/LeadFormDialog";
+import QualifyingForm from "@/components/QualifyingForm";
 import SiteHeader from "@/components/SiteHeader";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import { useLocale } from "@/contexts/LocaleContext";
@@ -87,7 +87,7 @@ const MentoriaProfissional = () => {
           },
         })}</script>
       </Helmet>
-      <LeadFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
+      <QualifyingForm open={formOpen} onClose={() => setFormOpen(false)} formType="mentoria_1a1_vendedores" />
 
       {/* Back link */}
       <div className="container max-w-5xl pt-8">

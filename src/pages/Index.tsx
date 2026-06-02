@@ -26,6 +26,8 @@ import {
   Star,
 } from "lucide-react";
 import LeadFormDialog from "@/components/LeadFormDialog";
+import QualifyingForm from "@/components/QualifyingForm";
+import type { FormType } from "@/lib/qualifying-forms";
 import SiteHeader from "@/components/SiteHeader";
 import gabrielPhoto from "@/assets/gabriel-g4-hero.jpg.asset.json";
 import monogramaFull from "@/assets/monograma-gv-full-tpn.png.asset.json";
@@ -53,6 +55,7 @@ const serviceIcons = [Workflow, Database, Sparkles, GraduationCap];
 const packageIcons = [Briefcase, Compass];
 const Index = () => {
   const [formOpen, setFormOpen] = useState(false);
+  const [qualifyingType, setQualifyingType] = useState<Exclude<FormType, "contato"> | null>(null);
   const { locale, formatPrice } = useLocale();
   const c = indexCopy[locale];
   useAnalytics("/");
@@ -83,6 +86,10 @@ const Index = () => {
   }, []);
 
   const openForm = () => { trackClick("cta", "open_lead_form"); setFormOpen(true); };
+  const openQualifying = (t: Exclude<FormType, "contato">) => {
+    trackClick("cta", `open_form_${t}`);
+    setQualifyingType(t);
+  };
   const openCalendar = () => { trackClick("cta", "open_calendar"); window.open(CALENDAR_URL, "_blank", "noopener,noreferrer"); };
 
   return (
@@ -97,6 +104,13 @@ const Index = () => {
         <meta property="og:url" content="https://gabrielconsultor.com/" />
       </Helmet>
       <LeadFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
+      {qualifyingType && (
+        <QualifyingForm
+          open={!!qualifyingType}
+          onClose={() => setQualifyingType(null)}
+          formType={qualifyingType}
+        />
+      )}
 
       <SiteHeader />
 
@@ -775,7 +789,9 @@ const Index = () => {
                     ))}
                   </ul>
                   <button
-                    onClick={openForm}
+                    onClick={() =>
+                      openQualifying(i === 0 ? "consultoria_operacional" : "mentoria_estrategica")
+                    }
                     className="inline-flex items-center justify-center gap-2 border border-primary/40 text-foreground font-sans font-medium text-sm tracking-wide uppercase px-6 py-3 rounded-md hover:bg-primary/10 transition-colors"
                   >
                     {c.packageCta}
