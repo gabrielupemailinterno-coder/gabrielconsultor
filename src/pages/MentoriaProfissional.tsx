@@ -15,7 +15,7 @@ import {
   Sparkles,
   Clock,
 } from "lucide-react";
-import LeadFormDialog from "@/components/LeadFormDialog";
+import QualifyingForm from "@/components/QualifyingForm";
 import SiteHeader from "@/components/SiteHeader";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import { useLocale } from "@/contexts/LocaleContext";
