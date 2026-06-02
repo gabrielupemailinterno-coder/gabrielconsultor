@@ -24,7 +24,9 @@ import {
   Briefcase,
   Compass,
   Star,
+  Menu,
 } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetTitle } from "@/components/ui/sheet";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import gabrielPhoto from "@/assets/gabriel-g4-hero.jpg.asset.json";
 import monogramaFull from "@/assets/monograma-gv-full-tpn.png.asset.json";
@@ -95,6 +97,98 @@ const Index = () => {
         <meta property="og:url" content="https://gabrielconsultor.com/" />
       </Helmet>
       <LeadFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
+
+      {/* Site Header */}
+      {(() => {
+        const navItems = locale === "pt"
+          ? [
+              { href: "#sobre", label: "Sobre" },
+              { href: "#empresas", label: "Empresas" },
+              { href: "#numeros", label: "Cases" },
+              { href: "#formacao", label: "Formação" },
+              { href: "#servicos", label: "Serviços" },
+              { href: "#pacotes", label: "Pacotes" },
+              { href: "/mentoria-profissional", label: "Mentoria" },
+              { href: "/blog", label: "Blog" },
+            ]
+          : [
+              { href: "#sobre", label: "About" },
+              { href: "#empresas", label: "Companies" },
+              { href: "#numeros", label: "Cases" },
+              { href: "#formacao", label: "Training" },
+              { href: "#servicos", label: "Services" },
+              { href: "#pacotes", label: "Packages" },
+              { href: "/mentoria-profissional", label: "Mentoring" },
+              { href: "/blog", label: "Blog" },
+            ];
+        const ctaLabel = locale === "pt" ? "Agendar diagnóstico" : "Book a diagnostic";
+        return (
+          <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border/60">
+            <div className="container max-w-6xl flex items-center justify-between h-16">
+              <Link to="/" aria-label="Gabriel Consultor" className="flex items-center">
+                <img src={monogramaFull.url} alt="Gabriel Consultor" className="h-10 md:h-11 w-auto" />
+              </Link>
+              <nav className="hidden lg:flex items-center gap-6">
+                {navItems.map((it) => (
+                  it.href.startsWith("#") ? (
+                    <a key={it.href} href={it.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      {it.label}
+                    </a>
+                  ) : (
+                    <Link key={it.href} to={it.href} className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                      {it.label}
+                    </Link>
+                  )
+                ))}
+              </nav>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={openCalendar}
+                  className="hidden md:inline-flex items-center gap-2 bg-primary text-primary-foreground text-sm font-medium px-4 py-2 rounded-full hover:bg-primary/90 transition-colors"
+                  data-track="header_cta"
+                >
+                  <Calendar size={14} />
+                  {ctaLabel}
+                </button>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <button aria-label="Menu" className="lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-full border border-border text-foreground">
+                      <Menu size={18} />
+                    </button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-[280px] bg-background">
+                    <SheetTitle className="sr-only">Menu</SheetTitle>
+                    <div className="flex flex-col gap-1 mt-8">
+                      {navItems.map((it) => (
+                        <SheetClose asChild key={it.href}>
+                          {it.href.startsWith("#") ? (
+                            <a href={it.href} className="px-3 py-3 rounded-md text-base text-foreground hover:bg-secondary/50 transition-colors">
+                              {it.label}
+                            </a>
+                          ) : (
+                            <Link to={it.href} className="px-3 py-3 rounded-md text-base text-foreground hover:bg-secondary/50 transition-colors">
+                              {it.label}
+                            </Link>
+                          )}
+                        </SheetClose>
+                      ))}
+                      <button
+                        onClick={openCalendar}
+                        className="mt-4 inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground text-sm font-medium px-4 py-3 rounded-full hover:bg-primary/90 transition-colors"
+                      >
+                        <Calendar size={14} />
+                        {ctaLabel}
+                      </button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </div>
+          </header>
+        );
+      })()}
+
+
 
       {/* Hero */}
       <section className="section-padding flex items-center justify-center min-h-[92vh] relative overflow-hidden">
