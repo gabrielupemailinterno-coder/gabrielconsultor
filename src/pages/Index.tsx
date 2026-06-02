@@ -481,8 +481,12 @@ const Index = () => {
             custom={0}
             className="max-w-3xl mb-12"
           >
-            <span className="text-primary text-xs tracking-[0.25em] uppercase font-medium font-mono">
-              {locale === "pt" ? "Formação contínua · G4 Educação" : "Continuous training · G4 Educação"}
+            <div className="inline-flex items-center gap-2 border border-primary/40 bg-primary/10 text-primary text-xs font-medium tracking-wide uppercase px-4 py-1.5 rounded-full mb-5">
+              <Trophy size={14} strokeWidth={2} />
+              {c.badge}
+            </div>
+            <span className="block text-primary text-xs tracking-[0.25em] uppercase font-medium font-mono">
+              {locale === "pt" ? "Capacitações · Formação contínua · G4 Educação" : "Training · Continuous education · G4 Educação"}
             </span>
             <h2 className="font-serif text-3xl md:text-4xl mt-3 mb-4 leading-tight">
               {locale === "pt" ? (
