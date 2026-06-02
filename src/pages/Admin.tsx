@@ -44,6 +44,7 @@ const Admin = () => {
   const [clicks, setClicks] = useState<Click[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [tab, setTab] = useState<"leads" | "visits" | "clicks" | "sessions" | "blog">("leads");
+  const [leadFilter, setLeadFilter] = useState<FormType | "all">("all");
 
   useEffect(() => {
     (async () => {
