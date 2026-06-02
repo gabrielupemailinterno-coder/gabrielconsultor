@@ -22,6 +22,7 @@ const SiteHeader = () => {
   const { pathname } = useLocation();
   const onHome = pathname === "/";
   const [hidden, setHidden] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
   const lastY = useRef(0);
 
   useEffect(() => {
