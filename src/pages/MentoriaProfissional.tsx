@@ -182,7 +182,7 @@ const MentoriaProfissional = () => {
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
             >
               <Sparkles size={16} />
-              Comprar agora · 3x {formatPrice(197)}
+              Comprar agora · 3x {formatPrice(187)}
             </button>
             <button
               onClick={() => openWhatsapp("mp_whatsapp_hero")}
