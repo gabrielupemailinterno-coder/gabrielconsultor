@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, User, MapPin, CreditCard, FileCheck2, Pencil } from "lucide-react";
+import { Loader2, User, MapPin, CreditCard, FileCheck2, Pencil, Download } from "lucide-react";
+import { downloadTermoPdf } from "@/components/TermoAdesao";
 
 type Profile = {
   full_name: string;
