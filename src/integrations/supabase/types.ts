@@ -333,6 +333,7 @@ export type Database = {
       }
       mentees: {
         Row: {
+          access_mode: string
           asaas_customer_id: string | null
           asaas_payment_id: string | null
           cpf: string | null
@@ -340,6 +341,9 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          payment_notes: string | null
+          payment_status: string
+          payment_updated_at: string | null
           phone: string | null
           plan_id: string
           started_at: string | null
@@ -348,6 +352,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          access_mode?: string
           asaas_customer_id?: string | null
           asaas_payment_id?: string | null
           cpf?: string | null
@@ -355,6 +360,9 @@ export type Database = {
           email: string
           full_name: string
           id?: string
+          payment_notes?: string | null
+          payment_status?: string
+          payment_updated_at?: string | null
           phone?: string | null
           plan_id: string
           started_at?: string | null
@@ -363,6 +371,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          access_mode?: string
           asaas_customer_id?: string | null
           asaas_payment_id?: string | null
           cpf?: string | null
@@ -370,6 +379,9 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          payment_notes?: string | null
+          payment_status?: string
+          payment_updated_at?: string | null
           phone?: string | null
           plan_id?: string
           started_at?: string | null

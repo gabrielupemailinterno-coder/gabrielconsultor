@@ -93,6 +93,21 @@ export default function PortalDashboard() {
             </div>
           </div>
           <Progress value={progress} className="h-2" />
+
+          {mentee.access_mode === "trial_then_paid" && mentee.payment_status === "pending" && (
+            <div className="mt-4 rounded-lg border border-primary/40 bg-primary/10 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-primary">Você está nos 3 encontros de avaliação</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Após o 3º encontro, finalize o pagamento para liberar os próximos 3 encontros da jornada.
+                </p>
+              </div>
+              <Button asChild size="sm" className="shrink-0"><a href="/mentoria-profissional#oferta">Fazer pagamento</a></Button>
+            </div>
+          )}
+          {mentee.access_mode === "trial_then_paid" && mentee.payment_status === "paid" && (
+            <p className="mt-3 text-xs text-emerald-500">✓ Pagamento confirmado — todos os encontros liberados.</p>
+          )}
         </div>
       </header>
 

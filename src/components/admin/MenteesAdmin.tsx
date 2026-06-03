@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import AdminNotesCard from "./AdminNotesCard";
+import MenteePaymentCard from "./MenteePaymentCard";
 
 type Mentee = { id: string; full_name: string; email: string; status: string; plan_id: string; plan_name?: string };
 type Meeting = { id: string; sequence: number; title: string; description: string | null; status: string; scheduled_at: string | null };
@@ -234,6 +235,7 @@ export default function MenteesAdmin() {
               <p className="text-sm text-muted-foreground">{selected.email} · {selected.plan_name}</p>
             </div>
 
+            <MenteePaymentCard menteeId={selected.id} onChange={() => loadDetail(selected.id)} />
             <AdminNotesCard menteeId={selected.id} />
 
             {/* Meetings */}
