@@ -2,9 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import TermoAdesao, { TERMO_ADESAO_VERSION } from "@/components/TermoAdesao";
+
+type AccessMode = "full" | "trial_then_paid" | "friend_promo";
 
 type CheckoutMentee = {
   id?: string;
@@ -12,8 +16,21 @@ type CheckoutMentee = {
   email?: string;
   phone?: string | null;
   cpf?: string | null;
-  accessMode?: "full" | "trial_then_paid";
+  accessMode?: AccessMode;
 };
+
+const PRICE = 187;
+
+function planFor(mode: AccessMode | undefined) {
+  if (mode === "trial_then_paid") {
+    return { installments: 2, value: PRICE, label: `2x de R$ ${PRICE.toFixed(2).replace(".", ",")}`, note: "Primeira mensalidade isenta pela modalidade de 3 encontros iniciais." };
+  }
+  if (mode === "friend_promo") {
+    const v = +(PRICE * 0.85).toFixed(2);
+    return { installments: 2, value: v, label: `1º mês grátis + 2x de R$ ${v.toFixed(2).replace(".", ",")} (15% off)`, note: "Promoção Amigo: primeiro mês cortesia e 15% de desconto nas duas próximas mensalidades." };
+  }
+  return { installments: 3, value: PRICE, label: `3x de R$ ${PRICE.toFixed(2).replace(".", ",")}`, note: null as string | null };
+}
 
 export default function CheckoutDialog({
   open,
@@ -29,9 +46,9 @@ export default function CheckoutDialog({
     postalCode: "", addressNumber: "", address: "", addressComplement: "",
     province: "", city: "", state: "",
   });
+  const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const installments = mentee?.accessMode === "trial_then_paid" ? 2 : 3;
-  const amountLabel = useMemo(() => `${installments}x de R$ 187,00`, [installments]);
+  const plan = useMemo(() => planFor(mentee?.accessMode), [mentee?.accessMode]);
 
   useEffect(() => {
     if (!open) return;
@@ -65,6 +82,10 @@ export default function CheckoutDialog({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!accepted) {
+      toast.error("Você precisa aceitar o Termo de Adesão para continuar.");
+      return;
+    }
     setLoading(true);
     const { data, error } = await supabase.functions.invoke("asaas-create-checkout", {
       body: {
@@ -73,6 +94,8 @@ export default function CheckoutDialog({
         postalCode: form.postalCode, addressNumber: form.addressNumber,
         address: form.address, addressComplement: form.addressComplement,
         province: form.province, city: form.city, state: form.state,
+        terms_accepted: true,
+        terms_version: TERMO_ADESAO_VERSION,
       },
     });
     setLoading(false);
@@ -92,13 +115,9 @@ export default function CheckoutDialog({
         <DialogHeader>
           <DialogTitle>Mentoria Comercial 1:1</DialogTitle>
           <p className="text-sm text-muted-foreground">
-            Assinatura mensal · {amountLabel} · 6 encontros em 3 meses
+            Assinatura mensal · {plan.label} · 6 encontros em 3 meses
           </p>
-          {installments === 2 && (
-            <p className="text-xs text-primary">
-              Primeira mensalidade isenta pela modalidade de 3 encontros iniciais.
-            </p>
-          )}
+          {plan.note && <p className="text-xs text-primary">{plan.note}</p>}
         </DialogHeader>
         <form onSubmit={submit} className="space-y-3">
           <Input placeholder="Nome completo" value={form.name} onChange={set("name")} required />
@@ -125,8 +144,19 @@ export default function CheckoutDialog({
             <Input placeholder="UF" maxLength={2} value={form.state} onChange={set("state")} required />
           </div>
 
+          <div className="pt-2">
+            <TermoAdesao />
+            <label className="flex items-start gap-2 mt-2 text-xs cursor-pointer select-none">
+              <Checkbox checked={accepted} onCheckedChange={(v) => setAccepted(v === true)} className="mt-0.5" />
+              <span>
+                Li e aceito o <strong>Termo de Adesão</strong>, incluindo multa de 2% e juros de 1% ao mês em caso
+                de atraso, suspensão dos serviços e recebimento de notificações de cobrança.
+              </span>
+            </label>
+          </div>
+
           <DialogFooter className="pt-2">
-            <Button type="submit" disabled={loading} className="w-full h-11 font-semibold">
+            <Button type="submit" disabled={loading || !accepted} className="w-full h-11 font-semibold">
               {loading ? <Loader2 className="animate-spin" size={16} /> : "Ir para o pagamento"}
             </Button>
           </DialogFooter>

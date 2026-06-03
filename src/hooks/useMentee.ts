@@ -10,7 +10,7 @@ export type Mentee = {
   cpf: string | null;
   status: string;
   started_at: string | null;
-  access_mode: "full" | "trial_then_paid";
+  access_mode: "full" | "trial_then_paid" | "friend_promo";
   payment_status: "pending" | "paid";
   plan: { id: string; name: string; total_meetings: number; duration_months: number } | null;
 };

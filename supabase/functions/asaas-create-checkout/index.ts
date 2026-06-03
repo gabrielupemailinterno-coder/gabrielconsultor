@@ -2,6 +2,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const ASAAS_BASE = "https://api.asaas.com/v3";
+const BASE_PRICE = 187.00;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -15,6 +16,7 @@ Deno.serve(async (req) => {
       postalCode, addressNumber, address, addressComplement, province, city, state,
       mentee_id,
       plan_slug = "mentoria-comercial-3m",
+      terms_accepted, terms_version,
     } = await req.json();
 
     const missing: string[] = [];
@@ -32,14 +34,19 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: `Campos obrigatórios: ${missing.join(", ")}` }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
+    if (!terms_accepted) {
+      return new Response(JSON.stringify({ error: "É necessário aceitar o Termo de Adesão." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    let installments = 3;
+    let accessMode: "full" | "trial_then_paid" | "friend_promo" = "full";
     let resolvedMenteeId: string | null = null;
+    let authUserId: string | null = null;
     if (mentee_id) {
       const authHeader = req.headers.get("Authorization") ?? "";
       const token = authHeader.replace("Bearer ", "").trim();
@@ -52,12 +59,13 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ error: "Sessão inválida. Entre novamente no portal e tente pagar." }),
           { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
+      authUserId = authData.user.id;
       const { data: mentee, error: menteeError } = await supabase
         .from("mentees")
         .select("id,user_id,access_mode,payment_status")
         .eq("id", mentee_id)
         .maybeSingle();
-      if (menteeError || !mentee || mentee.user_id !== authData.user.id) {
+      if (menteeError || !mentee || mentee.user_id !== authUserId) {
         return new Response(JSON.stringify({ error: "Mentorado não encontrado para esta sessão." }),
           { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
@@ -66,13 +74,38 @@ Deno.serve(async (req) => {
           { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       resolvedMenteeId = mentee.id;
-      installments = mentee.access_mode === "trial_then_paid" ? 2 : 3;
+      accessMode = (mentee.access_mode as any) ?? "full";
     }
+
+    // Pricing rules
+    let installments = 3;
+    let chargeValue = BASE_PRICE;
+    if (accessMode === "trial_then_paid") { installments = 2; chargeValue = BASE_PRICE; }
+    if (accessMode === "friend_promo")    { installments = 2; chargeValue = +(BASE_PRICE * 0.85).toFixed(2); }
 
     const headers = { "access_token": apiKey, "Content-Type": "application/json" };
     const cleanCpf = String(cpfCnpj).replace(/\D/g, "");
     const cleanCep = String(postalCode).replace(/\D/g, "");
     const cleanPhone = String(phone).replace(/\D/g, "");
+
+    // Persist address + terms acceptance on the mentee profile
+    if (resolvedMenteeId) {
+      await supabase.from("mentees").update({
+        full_name: name,
+        email,
+        phone: cleanPhone,
+        cpf: cleanCpf,
+        postal_code: cleanCep,
+        address,
+        address_number: String(addressNumber),
+        address_complement: addressComplement || null,
+        province,
+        city,
+        state,
+        terms_accepted_at: new Date().toISOString(),
+        terms_version: terms_version || null,
+      }).eq("id", resolvedMenteeId);
+    }
 
     // 1. Find or create customer with full address (required for PIX/boleto)
     const findRes = await fetch(`${ASAAS_BASE}/customers?cpfCnpj=${encodeURIComponent(cleanCpf)}`, { headers });
@@ -106,23 +139,32 @@ Deno.serve(async (req) => {
       }
       customerId = cust.id;
     } else {
-      // Update existing customer with fresh address info
       await fetch(`${ASAAS_BASE}/customers/${customerId}`, {
         method: "POST", headers, body: JSON.stringify(customerPayload),
       });
     }
 
-    // 2. Create monthly subscription. Trial mentees already consumed the first month, so charge only 2 cycles.
+    if (resolvedMenteeId) {
+      await supabase.from("mentees").update({ asaas_customer_id: customerId }).eq("id", resolvedMenteeId);
+    }
+
+    // 2. Create monthly subscription with fine 2% and interest 1%/month for late payments
     const nextDueDate = new Date(); nextDueDate.setDate(nextDueDate.getDate() + 3);
+    const descParts = [`Mentoria Comercial 1:1 — assinatura mensal (${installments}x R$ ${chargeValue.toFixed(2)})`];
+    if (accessMode === "trial_then_paid") descParts.push("modalidade 3 encontros iniciais");
+    if (accessMode === "friend_promo") descParts.push("Promoção Amigo: 1º mês cortesia + 15% off");
+
     const subBody = {
       customer: customerId,
-      billingType: "UNDEFINED", // user picks card / PIX / boleto on the checkout
-      value: 187.00,
+      billingType: "UNDEFINED",
+      value: chargeValue,
       nextDueDate: nextDueDate.toISOString().slice(0, 10),
       cycle: "MONTHLY",
       maxPayments: installments,
-      description: `Mentoria Comercial 1:1 — assinatura mensal (${installments}x R$ 187,00)`,
+      description: descParts.join(" — "),
       externalReference: resolvedMenteeId ? `mentoria:${email}:mentee:${resolvedMenteeId}` : `mentoria:${email}`,
+      fine: { value: 2 },         // 2% multa sobre atraso
+      interest: { value: 1 },     // 1% ao mês de juros
     };
     const subRes = await fetch(`${ASAAS_BASE}/subscriptions`, {
       method: "POST", headers, body: JSON.stringify(subBody),
@@ -135,7 +177,7 @@ Deno.serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // 3. Fetch the first payment to get its invoiceUrl. Asaas can take a moment to expose it.
+    // 3. Fetch the first payment to get its invoiceUrl
     let firstPayment: any = null;
     let paysData: any = null;
     for (let attempt = 0; attempt < 4; attempt++) {
@@ -159,6 +201,8 @@ Deno.serve(async (req) => {
       paymentId: firstPayment.id,
       customerId,
       installments,
+      chargeValue,
+      accessMode,
     }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (err) {
     console.error("create-checkout error", err);

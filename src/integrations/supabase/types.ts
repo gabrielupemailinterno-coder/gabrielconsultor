@@ -334,8 +334,12 @@ export type Database = {
       mentees: {
         Row: {
           access_mode: string
+          address: string | null
+          address_complement: string | null
+          address_number: string | null
           asaas_customer_id: string | null
           asaas_payment_id: string | null
+          city: string | null
           cpf: string | null
           created_at: string
           email: string
@@ -346,15 +350,24 @@ export type Database = {
           payment_updated_at: string | null
           phone: string | null
           plan_id: string
+          postal_code: string | null
+          province: string | null
           started_at: string | null
+          state: string | null
           status: string
+          terms_accepted_at: string | null
+          terms_version: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           access_mode?: string
+          address?: string | null
+          address_complement?: string | null
+          address_number?: string | null
           asaas_customer_id?: string | null
           asaas_payment_id?: string | null
+          city?: string | null
           cpf?: string | null
           created_at?: string
           email: string
@@ -365,15 +378,24 @@ export type Database = {
           payment_updated_at?: string | null
           phone?: string | null
           plan_id: string
+          postal_code?: string | null
+          province?: string | null
           started_at?: string | null
+          state?: string | null
           status?: string
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           access_mode?: string
+          address?: string | null
+          address_complement?: string | null
+          address_number?: string | null
           asaas_customer_id?: string | null
           asaas_payment_id?: string | null
+          city?: string | null
           cpf?: string | null
           created_at?: string
           email?: string
@@ -384,8 +406,13 @@ export type Database = {
           payment_updated_at?: string | null
           phone?: string | null
           plan_id?: string
+          postal_code?: string | null
+          province?: string | null
           started_at?: string | null
+          state?: string | null
           status?: string
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string
           user_id?: string
         }
