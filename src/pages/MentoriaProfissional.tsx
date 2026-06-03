@@ -93,7 +93,7 @@ const MentoriaProfissional = () => {
           },
           offers: {
             "@type": "Offer",
-            price: locale === "pt" ? "197.00" : "39.00",
+            price: locale === "pt" ? "187.00" : "39.00",
             priceCurrency: locale === "pt" ? "BRL" : "USD",
             availability: "https://schema.org/InStock",
           },
