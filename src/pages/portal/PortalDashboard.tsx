@@ -11,12 +11,14 @@ import CronogramaTab from "@/components/portal/CronogramaTab";
 import TarefasTab from "@/components/portal/TarefasTab";
 import RepositorioTab from "@/components/portal/RepositorioTab";
 import MetricasTab from "@/components/portal/MetricasTab";
+import CheckoutDialog from "@/components/CheckoutDialog";
 
 export default function PortalDashboard() {
   const navigate = useNavigate();
   const { mentee, loading, error } = useMentee();
   const [meetingsDone, setMeetingsDone] = useState(0);
   const [meetingsTotal, setMeetingsTotal] = useState(6);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.add("portal-theme");
@@ -102,7 +104,7 @@ export default function PortalDashboard() {
                   Após o 3º encontro, finalize o pagamento para liberar os próximos 3 encontros da jornada.
                 </p>
               </div>
-              <Button asChild size="sm" className="shrink-0"><a href="/mentoria-profissional#oferta">Fazer pagamento</a></Button>
+              <Button size="sm" className="shrink-0" onClick={() => setCheckoutOpen(true)}>Fazer pagamento</Button>
             </div>
           )}
           {mentee.access_mode === "trial_then_paid" && mentee.payment_status === "paid" && (
@@ -131,6 +133,18 @@ export default function PortalDashboard() {
           <TabsContent value="metricas" className="mt-6"><MetricasTab menteeId={mentee.id} /></TabsContent>
         </Tabs>
       </div>
+      <CheckoutDialog
+        open={checkoutOpen}
+        onOpenChange={setCheckoutOpen}
+        mentee={{
+          id: mentee.id,
+          name: mentee.full_name,
+          email: mentee.email,
+          phone: mentee.phone,
+          cpf: mentee.cpf,
+          accessMode: mentee.access_mode,
+        }}
+      />
     </main>
   );
 }
