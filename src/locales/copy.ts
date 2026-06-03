@@ -447,6 +447,39 @@ export const mentoriaCopy = {
     finalDesc: "Less than a phone bill to have a senior mentor pulling you to the next level every month.",
     finalCta: "I want to start now",
     finalCtaAlt: "I have questions",
+
+    case: {
+      eyebrow: "Success Story",
+      title: "From service to high-ticket sales success",
+      subtitle:
+        "How a professional with a Customer Success background used process and a consultative approach to bill R$ 76k still during the trial period.",
+      contextEyebrow: "Context & challenge",
+      contextTitle: "First-time seller on a R$ 12k product",
+      contextBody:
+        "The mentee stepped into a sales role at a company with a highly technical product and a high average ticket (R$ 12,000), coming from a full career in Customer Success into a purely commercial position.",
+      turningEyebrow: "The turning point",
+      turningTitle: "CS as competitive edge",
+      turningBody:
+        "Despite the traditional sales role, she applied her CS background: flawless service, experience-first mindset and precise pain diagnosis. Result: price objections dissolved and the closing cycle drastically shortened.",
+      metricsEyebrow: "Financial metrics · trial period",
+      metrics: [
+        { label: "Total revenue", value: "R$ 76,000", hint: "Generated still during the trial period" },
+        { label: "Average ticket", value: "R$ 12,000", hint: "High-complexity product" },
+        { label: "Commission rate", value: "2%", hint: "Variable compensation model" },
+        { label: "Commission earned", value: "R$ 1,520", hint: "Direct return to the mentee during the trial" },
+      ],
+      lessonsTitle: "Key takeaways",
+      lessons: [
+        {
+          title: "Consultative selling beats price",
+          desc: "When the ticket hits R$ 12k, the customer doesn't buy the product — they buy trust. Precise diagnosis kills the objection.",
+        },
+        {
+          title: "Process beats raw talent",
+          desc: "Pairing flawless experience with a structured sales process accelerates the seller's ramp-up, even without prior sales background.",
+        },
+      ],
+    },
   },
 } as const;
 
