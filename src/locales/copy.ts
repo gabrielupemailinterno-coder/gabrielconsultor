@@ -353,6 +353,39 @@ export const mentoriaCopy = {
     finalDesc: "Menos do que uma conta de celular para ter um mentor sênior te puxando para o próximo nível, todo mês.",
     finalCta: "Quero começar agora",
     finalCtaAlt: "Tenho dúvidas",
+
+    case: {
+      eyebrow: "Case de Sucesso",
+      title: "Do atendimento ao sucesso em vendas de alto ticket",
+      subtitle:
+        "Como uma profissional com background em Customer Success usou processos e abordagem consultiva para faturar R$ 76 mil ainda no período de experiência.",
+      contextEyebrow: "Contexto e desafio",
+      contextTitle: "Vendedora estreante em um produto de R$ 12k",
+      contextBody:
+        "A mentorada assumiu o desafio como vendedora em uma empresa com produto de alta complexidade técnica e ticket médio elevado (R$ 12.000), saindo de uma trajetória inteira em Customer Success para uma posição puramente comercial.",
+      turningEyebrow: "A virada de chave",
+      turningTitle: "CS como diferencial competitivo",
+      turningBody:
+        "Embora em uma função comercial tradicional, ela aplicou sua bagagem de CS: atendimento impecável, foco em experiência e diagnóstico preciso das dores. Resultado: objeções de preço dissolvidas e ciclo de fechamento drasticamente acelerado.",
+      metricsEyebrow: "Métricas financeiras · período de experiência",
+      metrics: [
+        { label: "Faturamento total", value: "R$ 76.000", hint: "Gerado ainda no período de experiência" },
+        { label: "Ticket médio", value: "R$ 12.000", hint: "Produto de alta complexidade" },
+        { label: "Taxa de comissão", value: "2%", hint: "Modelo de remuneração variável" },
+        { label: "Comissão no bolso", value: "R$ 1.520", hint: "Retorno direto da mentorada na fase de teste" },
+      ],
+      lessonsTitle: "Lições práticas",
+      lessons: [
+        {
+          title: "Venda consultiva vence o preço",
+          desc: "Quando o ticket chega a R$ 12k, o cliente não compra o produto — compra confiança. Diagnóstico preciso elimina a objeção.",
+        },
+        {
+          title: "Processo vence o talento bruto",
+          desc: "Alinhar experiência impecável com um processo comercial estruturado acelera o tempo de rampa do vendedor, mesmo sem experiência prévia em vendas.",
+        },
+      ],
+    },
   },
   en: {
     metaTitle: "1:1 Professional Mentoring for Sales & CS · USD 39/month | Gabriel Vieira",
