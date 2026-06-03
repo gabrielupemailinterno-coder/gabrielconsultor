@@ -5,12 +5,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Loader2, LogOut, CalendarDays, ListChecks, FolderOpen, BarChart3 } from "lucide-react";
+import { Loader2, LogOut, CalendarDays, ListChecks, FolderOpen, BarChart3, UserCircle2 } from "lucide-react";
 import { useMentee } from "@/hooks/useMentee";
 import CronogramaTab from "@/components/portal/CronogramaTab";
 import TarefasTab from "@/components/portal/TarefasTab";
 import RepositorioTab from "@/components/portal/RepositorioTab";
 import MetricasTab from "@/components/portal/MetricasTab";
+import PerfilTab from "@/components/portal/PerfilTab";
 import CheckoutDialog from "@/components/CheckoutDialog";
 
 export default function PortalDashboard() {
@@ -121,11 +122,12 @@ export default function PortalDashboard() {
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
         <Tabs defaultValue="cronograma" className="w-full">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full h-auto p-1 bg-muted">
+          <TabsList className="grid grid-cols-3 md:grid-cols-5 w-full h-auto p-1 bg-muted">
             <TabsTrigger value="cronograma" className="gap-2 py-2.5"><CalendarDays size={15} /><span className="hidden sm:inline">Cronograma</span></TabsTrigger>
             <TabsTrigger value="tarefas" className="gap-2 py-2.5"><ListChecks size={15} /><span className="hidden sm:inline">Tarefas</span></TabsTrigger>
             <TabsTrigger value="repositorio" className="gap-2 py-2.5"><FolderOpen size={15} /><span className="hidden sm:inline">Repositório</span></TabsTrigger>
             <TabsTrigger value="metricas" className="gap-2 py-2.5"><BarChart3 size={15} /><span className="hidden sm:inline">Métricas</span></TabsTrigger>
+            <TabsTrigger value="perfil" className="gap-2 py-2.5"><UserCircle2 size={15} /><span className="hidden sm:inline">Perfil</span></TabsTrigger>
           </TabsList>
           <TabsContent value="cronograma" className="mt-6">
             <CronogramaTab menteeId={mentee.id} menteeEmail={mentee.email} onChange={() => {
@@ -137,6 +139,7 @@ export default function PortalDashboard() {
           <TabsContent value="tarefas" className="mt-6"><TarefasTab menteeId={mentee.id} /></TabsContent>
           <TabsContent value="repositorio" className="mt-6"><RepositorioTab menteeId={mentee.id} /></TabsContent>
           <TabsContent value="metricas" className="mt-6"><MetricasTab menteeId={mentee.id} /></TabsContent>
+          <TabsContent value="perfil" className="mt-6"><PerfilTab menteeId={mentee.id} onOpenCheckout={() => setCheckoutOpen(true)} /></TabsContent>
         </Tabs>
       </div>
       <CheckoutDialog
