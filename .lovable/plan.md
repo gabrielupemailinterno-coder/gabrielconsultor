@@ -1,41 +1,34 @@
-## Contexto
-A landing page `/mentoria-profissional` segue tema dark com paleta oficial (laranja `#C4632D` como acento primário). O usuário quer inserir um case real anônimo de uma profissional que migrou de CS para vendas de alto ticket.
+## Plano de correção definitiva
 
-## Escopo
-1. **Novo componente** `src/components/CaseSection.tsx`
-   - Título + subtítulo com animação `fadeUp` (framer-motion).
-   - Bloco de contexto/desafio + bloco "Virada de chave" (diferencial competitivo).
-   - **4 blocos de métricas financeiras** grandes e visuais:
-     - Faturamento Total: R$ 76.000,00
-     - Ticket Médio: R$ 12.000,00
-     - Taxa de Comissão: 2%
-     - Retorno Direto: R$ 1.520,00
-     - Estilo: fonte mono para os números, cor `primary` (laranja) nos valores, cards com fundo `card` e borda sutil.
-   - **2 cards de lições práticas** (key takeaways) com ícones relevantes do lucide-react.
-   - Layout responsivo: grid 2x2 em desktop, 1 coluna em mobile.
-   - Sem foto da pessoa (anonimato).
+1. **Corrigir o botão “Fazer pagamento” no Portal do Mentorado**
+   - Hoje ele só leva para `/mentoria-profissional#oferta`, mas não abre o checkout automaticamente.
+   - Vou trocar para um fluxo direto: clicar em “Fazer pagamento” abre o formulário de pagamento já no contexto do mentorado.
+   - O formulário será pré-preenchido com nome e e-mail do mentorado quando ele estiver logado.
 
-2. **Conteúdo bilíngue** em `src/locales/copy.ts`
-   - Adicionar chaves do case dentro de `mentoriaCopy.pt`.
-   - Adicionar versão `en` básica para manter paridade (placeholder ou tradução fiel).
+2. **Ajustar a regra de cobrança da Asaas por modalidade**
+   - Modalidade **Acesso completo/pago**: assinatura mensal de **3 mensalidades de R$ 187,00**.
+   - Modalidade **3 primeiros grátis, depois paga**: isenta a primeira mensalidade e cria assinatura de **2 mensalidades de R$ 187,00**.
+   - A função de checkout vai receber o `mentee_id`, validar o mentorado no backend e decidir com segurança se `maxPayments` será `2` ou `3`.
 
-3. **Inserção na página** `src/pages/MentoriaProfissional.tsx`
-   - Posicionar a `<CaseSection />` **entre** a seção "Como funciona" e a seção "CTA Final".
-   - Usar `<div className="gold-divider" />` antes e depois, igual às demais seções.
-   - Importar o componente e as chaves de copy.
+3. **Melhorar o formulário de checkout**
+   - Manter os campos obrigatórios para cadastrar cliente na Asaas: nome, e-mail, WhatsApp, CPF, CEP, número e endereço de cobrança.
+   - Preencher automaticamente dados conhecidos do mentorado e permitir completar CPF/endereço.
+   - Atualizar o texto do checkout para mostrar claramente quando for “2x de R$ 187,00” por isenção da primeira mensalidade.
 
-## Fora do escopo
-- Sem alteração de backend.
-- Sem novas dependências.
-- Sem imagem/foto do mentorado (anonimato).
+4. **Ajustar o webhook para pagamentos de assinatura**
+   - Quando a primeira cobrança confirmada chegar da Asaas, se o mentorado já existir, o webhook deverá marcar `payment_status = paid`, salvar IDs da Asaas e liberar os encontros bloqueados.
+   - Se o mentorado ainda não existir, mantém o provisionamento automático atual.
+   - Assim, quem começou com 3 encontros grátis será desbloqueado após pagar a primeira das 2 mensalidades.
 
-## Arquivos afetados
-- `src/components/CaseSection.tsx` (novo)
-- `src/locales/copy.ts` (adição de chaves)
-- `src/pages/MentoriaProfissional.tsx` (import + inserção)
+5. **Validar a integração**
+   - Testar a função de checkout com payload simulado para confirmar que retorna link de pagamento e usa 2 ou 3 mensalidades conforme a modalidade.
+   - Testar o webhook em modo seguro para confirmar que o mentorado existente é atualizado e os encontros são liberados sem depender do redirecionamento do navegador.
 
-## Checklist de qualidade
-- [ ] Tokens de design: `bg-card`, `border-border`, `text-primary`, `font-mono`, `font-serif`, `text-muted-foreground`.
-- [ ] Animação `fadeUp` consistente com as demais seções da página.
-- [ ] Responsividade mobile verificada.
-- [ ] Conteúdo PT/EN presente no copy.ts.
+## Detalhes técnicos
+
+- Arquivos principais envolvidos:
+  - `src/pages/portal/PortalDashboard.tsx`
+  - `src/components/CheckoutDialog.tsx`
+  - `supabase/functions/asaas-create-checkout/index.ts`
+  - `supabase/functions/asaas-webhook/index.ts`
+- Não vou mudar sua tabela de mentorados, porque os campos `access_mode` e `payment_status` já existem e suportam essa regra.
