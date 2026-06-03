@@ -93,7 +93,7 @@ const MentoriaProfissional = () => {
           },
           offers: {
             "@type": "Offer",
-            price: locale === "pt" ? "197.00" : "39.00",
+            price: locale === "pt" ? "187.00" : "39.00",
             priceCurrency: locale === "pt" ? "BRL" : "USD",
             availability: "https://schema.org/InStock",
           },
@@ -162,7 +162,7 @@ const MentoriaProfissional = () => {
             </span>
             <div className="flex items-baseline gap-2">
               <span className="font-serif text-5xl md:text-6xl font-bold text-foreground">
-                {formatPrice(197)}
+                {formatPrice(187)}
               </span>
               <span className="text-muted-foreground text-sm">{c.pricePeriod}</span>
             </div>
@@ -182,7 +182,7 @@ const MentoriaProfissional = () => {
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
             >
               <Sparkles size={16} />
-              Comprar agora · 3x {formatPrice(197)}
+              Comprar agora · 3x {formatPrice(187)}
             </button>
             <button
               onClick={() => openWhatsapp("mp_whatsapp_hero")}
@@ -423,7 +423,7 @@ const MentoriaProfissional = () => {
             custom={0}
             className="font-serif text-3xl md:text-4xl mb-6 leading-tight"
           >
-            {formatPrice(197)}
+            {formatPrice(187)}
             {c.pricePeriod} {c.finalHeadA}{" "}
             <span className="text-primary">{c.finalHeadB}</span>
           </motion.h2>
