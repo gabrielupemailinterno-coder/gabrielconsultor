@@ -69,7 +69,6 @@ Deno.serve(async (req) => {
         .update({
           payment_status: "paid",
           status: "active",
-          started_at: new Date().toISOString(),
           asaas_customer_id: payment.customer,
           asaas_payment_id: payment.id,
           payment_updated_at: new Date().toISOString(),
