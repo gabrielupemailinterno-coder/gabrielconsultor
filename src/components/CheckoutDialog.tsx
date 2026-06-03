@@ -145,14 +145,41 @@ export default function CheckoutDialog({
           </div>
 
           <div className="pt-2">
-            <TermoAdesao />
+            <TermoAdesao data={{
+              name: form.name, cpf: form.cpf, email: form.email,
+              address: form.address, address_number: form.addressNumber,
+              address_complement: form.addressComplement, province: form.province,
+              city: form.city, state: form.state, postal_code: form.postalCode,
+              installments: plan.installments, installmentValue: plan.value,
+              totalValue: +(plan.value * plan.installments).toFixed(2),
+              accessMode: mentee?.accessMode,
+            }} />
             <label className="flex items-start gap-2 mt-2 text-xs cursor-pointer select-none">
               <Checkbox checked={accepted} onCheckedChange={(v) => setAccepted(v === true)} className="mt-0.5" />
               <span>
-                Li e aceito o <strong>Termo de Adesão</strong>, incluindo multa de 2% e juros de 1% ao mês em caso
-                de atraso, suspensão dos serviços e recebimento de notificações de cobrança.
+                Li e aceito o <strong>Termo de Adesão e Contrato de Prestação de Serviços de Mentoria</strong>,
+                incluindo multa de 2%, juros de 1% ao mês em caso de atraso, suspensão dos serviços e recebimento
+                de notificações de cobrança.
               </span>
             </label>
+            {accepted && (
+              <button
+                type="button"
+                onClick={() => downloadTermoPdf({
+                  name: form.name, cpf: form.cpf, email: form.email,
+                  address: form.address, address_number: form.addressNumber,
+                  address_complement: form.addressComplement, province: form.province,
+                  city: form.city, state: form.state, postal_code: form.postalCode,
+                  installments: plan.installments, installmentValue: plan.value,
+                  totalValue: +(plan.value * plan.installments).toFixed(2),
+                  accessMode: mentee?.accessMode,
+                  acceptedAt: new Date().toISOString(),
+                })}
+                className="mt-2 inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+              >
+                <Download size={13} /> Baixar PDF do termo aceito
+              </button>
+            )}
           </div>
 
           <DialogFooter className="pt-2">
