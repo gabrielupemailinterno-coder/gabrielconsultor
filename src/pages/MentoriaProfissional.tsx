@@ -178,11 +178,11 @@ const MentoriaProfissional = () => {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
             <button
-              onClick={() => { trackClick("cta", "mp_buy_hero"); setCheckoutOpen(true); }}
+              onClick={() => { trackClick("cta", "mp_buy_hero"); openForm(); }}
               className="cta-glow inline-flex items-center gap-2 bg-primary text-primary-foreground font-sans font-semibold text-sm tracking-wide uppercase px-8 py-4 rounded-md"
             >
               <Sparkles size={16} />
-              Comprar agora · 3x {formatPrice(187)}
+              Quero fazer meu cadastro
             </button>
             <button
               onClick={() => openWhatsapp("mp_whatsapp_hero")}
