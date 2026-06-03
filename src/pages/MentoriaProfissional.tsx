@@ -16,6 +16,7 @@ import {
   Clock,
 } from "lucide-react";
 import QualifyingForm from "@/components/QualifyingForm";
+import CaseSection from "@/components/CaseSection";
 import QuickContactDialog from "@/components/QuickContactDialog";
 import CheckoutDialog from "@/components/CheckoutDialog";
 import SiteHeader from "@/components/SiteHeader";
@@ -404,6 +405,10 @@ const MentoriaProfissional = () => {
           </motion.div>
         </div>
       </section>
+
+      <div className="gold-divider" />
+
+      <CaseSection />
 
       <div className="gold-divider" />
 
