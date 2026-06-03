@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { CreditCard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-type AccessMode = "full" | "trial_then_paid";
+type AccessMode = "full" | "trial_then_paid" | "friend_promo";
 type PaymentStatus = "pending" | "paid";
 
 export default function MenteePaymentCard({ menteeId, onChange }: { menteeId: string; onChange?: () => void }) {
@@ -80,6 +80,7 @@ export default function MenteePaymentCard({ menteeId, onChange }: { menteeId: st
             <SelectContent>
               <SelectItem value="full">Acesso completo (pago)</SelectItem>
               <SelectItem value="trial_then_paid">3 primeiros grátis, depois paga</SelectItem>
+              <SelectItem value="friend_promo">Amigos — promoção especial (1º mês off + 15% nas 2 próximas)</SelectItem>
             </SelectContent>
           </Select>
         </label>
@@ -116,7 +117,8 @@ export default function MenteePaymentCard({ menteeId, onChange }: { menteeId: st
 
       <p className="text-xs text-muted-foreground">
         <strong>Acesso completo:</strong> mentorado vê todos os encontros liberados normalmente.<br />
-        <strong>3 primeiros grátis:</strong> encontros 4–6 ficam bloqueados até você marcar como Pago.
+        <strong>3 primeiros grátis:</strong> encontros 4–6 ficam bloqueados até você marcar como Pago.<br />
+        <strong>Amigos — promoção especial:</strong> 1ª mensalidade cortesia e 15% de desconto nas 2 próximas (2x R$ 158,95).
       </p>
     </div>
   );

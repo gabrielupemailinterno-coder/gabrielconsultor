@@ -96,18 +96,24 @@ export default function PortalDashboard() {
           </div>
           <Progress value={progress} className="h-2" />
 
-          {mentee.access_mode === "trial_then_paid" && mentee.payment_status === "pending" && (
+          {mentee.payment_status === "pending" && mentee.access_mode !== "full" && (
             <div className="mt-4 rounded-lg border border-primary/40 bg-primary/10 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-primary">Você está nos 3 encontros de avaliação</p>
+                <p className="text-sm font-semibold text-primary">
+                  {mentee.access_mode === "friend_promo"
+                    ? "Promoção Amigo: 1ª mensalidade cortesia"
+                    : "Você está nos 3 encontros de avaliação"}
+                </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Após o 3º encontro, finalize o pagamento para liberar os próximos 3 encontros da jornada.
+                  {mentee.access_mode === "friend_promo"
+                    ? "Finalize o cadastro de pagamento para liberar todos os encontros (2x R$ 158,95 com 15% off)."
+                    : "Após o 3º encontro, finalize o pagamento para liberar os próximos 3 encontros da jornada."}
                 </p>
               </div>
               <Button size="sm" className="shrink-0" onClick={() => setCheckoutOpen(true)}>Fazer pagamento</Button>
             </div>
           )}
-          {mentee.access_mode === "trial_then_paid" && mentee.payment_status === "paid" && (
+          {mentee.access_mode !== "full" && mentee.payment_status === "paid" && (
             <p className="mt-3 text-xs text-emerald-500">✓ Pagamento confirmado — todos os encontros liberados.</p>
           )}
         </div>
