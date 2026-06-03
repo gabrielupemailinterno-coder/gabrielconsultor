@@ -6,6 +6,8 @@ export type Mentee = {
   user_id: string;
   full_name: string;
   email: string;
+  phone: string | null;
+  cpf: string | null;
   status: string;
   started_at: string | null;
   access_mode: "full" | "trial_then_paid";
@@ -25,7 +27,7 @@ export function useMentee() {
       if (!session.session) { if (active) { setLoading(false); setError("unauth"); } return; }
       const { data, error } = await supabase
         .from("mentees")
-        .select("id,user_id,full_name,email,status,started_at,access_mode,payment_status,plan:mentorship_plans(id,name,total_meetings,duration_months)")
+        .select("id,user_id,full_name,email,phone,cpf,status,started_at,access_mode,payment_status,plan:mentorship_plans(id,name,total_meetings,duration_months)")
         .eq("user_id", session.session.user.id)
         .maybeSingle();
       if (!active) return;
