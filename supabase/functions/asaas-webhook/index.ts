@@ -60,11 +60,30 @@ Deno.serve(async (req) => {
       }), { status: 200, headers: { "Content-Type": "application/json" } });
     }
 
-    // Already provisioned?
+    // Already provisioned? Mark as paid and release the remaining meetings.
     const { data: existing } = await supabase
       .from("mentees").select("id, user_id").eq("email", email).maybeSingle();
     if (existing) {
-      return new Response(JSON.stringify({ already_active: true, mentee_id: existing.id }),
+      const { error: updateErr } = await supabase
+        .from("mentees")
+        .update({
+          payment_status: "paid",
+          status: "active",
+          asaas_customer_id: payment.customer,
+          asaas_payment_id: payment.id,
+          payment_updated_at: new Date().toISOString(),
+        })
+        .eq("id", existing.id);
+      if (updateErr) throw new Error("update mentee payment: " + updateErr.message);
+
+      const { error: unlockErr } = await supabase
+        .from("meetings")
+        .update({ status: "available" })
+        .eq("mentee_id", existing.id)
+        .eq("status", "blocked");
+      if (unlockErr) throw new Error("unlock meetings: " + unlockErr.message);
+
+      return new Response(JSON.stringify({ already_active: true, payment_updated: true, mentee_id: existing.id }),
         { status: 200, headers: { "Content-Type": "application/json" } });
     }
 
@@ -89,6 +108,19 @@ Deno.serve(async (req) => {
       _phone: phone, _asaas_customer_id: payment.customer, _asaas_payment_id: payment.id,
     });
     if (provErr) throw new Error("provision: " + provErr.message);
+
+    const { error: paidErr } = await supabase
+      .from("mentees")
+      .update({ payment_status: "paid", payment_updated_at: new Date().toISOString() })
+      .eq("id", menteeId);
+    if (paidErr) throw new Error("mark paid: " + paidErr.message);
+
+    const { error: unlockErr } = await supabase
+      .from("meetings")
+      .update({ status: "available" })
+      .eq("mentee_id", menteeId)
+      .eq("status", "blocked");
+    if (unlockErr) throw new Error("unlock meetings: " + unlockErr.message);
 
     // Send welcome email if transactional email infra exists
     try {

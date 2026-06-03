@@ -1,22 +1,52 @@
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useEffect, useMemo, useState } from "react";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export default function CheckoutDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+type CheckoutMentee = {
+  id?: string;
+  name?: string;
+  email?: string;
+  phone?: string | null;
+  cpf?: string | null;
+  accessMode?: "full" | "trial_then_paid";
+};
+
+export default function CheckoutDialog({
+  open,
+  onOpenChange,
+  mentee,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  mentee?: CheckoutMentee;
+}) {
   const [form, setForm] = useState({
     name: "", email: "", phone: "", cpf: "",
     postalCode: "", addressNumber: "", address: "", addressComplement: "",
     province: "", city: "", state: "",
   });
   const [loading, setLoading] = useState(false);
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setForm((s) => ({ ...s, [k]: e.target.value }));
+  const installments = mentee?.accessMode === "trial_then_paid" ? 2 : 3;
+  const amountLabel = useMemo(() => `${installments}x de R$ 187,00`, [installments]);
 
-  // Auto-fill address from ViaCEP when 8 digits typed
+  useEffect(() => {
+    if (!open) return;
+    setForm((current) => ({
+      ...current,
+      name: mentee?.name ?? current.name,
+      email: mentee?.email ?? current.email,
+      phone: mentee?.phone ?? current.phone,
+      cpf: mentee?.cpf ?? current.cpf,
+    }));
+  }, [open, mentee?.name, mentee?.email, mentee?.phone, mentee?.cpf]);
+
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((s) => ({ ...s, [k]: k === "state" ? e.target.value.toUpperCase() : e.target.value }));
+
   const onCepBlur = async () => {
     const cep = form.postalCode.replace(/\D/g, "");
     if (cep.length !== 8) return;
@@ -38,6 +68,7 @@ export default function CheckoutDialog({ open, onOpenChange }: { open: boolean; 
     setLoading(true);
     const { data, error } = await supabase.functions.invoke("asaas-create-checkout", {
       body: {
+        mentee_id: mentee?.id,
         name: form.name, email: form.email, phone: form.phone, cpfCnpj: form.cpf.replace(/\D/g, ""),
         postalCode: form.postalCode, addressNumber: form.addressNumber,
         address: form.address, addressComplement: form.addressComplement,
@@ -61,8 +92,13 @@ export default function CheckoutDialog({ open, onOpenChange }: { open: boolean; 
         <DialogHeader>
           <DialogTitle>Mentoria Comercial 1:1</DialogTitle>
           <p className="text-sm text-muted-foreground">
-            Assinatura mensal · 3x de R$ 187,00 · 6 encontros em 3 meses
+            Assinatura mensal · {amountLabel} · 6 encontros em 3 meses
           </p>
+          {installments === 2 && (
+            <p className="text-xs text-primary">
+              Primeira mensalidade isenta pela modalidade de 3 encontros iniciais.
+            </p>
+          )}
         </DialogHeader>
         <form onSubmit={submit} className="space-y-3">
           <Input placeholder="Nome completo" value={form.name} onChange={set("name")} required />
@@ -76,23 +112,17 @@ export default function CheckoutDialog({ open, onOpenChange }: { open: boolean; 
             Endereço de cobrança
           </div>
           <div className="grid grid-cols-3 gap-3">
-            <Input
-              placeholder="CEP"
-              value={form.postalCode}
-              onChange={set("postalCode")}
-              onBlur={onCepBlur}
-              required
-            />
-            <Input className="col-span-2" placeholder="Endereço (rua/avenida)" value={form.address} onChange={set("address")} />
+            <Input placeholder="CEP" value={form.postalCode} onChange={set("postalCode")} onBlur={onCepBlur} required />
+            <Input className="col-span-2" placeholder="Endereço (rua/avenida)" value={form.address} onChange={set("address")} required />
           </div>
           <div className="grid grid-cols-3 gap-3">
             <Input placeholder="Número" value={form.addressNumber} onChange={set("addressNumber")} required />
             <Input className="col-span-2" placeholder="Complemento (opcional)" value={form.addressComplement} onChange={set("addressComplement")} />
           </div>
           <div className="grid grid-cols-3 gap-3">
-            <Input placeholder="Bairro" value={form.province} onChange={set("province")} />
-            <Input placeholder="Cidade" value={form.city} onChange={set("city")} />
-            <Input placeholder="UF" maxLength={2} value={form.state} onChange={set("state")} />
+            <Input placeholder="Bairro" value={form.province} onChange={set("province")} required />
+            <Input placeholder="Cidade" value={form.city} onChange={set("city")} required />
+            <Input placeholder="UF" maxLength={2} value={form.state} onChange={set("state")} required />
           </div>
 
           <DialogFooter className="pt-2">
@@ -101,7 +131,7 @@ export default function CheckoutDialog({ open, onOpenChange }: { open: boolean; 
             </Button>
           </DialogFooter>
           <p className="text-xs text-muted-foreground text-center">
-            Pagamento processado com segurança via Asaas. Acesso ao portal liberado automaticamente após a confirmação da 1ª mensalidade.
+            Pagamento processado com segurança via Asaas. Acesso liberado automaticamente após confirmação.
           </p>
         </form>
       </DialogContent>
