@@ -17,6 +17,8 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const event = body?.event;
     const payment = body?.payment;
+    const isTest = body?.test === true;
+    const isDryRun = body?.dry_run === true;
     if (!event || !payment) return new Response("ignored", { status: 200 });
 
     // Only act on first confirmation of the installment series
@@ -30,16 +32,33 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Fetch customer details from Asaas
-    const apiKey = Deno.env.get("ASAAS_API_KEY")!;
-    const custRes = await fetch(`${ASAAS_BASE}/customers/${payment.customer}`, {
-      headers: { "access_token": apiKey },
-    });
-    const customer = await custRes.json();
+    // Get customer details: mocked in test mode, otherwise from Asaas API
+    let customer: any;
+    if (isTest && body?.customer) {
+      customer = body.customer;
+    } else {
+      const apiKey = Deno.env.get("ASAAS_API_KEY")!;
+      const custRes = await fetch(`${ASAAS_BASE}/customers/${payment.customer}`, {
+        headers: { "access_token": apiKey },
+      });
+      customer = await custRes.json();
+    }
     const email = customer.email?.toLowerCase().trim();
     const fullName = customer.name ?? "Mentorado";
     const phone = customer.mobilePhone ?? customer.phone ?? null;
     if (!email) throw new Error("customer email missing");
+
+    // Dry run: validate plan exists and stop before creating user/mentee
+    if (isDryRun) {
+      const { data: plan } = await supabase
+        .from("mentorship_plans").select("id, slug").eq("slug", "mentoria-comercial-3m").single();
+      const { data: existing } = await supabase
+        .from("mentees").select("id").eq("email", email).maybeSingle();
+      return new Response(JSON.stringify({
+        dry_run: true, ok: true, event, email, fullName, phone,
+        plan_found: !!plan, already_provisioned: !!existing,
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
 
     // Already provisioned?
     const { data: existing } = await supabase
