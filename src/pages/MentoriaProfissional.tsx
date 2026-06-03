@@ -162,7 +162,7 @@ const MentoriaProfissional = () => {
             </span>
             <div className="flex items-baseline gap-2">
               <span className="font-serif text-5xl md:text-6xl font-bold text-foreground">
-                {formatPrice(197)}
+                {formatPrice(187)}
               </span>
               <span className="text-muted-foreground text-sm">{c.pricePeriod}</span>
             </div>
@@ -423,7 +423,7 @@ const MentoriaProfissional = () => {
             custom={0}
             className="font-serif text-3xl md:text-4xl mb-6 leading-tight"
           >
-            {formatPrice(197)}
+            {formatPrice(187)}
             {c.pricePeriod} {c.finalHeadA}{" "}
             <span className="text-primary">{c.finalHeadB}</span>
           </motion.h2>
