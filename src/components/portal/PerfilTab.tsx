@@ -117,10 +117,26 @@ export default function PerfilTab({ menteeId, onOpenCheckout }: { menteeId: stri
       <Card className="p-5 space-y-3">
         <h3 className="text-sm font-semibold flex items-center gap-2"><FileCheck2 size={15} /> Termo de Adesão</h3>
         {p.terms_accepted_at ? (
-          <div className="text-sm space-y-1">
+          <div className="text-sm space-y-2">
             <p className="text-emerald-500">✓ Aceito em {new Date(p.terms_accepted_at).toLocaleString("pt-BR")}</p>
             {p.terms_version && <p className="text-xs text-muted-foreground">Versão {p.terms_version}</p>}
             <p className="text-xs text-muted-foreground">Inclui multa de 2%, juros de 1% a.m. em atraso, suspensão dos serviços e notificações de cobrança.</p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-2"
+              onClick={() => downloadTermoPdf({
+                name: p.full_name, cpf: p.cpf, email: p.email,
+                address: p.address, address_number: p.address_number,
+                address_complement: p.address_complement, province: p.province,
+                city: p.city, state: p.state, postal_code: p.postal_code,
+                access_mode: undefined,
+                accessMode: p.access_mode as any,
+                acceptedAt: p.terms_accepted_at,
+              } as any)}
+            >
+              <Download size={14} /> Baixar PDF do termo
+            </Button>
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">Você ainda não aceitou o termo. Ele é apresentado no momento do pagamento.</p>
