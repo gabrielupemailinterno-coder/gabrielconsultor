@@ -122,19 +122,17 @@ Deno.serve(async (req) => {
       .eq("status", "blocked");
     if (unlockErr) throw new Error("unlock meetings: " + unlockErr.message);
 
-    // Send welcome email if transactional email infra exists
+    // Send welcome email via Zoho (app email)
     try {
-      await supabase.functions.invoke("send-transactional-email", {
+      await supabase.functions.invoke("send-app-email", {
         body: {
+          template: "welcome-mentee",
           to: email,
-          subject: "Bem-vindo à Mentoria Comercial 1:1",
-          purpose: "transactional",
-          idempotency_key: `welcome:${menteeId}`,
-          html: welcomeHtml(fullName, email, tempPassword),
+          data: { fullName, email, tempPassword },
         },
       });
     } catch (mailErr) {
-      console.warn("welcome email skipped (likely infra not set up yet):", mailErr);
+      console.warn("welcome email send failed:", mailErr);
     }
 
     return new Response(JSON.stringify({ ok: true, mentee_id: menteeId }),
@@ -153,17 +151,3 @@ function generatePassword(len: number) {
   return Array.from(arr, (n) => chars[n % chars.length]).join("");
 }
 
-function welcomeHtml(name: string, email: string, password: string) {
-  const portalUrl = "https://gabrielconsultor.com/mentorados/login";
-  return `
-    <div style="font-family:Inter,system-ui,sans-serif;color:#111;line-height:1.55">
-      <h2>Bem-vindo, ${name.split(" ")[0]}!</h2>
-      <p>Seu acesso ao <strong>Portal do Mentorado</strong> foi liberado.</p>
-      <p style="background:#f3f4f6;padding:14px;border-radius:8px">
-        <strong>E-mail:</strong> ${email}<br>
-        <strong>Senha temporária:</strong> <code>${password}</code>
-      </p>
-      <p><a href="${portalUrl}" style="display:inline-block;background:#FF6B5B;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:600">Acessar o Portal</a></p>
-      <p style="color:#666;font-size:13px">Recomendamos trocar a senha no primeiro acesso. Qualquer dúvida, é só responder este e-mail.</p>
-    </div>`;
-}
