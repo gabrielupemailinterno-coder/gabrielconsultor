@@ -6,6 +6,7 @@ import { WelcomeMenteeEmail } from '../_shared/app-email-templates/welcome-mente
 import { MeetingScheduledEmail } from '../_shared/app-email-templates/meeting-scheduled.tsx'
 import { MeetingAvailableEmail } from '../_shared/app-email-templates/meeting-available.tsx'
 import { ActivityAvailableEmail } from '../_shared/app-email-templates/activity-available.tsx'
+import { BlogInsightEmail } from '../_shared/app-email-templates/blog-insight.tsx'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -29,6 +30,10 @@ const TEMPLATES: Record<string, { component: React.ComponentType<any>; subject: 
   'activity-available': {
     component: ActivityAvailableEmail,
     subject: (d) => `Nova atividade: ${d.activityTitle}`,
+  },
+  'blog-insight': {
+    component: BlogInsightEmail,
+    subject: (d) => d.title || 'Insight Comercial · Gabriel Vieira',
   },
 }
 
