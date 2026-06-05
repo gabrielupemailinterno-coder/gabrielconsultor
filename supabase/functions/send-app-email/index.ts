@@ -7,6 +7,7 @@ import { MeetingScheduledEmail } from '../_shared/app-email-templates/meeting-sc
 import { MeetingAvailableEmail } from '../_shared/app-email-templates/meeting-available.tsx'
 import { ActivityAvailableEmail } from '../_shared/app-email-templates/activity-available.tsx'
 import { BlogInsightEmail } from '../_shared/app-email-templates/blog-insight.tsx'
+import { ProspectingEmail } from '../_shared/app-email-templates/prospecting.tsx'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
