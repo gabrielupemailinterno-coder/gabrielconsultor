@@ -31,6 +31,10 @@ const TEMPLATES: Record<string, { component: React.ComponentType<any>; subject: 
     component: ActivityAvailableEmail,
     subject: (d) => `Nova atividade: ${d.activityTitle}`,
   },
+  'blog-insight': {
+    component: BlogInsightEmail,
+    subject: (d) => d.title || 'Insight Comercial · Gabriel Vieira',
+  },
 }
 
 Deno.serve(async (req) => {
