@@ -5,6 +5,7 @@ import { Loader2, Users, MousePointerClick, Eye, Clock, LogOut, Trash2, Mail, Ph
 import BlogAdmin from "@/components/BlogAdmin";
 import MenteesAdmin from "@/components/admin/MenteesAdmin";
 import InviteMenteeDialog from "@/components/admin/InviteMenteeDialog";
+import MenteeEmailComposer from "@/components/admin/MenteeEmailComposer";
 import { FORM_LABELS, type FormType } from "@/lib/qualifying-forms";
 
 type Lead = {
@@ -45,7 +46,7 @@ const Admin = () => {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [clicks, setClicks] = useState<Click[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [tab, setTab] = useState<"mentees" | "leads" | "visits" | "clicks" | "sessions" | "blog">("mentees");
+  const [tab, setTab] = useState<"mentees" | "emails" | "leads" | "visits" | "clicks" | "sessions" | "blog">("mentees");
   const [leadFilter, setLeadFilter] = useState<FormType | "all">("all");
 
   useEffect(() => {
@@ -135,6 +136,7 @@ const Admin = () => {
         <div className="flex gap-2 border-b border-border">
           {[
             { id: "mentees", label: "Mentorados" },
+            { id: "emails", label: "E-mails" },
             { id: "leads", label: `Cadastros (${leads.length})` },
             { id: "visits", label: `Visitas (${visits.length})` },
             { id: "clicks", label: `Cliques (${clicks.length})` },
@@ -152,6 +154,7 @@ const Admin = () => {
         </div>
 
         {tab === "mentees" && <MenteesAdmin />}
+        {tab === "emails" && <MenteeEmailComposer />}
 
         {tab === "leads" && (() => {
           const types: Array<FormType | "all"> = ["all", "contato", "mentoria_1a1_vendedores", "consultoria_operacional", "mentoria_estrategica"];
