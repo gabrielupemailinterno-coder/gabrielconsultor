@@ -36,6 +36,10 @@ const TEMPLATES: Record<string, { component: React.ComponentType<any>; subject: 
     component: BlogInsightEmail,
     subject: (d) => d.title || 'Insight Comercial · Gabriel Vieira',
   },
+  'prospecting': {
+    component: ProspectingEmail,
+    subject: (d) => d.headline || 'Uma ideia comercial para a sua operação',
+  },
 }
 
 Deno.serve(async (req) => {
