@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import AdminNotesCard from "./AdminNotesCard";
 import MenteePaymentCard from "./MenteePaymentCard";
+import InviteMenteeDialog from "./InviteMenteeDialog";
 
 type Mentee = { id: string; full_name: string; email: string; status: string; plan_id: string; plan_name?: string };
 type Meeting = { id: string; sequence: number; title: string; description: string | null; status: string; scheduled_at: string | null };
