@@ -4,7 +4,13 @@ import { Loader2, Mail, Send, Users } from "lucide-react";
 
 type Mentee = { id: string; full_name: string; email: string };
 
-type TemplateKey = "welcome-mentee" | "meeting-scheduled" | "meeting-available" | "activity-available";
+type TemplateKey = "welcome-mentee" | "meeting-scheduled" | "meeting-available" | "activity-available" | "blog-insight";
+
+type Preset = {
+  id: string;
+  label: string;
+  values: Record<string, string>;
+};
 
 type FieldDef = {
   key: string;
