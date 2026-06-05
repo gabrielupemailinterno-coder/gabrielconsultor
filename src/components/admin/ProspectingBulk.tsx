@@ -82,9 +82,9 @@ const PRESETS: FunnelPreset[] = [
 
 const personalize = (s: string, r: Recipient) =>
   s
-    .replaceAll("{{name}}", r.name || "")
-    .replaceAll("{{first_name}}", (r.name || "").split(" ")[0] || "")
-    .replaceAll("{{company}}", r.company || "sua empresa");
+    .split("{{name}}").join(r.name || "")
+    .split("{{first_name}}").join((r.name || "").split(" ")[0] || "")
+    .split("{{company}}").join(r.company || "sua empresa");
 
 const parseCsv = (text: string): Recipient[] => {
   const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
