@@ -7,6 +7,7 @@ import { MeetingScheduledEmail } from '../_shared/app-email-templates/meeting-sc
 import { MeetingAvailableEmail } from '../_shared/app-email-templates/meeting-available.tsx'
 import { ActivityAvailableEmail } from '../_shared/app-email-templates/activity-available.tsx'
 import { BlogInsightEmail } from '../_shared/app-email-templates/blog-insight.tsx'
+import { ProspectingEmail } from '../_shared/app-email-templates/prospecting.tsx'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -34,6 +35,10 @@ const TEMPLATES: Record<string, { component: React.ComponentType<any>; subject: 
   'blog-insight': {
     component: BlogInsightEmail,
     subject: (d) => d.title || 'Insight Comercial · Gabriel Vieira',
+  },
+  'prospecting': {
+    component: ProspectingEmail,
+    subject: (d) => d.headline || 'Uma ideia comercial para a sua operação',
   },
 }
 

@@ -168,7 +168,7 @@ const TEMPLATES: TemplateDef[] = [
     key: "meeting-scheduled",
     label: "Reunião agendada",
     description: "Confirmação de agendamento de uma sessão (com data, hora e link do Meet).",
-    defaultSubject: (d) => `Reunião agendada: ${d.meetingTitle}`,
+    defaultSubject: (d) => `Reunião agendada: ${d.meetingTitle || "[título]"}`,
     fields: [
       { key: "meetingTitle", label: "Título da sessão", required: true, placeholder: "Ex.: Sessão 3 — Qualificação SPIN" },
       { key: "scheduledAt", label: "Data e hora", type: "datetime-local", required: true },
@@ -185,7 +185,7 @@ const TEMPLATES: TemplateDef[] = [
     key: "meeting-available",
     label: "Nova sessão liberada",
     description: "Avisa que uma nova sessão do cronograma foi liberada no portal.",
-    defaultSubject: (d) => `Nova sessão liberada: ${d.meetingTitle}`,
+    defaultSubject: (d) => `Nova sessão liberada: ${d.meetingTitle || "[título]"}`,
     fields: [
       { key: "meetingTitle", label: "Título da sessão", required: true, placeholder: "Ex.: Sessão 4 — Negociação" },
       { key: "meetingSequence", label: "Número da sessão (opcional)", type: "number", placeholder: "Ex.: 4" },
@@ -200,7 +200,7 @@ const TEMPLATES: TemplateDef[] = [
     key: "activity-available",
     label: "Nova atividade",
     description: "Avisa que uma nova atividade prática foi liberada para o mentorado.",
-    defaultSubject: (d) => `Nova atividade: ${d.activityTitle}`,
+    defaultSubject: (d) => `Nova atividade: ${d.activityTitle || "[título]"}`,
     fields: [
       { key: "activityTitle", label: "Título da atividade", required: true, placeholder: "Ex.: Mapear 10 contas-alvo" },
       { key: "activityDescription", label: "Descrição (opcional)", type: "textarea", placeholder: "Detalhes da atividade..." },
