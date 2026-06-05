@@ -154,6 +154,7 @@ const Admin = () => {
         </div>
 
         {tab === "mentees" && <MenteesAdmin />}
+        {tab === "emails" && <MenteeEmailComposer />}
 
         {tab === "leads" && (() => {
           const types: Array<FormType | "all"> = ["all", "contato", "mentoria_1a1_vendedores", "consultoria_operacional", "mentoria_estrategica"];
