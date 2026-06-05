@@ -29,9 +29,34 @@ Deno.serve(async (req) => {
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
     const calKey = Deno.env.get("GOOGLE_CALENDAR_API_KEY");
 
+    // Fetch mentee name for email personalization
+    const { data: menteeRow } = await supabase
+      .from("mentees").select("full_name").eq("id", meeting.mentee_id).maybeSingle();
+    const fullName = menteeRow?.full_name ?? "Mentorado";
+
+    const sendConfirmation = async (meetLink?: string | null) => {
+      try {
+        await supabase.functions.invoke("send-app-email", {
+          body: {
+            template: "meeting-scheduled",
+            to: mentee_email,
+            data: {
+              fullName,
+              meetingTitle: meeting.title,
+              scheduledAt: scheduled_at,
+              meetLink: meetLink ?? undefined,
+            },
+          },
+        });
+      } catch (e) {
+        console.warn("meeting-scheduled email failed:", e);
+      }
+    };
+
     if (!lovableKey || !calKey) {
       // Connector not linked yet — save schedule without calendar event
       await supabase.from("meetings").update({ scheduled_at, status: "scheduled" }).eq("id", meeting_id);
+      await sendConfirmation(null);
       return json({ ok: true, calendar_skipped: true, reason: "google_calendar connector not linked" });
     }
 
@@ -69,7 +94,10 @@ Deno.serve(async (req) => {
       scheduled_at, status: "scheduled", google_event_id: calData.id, meet_link: meetLink,
     }).eq("id", meeting_id);
 
+    await sendConfirmation(meetLink);
+
     return json({ ok: true, google_event_id: calData.id, meet_link: meetLink });
+
   } catch (err) {
     console.error("schedule-meeting error", err);
     return json({ error: String((err as Error).message ?? err) }, 500);
