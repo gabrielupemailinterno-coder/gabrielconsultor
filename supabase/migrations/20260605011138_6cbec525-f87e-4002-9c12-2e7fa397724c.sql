@@ -1,0 +1,1 @@
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS converted_mentee_id uuid REFERENCES public.mentees(id) ON DELETE SET NULL;

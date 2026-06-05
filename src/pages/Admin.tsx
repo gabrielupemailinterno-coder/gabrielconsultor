@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Users, MousePointerClick, Eye, Clock, LogOut, Trash2, Mail, Phone, Building2 } from "lucide-react";
 import BlogAdmin from "@/components/BlogAdmin";
 import MenteesAdmin from "@/components/admin/MenteesAdmin";
+import InviteMenteeDialog from "@/components/admin/InviteMenteeDialog";
 import { FORM_LABELS, type FormType } from "@/lib/qualifying-forms";
 
 type Lead = {
@@ -213,7 +214,16 @@ const Admin = () => {
                       {l.revenue && <p className="text-sm mt-2"><span className="text-muted-foreground">Faturamento:</span> {l.revenue}</p>}
                       {l.main_pain && !l.answers && <p className="text-sm mt-2 text-muted-foreground italic">"{l.main_pain}"</p>}
                     </div>
-                    <button onClick={() => deleteLead(l.id)} className="text-muted-foreground hover:text-destructive transition"><Trash2 size={16} /></button>
+                    <div className="flex flex-col items-end gap-2">
+                      <InviteMenteeDialog
+                        triggerLabel="Virar mentorado"
+                        defaultName={l.name}
+                        defaultEmail={l.email}
+                        defaultPhone={l.phone}
+                        leadId={l.id}
+                      />
+                      <button onClick={() => deleteLead(l.id)} className="text-muted-foreground hover:text-destructive transition"><Trash2 size={16} /></button>
+                    </div>
                   </div>
                 </div>
               ))}

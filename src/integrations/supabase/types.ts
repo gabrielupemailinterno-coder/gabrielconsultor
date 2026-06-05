@@ -143,6 +143,7 @@ export type Database = {
         Row: {
           answers: Json | null
           company_name: string | null
+          converted_mentee_id: string | null
           created_at: string
           email: string
           form_type: string
@@ -156,6 +157,7 @@ export type Database = {
         Insert: {
           answers?: Json | null
           company_name?: string | null
+          converted_mentee_id?: string | null
           created_at?: string
           email: string
           form_type?: string
@@ -169,6 +171,7 @@ export type Database = {
         Update: {
           answers?: Json | null
           company_name?: string | null
+          converted_mentee_id?: string | null
           created_at?: string
           email?: string
           form_type?: string
@@ -179,7 +182,15 @@ export type Database = {
           revenue?: string | null
           source?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "leads_converted_mentee_id_fkey"
+            columns: ["converted_mentee_id"]
+            isOneToOne: false
+            referencedRelation: "mentees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       meeting_resources: {
         Row: {
