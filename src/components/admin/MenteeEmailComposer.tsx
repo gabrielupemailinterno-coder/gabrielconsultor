@@ -27,7 +27,125 @@ type TemplateDef = {
   defaultSubject: (data: Record<string, any>) => string;
   fields: FieldDef[];
   buildData: (form: Record<string, string>, mentee: Mentee) => Record<string, any>;
+  presets?: Preset[];
 };
+
+const BLOG_BASE = "https://gabrielconsultor.com/blog";
+
+const BLOG_PRESETS: Preset[] = [
+  {
+    id: "spin-selling",
+    label: "SPIN Selling na prática",
+    values: {
+      eyebrow: "INSIGHT · QUALIFICAÇÃO",
+      title: "SPIN Selling na prática: a matemática que limpa o seu funil",
+      intro: "A maioria das operações acha que o problema é falta de lead. Quando a gente abre o funil, o erro quase sempre está na qualificação — não no topo.",
+      bullets: "Situação: entenda o contexto operacional antes de propor qualquer coisa.\nProblema: traga à tona a dor que o cliente ainda não verbalizou.\nImplicação: faça o custo da inércia ficar maior que o custo da decisão.\nNecessidade de solução: deixe o próprio cliente descrever o ganho.",
+      body: "Quando o vendedor aplica SPIN com disciplina, a taxa de conversão de proposta para fechamento sobe — e o tempo médio de ciclo cai. É matemática, não sorte.",
+      ctaLabel: "Ler artigo completo",
+      ctaUrl: `${BLOG_BASE}/spin-selling-na-pratica-a-matematica-para-limpar-seu-funil-e-escalar-a-conversao`,
+      closing: "Aplique numa call essa semana e me conta o resultado.",
+    },
+  },
+  {
+    id: "arquitetura-receita",
+    label: "Arquitetura de Receita",
+    values: {
+      eyebrow: "INSIGHT · ESTRATÉGIA",
+      title: "Arquitetura de Receita: pare de vender no escuro",
+      intro: "Receita previsível não nasce de esforço, nasce de estrutura. Existem 4 camadas que sustentam uma operação comercial saudável — e é nelas que você precisa olhar antes de contratar mais um vendedor.",
+      bullets: "Camada 1 — ICP e oferta: para quem você vende e o que entrega de valor real.\nCamada 2 — Aquisição: quais canais sustentam o seu CAC.\nCamada 3 — Conversão: processo, qualificação e cadência.\nCamada 4 — Retenção e expansão: onde mora a receita mais barata.",
+      body: "Se uma dessas camadas está furada, todo o resto compensa com esforço — e esforço não escala.",
+      ctaLabel: "Ler artigo completo",
+      ctaUrl: `${BLOG_BASE}/arquitetura-de-receita-pare-de-vender-no-escuro`,
+      closing: "Qual camada está mais fraca na sua operação hoje? Responde aqui.",
+    },
+  },
+  {
+    id: "icp-filtro",
+    label: "ICP como filtro de decisão",
+    values: {
+      eyebrow: "INSIGHT · ICP",
+      title: "ICP não é uma persona bonita no slide — é um filtro de decisão",
+      intro: "Se o seu ICP não muda a sua rotina comercial diária, ele não existe. Persona não qualifica lead, não decide canal e não fecha negócio.",
+      bullets: "Defina critérios objetivos: setor, porte, momento, dor mensurável.\nUse o ICP para dizer NÃO — não para abraçar todo mundo.\nRevise trimestralmente: quem fechou, ficou e expandiu?",
+      body: "Um ICP bem desenhado economiza CAC, encurta ciclo e melhora margem. É um dos exercícios de maior ROI numa operação comercial.",
+      ctaLabel: "Ler artigo completo",
+      ctaUrl: `${BLOG_BASE}/icp-nao-e-persona-bonita-e-filtro-de-decisao`,
+      closing: "Olhe seus últimos 10 fechados: existe um padrão? Esse é o seu ICP real.",
+    },
+  },
+  {
+    id: "qualificacao",
+    label: "Qualificação — a pergunta que falta",
+    values: {
+      eyebrow: "INSIGHT · QUALIFICAÇÃO",
+      title: "A pergunta que você não faz está custando o seu mês",
+      intro: "Vendedor que não qualifica entrega proposta para quem nunca ia comprar. E proposta sem qualificação é só desconto disfarçado de processo.",
+      bullets: "Dor: o problema é real, mensurável e prioritário?\nOrçamento: existe verba destinada ou precisa ser aprovada?\nAutoridade: quem decide e quem influencia?\nTiming: qual o gatilho que faz isso virar prioridade?",
+      body: "Quando os 4 blocos estão cobertos, a proposta vira formalidade. Quando não estão, a proposta vira torcida.",
+      ctaLabel: "Ler artigo completo",
+      ctaUrl: `${BLOG_BASE}/qualificacao-a-pergunta-que-voce-nao-faz`,
+      closing: "Reveja sua próxima call com esses 4 blocos em mãos.",
+    },
+  },
+  {
+    id: "canais-cac",
+    label: "Canais — gostar de CAC",
+    values: {
+      eyebrow: "INSIGHT · AQUISIÇÃO",
+      title: "Pare de gostar de canal. Comece a gostar de CAC.",
+      intro: "Escolher canal por moda é o caminho mais rápido para queimar caixa. O critério é frio: quanto custa adquirir, quanto retorna, em quanto tempo.",
+      bullets: "CAC por canal: separe e meça individualmente.\nPayback: em quantos meses o cliente paga o custo de aquisição.\nLTV/CAC: relação saudável começa em 3x.\nConcentração: 1 canal forte > 5 canais médios.",
+      body: "Operação enxuta dobra antes em um canal dominado do que em cinco canais mornos.",
+      ctaLabel: "Ler artigo completo",
+      ctaUrl: `${BLOG_BASE}/canais-de-aquisicao-gostar-de-cac`,
+      closing: "Qual canal hoje paga o próprio CAC em menos de 6 meses?",
+    },
+  },
+  {
+    id: "gestao-carteira",
+    label: "Gestão de carteira",
+    values: {
+      eyebrow: "INSIGHT · CARTEIRA",
+      title: "O ouro está dentro de casa — e quase ninguém olha",
+      intro: "A receita mais barata da sua empresa não está no novo lead. Está no cliente que já comprou, já confia e já tem histórico de pagamento.",
+      bullets: "Segmente a base: A, B, C — por receita, margem e potencial.\nCrie rotina de contato proativa, não reativa.\nMapeie oportunidades de cross-sell e upsell por segmento.\nTrate churn como métrica diária, não trimestral.",
+      body: "Reduzir 5% do churn impacta mais o EBITDA do que dobrar leads novos. Faça as contas.",
+      ctaLabel: "Ler artigo completo",
+      ctaUrl: `${BLOG_BASE}/gestao-de-carteira-o-ouro-dentro-de-casa`,
+      closing: "Olhe sua carteira essa semana. Existe receita parada aí.",
+    },
+  },
+  {
+    id: "alta-performance",
+    label: "Times de alta performance",
+    values: {
+      eyebrow: "INSIGHT · GESTÃO",
+      title: "Times de alta performance não nascem motivados — são construídos com método",
+      intro: "Motivação é resultado, não insumo. Time bom não é o que está animado na segunda — é o que entrega previsível na sexta.",
+      bullets: "Processo claro: cada etapa com critério de avanço definido.\nCadência de gestão: 1:1 semanal, fórum semanal, ciclo mensal.\nMétrica de atividade + métrica de resultado, todo dia visível.",
+      body: "Quando o método existe, motivação aparece sozinha. Quando não existe, nenhum bônus segura.",
+      ctaLabel: "Ler artigo completo",
+      ctaUrl: `${BLOG_BASE}/times-de-alta-performance-construidos-com-metodo`,
+      closing: "Qual desses 3 pilares está mais fraco no seu time hoje?",
+    },
+  },
+  {
+    id: "caso-1milhao",
+    label: "Case: R$ 1M em 2 meses",
+    values: {
+      eyebrow: "CASE · RESULTADO",
+      title: "Como um processo comercial estruturado destravou R$ 1M em 2 meses",
+      intro: "Não foi mágica e não foi sorte. Foi redesenho de processo, automações de ponta a ponta e alinhamento real com os representantes.",
+      bullets: "Diagnóstico do funil: onde o lead morria e por quê.\nRedesenho do processo: etapas, critérios de avanço e SLA.\nAutomação: tirou do vendedor o que não era venda.\nAlinhamento: representantes na mesma régua, mesma linguagem.",
+      body: "Em 2 meses, mais de R$ 1 milhão em contratos fechados. O ativo que sobra é o processo — replicável, mensurável, escalável.",
+      ctaLabel: "Ler o case completo",
+      ctaUrl: `${BLOG_BASE}/processo-comercial-r1-milhao-contratos-2-meses`,
+      closing: "Se quiser olhar o seu funil com esse mesmo rigor, me responde.",
+    },
+  },
+];
 
 const TEMPLATES: TemplateDef[] = [
   {
