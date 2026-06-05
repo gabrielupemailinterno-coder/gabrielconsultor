@@ -185,7 +185,7 @@ const TEMPLATES: TemplateDef[] = [
     key: "meeting-available",
     label: "Nova sessão liberada",
     description: "Avisa que uma nova sessão do cronograma foi liberada no portal.",
-    defaultSubject: (d) => `Nova sessão liberada: ${d.meetingTitle}`,
+    defaultSubject: (d) => `Nova sessão liberada: ${d.meetingTitle || "[título]"}`,
     fields: [
       { key: "meetingTitle", label: "Título da sessão", required: true, placeholder: "Ex.: Sessão 4 — Negociação" },
       { key: "meetingSequence", label: "Número da sessão (opcional)", type: "number", placeholder: "Ex.: 4" },
