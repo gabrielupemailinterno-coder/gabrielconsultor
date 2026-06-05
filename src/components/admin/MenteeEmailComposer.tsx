@@ -200,7 +200,7 @@ const TEMPLATES: TemplateDef[] = [
     key: "activity-available",
     label: "Nova atividade",
     description: "Avisa que uma nova atividade prática foi liberada para o mentorado.",
-    defaultSubject: (d) => `Nova atividade: ${d.activityTitle}`,
+    defaultSubject: (d) => `Nova atividade: ${d.activityTitle || "[título]"}`,
     fields: [
       { key: "activityTitle", label: "Título da atividade", required: true, placeholder: "Ex.: Mapear 10 contas-alvo" },
       { key: "activityDescription", label: "Descrição (opcional)", type: "textarea", placeholder: "Detalhes da atividade..." },
