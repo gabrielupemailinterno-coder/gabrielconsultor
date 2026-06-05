@@ -138,6 +138,7 @@ const Admin = () => {
           {[
             { id: "mentees", label: "Mentorados" },
             { id: "emails", label: "E-mails" },
+            { id: "prospect", label: "Prospecção" },
             { id: "leads", label: `Cadastros (${leads.length})` },
             { id: "visits", label: `Visitas (${visits.length})` },
             { id: "clicks", label: `Cliques (${clicks.length})` },
