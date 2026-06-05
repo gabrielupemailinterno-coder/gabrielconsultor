@@ -1,44 +1,44 @@
 /// <reference types="npm:@types/react@18.3.1" />
 
 import * as React from 'npm:react@18.3.1'
-
 import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Preview,
-  Text,
+  Body, Button, Container, Head, Heading, Hr, Html, Preview, Section, Text,
 } from 'npm:@react-email/components@0.0.22'
 
-interface RecoveryEmailProps {
+interface Props {
   siteName: string
   confirmationUrl: string
 }
 
-export const RecoveryEmail = ({
-  siteName,
-  confirmationUrl,
-}: RecoveryEmailProps) => (
-  <Html lang="en" dir="ltr">
+export const RecoveryEmail = ({ siteName, confirmationUrl }: Props) => (
+  <Html lang="pt-BR" dir="ltr">
     <Head />
-    <Preview>Reset your password for {siteName}</Preview>
+    <Preview>Redefina sua senha em {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Reset your password</Heading>
-        <Text style={text}>
-          We received a request to reset your password for {siteName}. Click
-          the button below to choose a new password.
-        </Text>
-        <Button style={button} href={confirmationUrl}>
-          Reset Password
-        </Button>
-        <Text style={footer}>
-          If you didn't request a password reset, you can safely ignore this
-          email. Your password will not be changed.
-        </Text>
+        <Section style={header}>
+          <Text style={brand}>GABRIEL VIEIRA</Text>
+          <Text style={brandSub}>Consultoria & Mentoria Comercial</Text>
+        </Section>
+        <Section style={accent} />
+        <Section style={content}>
+          <Heading style={h1}>Redefina sua senha.</Heading>
+          <Text style={text}>
+            Recebemos um pedido para redefinir sua senha em {siteName}. Clique no botão abaixo para escolher uma nova senha.
+          </Text>
+          <Section style={{ textAlign: 'center', margin: '32px 0' }}>
+            <Button style={button} href={confirmationUrl}>Redefinir senha</Button>
+          </Section>
+          <Hr style={hr} />
+          <Text style={footer}>
+            Se você não pediu isto, pode ignorar este e-mail. Sua senha continuará a mesma.
+          </Text>
+        </Section>
+        <Section style={signature}>
+          <Text style={sigName}>Gabriel Vieira</Text>
+          <Text style={sigRole}>Consultor & Mentor Comercial · São João del Rei, MG</Text>
+          <Text style={sigContact}>contato@gabrielconsultor.com</Text>
+        </Section>
       </Container>
     </Body>
   </Html>
@@ -46,26 +46,19 @@ export const RecoveryEmail = ({
 
 export default RecoveryEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '20px 25px' }
-const h1 = {
-  fontSize: '22px',
-  fontWeight: 'bold' as const,
-  color: '#000000',
-  margin: '0 0 20px',
-}
-const text = {
-  fontSize: '14px',
-  color: '#55575d',
-  lineHeight: '1.5',
-  margin: '0 0 25px',
-}
-const button = {
-  backgroundColor: '#000000',
-  color: '#ffffff',
-  fontSize: '14px',
-  borderRadius: '8px',
-  padding: '12px 20px',
-  textDecoration: 'none',
-}
-const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+const main = { backgroundColor: '#ffffff', fontFamily: "'Inter', 'Helvetica Neue', Arial, sans-serif", margin: 0, padding: '24px 0' }
+const container = { maxWidth: '560px', margin: '0 auto', backgroundColor: '#ffffff', border: '1px solid #e8e4dd' }
+const header = { padding: '28px 32px 16px', textAlign: 'center' as const }
+const brand = { fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: '20px', letterSpacing: '0.18em', color: '#111418', margin: 0, fontWeight: 'bold' as const }
+const brandSub = { fontFamily: "'Inter', sans-serif", fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase' as const, color: '#6b6b6b', margin: '6px 0 0' }
+const accent = { height: '3px', backgroundColor: '#C4632D' }
+const content = { padding: '32px' }
+const h1 = { fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: '26px', lineHeight: '1.25', color: '#111418', margin: '0 0 18px', fontWeight: 'normal' as const }
+const text = { fontSize: '15px', lineHeight: '1.65', color: '#3a3a3a', margin: '0 0 16px' }
+const button = { backgroundColor: '#C4632D', color: '#F4EFE8', fontSize: '14px', fontWeight: 'bold' as const, letterSpacing: '0.08em', textTransform: 'uppercase' as const, borderRadius: '2px', padding: '14px 28px', textDecoration: 'none', display: 'inline-block' }
+const hr = { borderColor: '#e8e4dd', margin: '28px 0 16px' }
+const footer = { fontSize: '12px', color: '#8a8a8a', lineHeight: '1.5', margin: 0 }
+const signature = { padding: '20px 32px 28px', borderTop: '1px solid #e8e4dd', backgroundColor: '#F4EFE8' }
+const sigName = { fontFamily: "'Libre Baskerville', Georgia, serif", fontSize: '14px', color: '#111418', margin: 0, fontWeight: 'bold' as const }
+const sigRole = { fontSize: '12px', color: '#6b6b6b', margin: '4px 0 0' }
+const sigContact = { fontSize: '12px', color: '#C4632D', margin: '4px 0 0' }
