@@ -7,3 +7,7 @@ project_id = "xhzsdnbztsnupbukmdjg"
     verify_jwt = true
   [functions.zoho-mail]
     verify_jwt = true
+  [functions.send-app-email]
+    verify_jwt = false
+  [functions.asaas-webhook]
+    verify_jwt = false
