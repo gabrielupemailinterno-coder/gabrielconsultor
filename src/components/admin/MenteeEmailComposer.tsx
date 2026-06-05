@@ -388,6 +388,26 @@ const MenteeEmailComposer = () => {
 
         <div className="space-y-3 pt-2 border-t border-border">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">Conteúdo</div>
+          {template.presets && template.presets.length > 0 && (
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Modelos prontos (clique para preencher)</label>
+              <div className="flex flex-wrap gap-2">
+                {template.presets.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => {
+                      setForm(p.values);
+                      setCustomSubject("");
+                    }}
+                    className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary hover:bg-primary/5 transition"
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {template.fields.map((f) => (
             <div key={f.key}>
               <label className="text-xs text-muted-foreground mb-1 block">
