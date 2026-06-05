@@ -211,6 +211,34 @@ const TEMPLATES: TemplateDef[] = [
       ...(f.activityDescription ? { activityDescription: f.activityDescription } : {}),
     }),
   },
+  {
+    key: "blog-insight",
+    label: "Conteúdo / Insight do blog",
+    description: "Envia um insight editorial baseado nos artigos do blog. Use um dos presets ou edite livremente.",
+    defaultSubject: (d) => d.title || "Insight Comercial · Gabriel Vieira",
+    presets: BLOG_PRESETS,
+    fields: [
+      { key: "eyebrow", label: "Categoria / Etiqueta", placeholder: "Ex.: INSIGHT · QUALIFICAÇÃO" },
+      { key: "title", label: "Título", required: true, placeholder: "Título do e-mail" },
+      { key: "intro", label: "Introdução", type: "textarea", required: true, placeholder: "Parágrafo de abertura" },
+      { key: "bullets", label: "Pontos-chave (uma linha por bullet)", type: "textarea", placeholder: "Ponto 1\nPonto 2\nPonto 3" },
+      { key: "body", label: "Parágrafo de fechamento (opcional)", type: "textarea" },
+      { key: "ctaLabel", label: "Texto do botão (opcional)", placeholder: "Ex.: Ler artigo completo" },
+      { key: "ctaUrl", label: "Link do botão (opcional)", placeholder: "https://gabrielconsultor.com/blog/..." },
+      { key: "closing", label: "Linha de encerramento (opcional)", placeholder: "Ex.: Aplique e me conta o resultado." },
+    ],
+    buildData: (f, m) => ({
+      fullName: m.full_name,
+      eyebrow: f.eyebrow || undefined,
+      title: f.title,
+      intro: f.intro,
+      bullets: f.bullets ? f.bullets.split("\n").map((s) => s.trim()).filter(Boolean) : undefined,
+      body: f.body || undefined,
+      ctaLabel: f.ctaLabel || undefined,
+      ctaUrl: f.ctaUrl || undefined,
+      closing: f.closing || undefined,
+    }),
+  },
 ];
 
 const MenteeEmailComposer = () => {
