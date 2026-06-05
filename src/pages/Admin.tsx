@@ -6,6 +6,7 @@ import BlogAdmin from "@/components/BlogAdmin";
 import MenteesAdmin from "@/components/admin/MenteesAdmin";
 import InviteMenteeDialog from "@/components/admin/InviteMenteeDialog";
 import MenteeEmailComposer from "@/components/admin/MenteeEmailComposer";
+import ProspectingBulk from "@/components/admin/ProspectingBulk";
 import { FORM_LABELS, type FormType } from "@/lib/qualifying-forms";
 
 type Lead = {
