@@ -136,6 +136,7 @@ const Admin = () => {
         <div className="flex gap-2 border-b border-border">
           {[
             { id: "mentees", label: "Mentorados" },
+            { id: "emails", label: "E-mails" },
             { id: "leads", label: `Cadastros (${leads.length})` },
             { id: "visits", label: `Visitas (${visits.length})` },
             { id: "clicks", label: `Cliques (${clicks.length})` },
