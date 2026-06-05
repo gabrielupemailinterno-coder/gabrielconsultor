@@ -168,7 +168,7 @@ const TEMPLATES: TemplateDef[] = [
     key: "meeting-scheduled",
     label: "Reunião agendada",
     description: "Confirmação de agendamento de uma sessão (com data, hora e link do Meet).",
-    defaultSubject: (d) => `Reunião agendada: ${d.meetingTitle}`,
+    defaultSubject: (d) => `Reunião agendada: ${d.meetingTitle || "[título]"}`,
     fields: [
       { key: "meetingTitle", label: "Título da sessão", required: true, placeholder: "Ex.: Sessão 3 — Qualificação SPIN" },
       { key: "scheduledAt", label: "Data e hora", type: "datetime-local", required: true },
