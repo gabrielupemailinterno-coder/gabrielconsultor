@@ -204,6 +204,10 @@ export default function MenteesAdmin() {
     <div className="grid md:grid-cols-[280px_1fr] gap-6">
       {/* List */}
       <div className="space-y-3">
+        <InviteMenteeDialog
+          triggerClassName="w-full"
+          onDone={() => loadMentees()}
+        />
         <Input placeholder="Buscar..." value={search} onChange={(e) => setSearch(e.target.value)} />
         <div className="border border-border rounded-lg divide-y divide-border max-h-[700px] overflow-y-auto">
           {filteredMentees.length === 0 && <p className="p-4 text-sm text-muted-foreground">Nenhum mentorado.</p>}
