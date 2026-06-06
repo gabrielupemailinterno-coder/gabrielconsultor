@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Trash2, Upload, CheckCircle2, Unlock, Pencil, Link2 } from "lucide-react";
+import { Loader2, Plus, Trash2, Upload, CheckCircle2, Unlock, Pencil, Link2, KeyRound, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,6 +42,33 @@ export default function MenteesAdmin() {
 
   const [editingMeeting, setEditingMeeting] = useState(false);
   const [meetingDraft, setMeetingDraft] = useState({ title: "", description: "" });
+
+  const [resettingPwd, setResettingPwd] = useState(false);
+  const [newPassword, setNewPassword] = useState<string | null>(null);
+
+  const resetPassword = async () => {
+    if (!selectedId || !selected) return;
+    if (!confirm(`Gerar uma NOVA senha para ${selected.full_name}? A senha antiga deixará de funcionar imediatamente.`)) return;
+    setResettingPwd(true);
+    setNewPassword(null);
+    const { data, error } = await supabase.functions.invoke("admin-reset-mentee-password", {
+      body: { mentee_id: selectedId },
+    });
+    setResettingPwd(false);
+    if (error || (data as any)?.error) {
+      toast.error((data as any)?.error ?? error?.message ?? "Falha ao redefinir senha");
+      return;
+    }
+    setNewPassword((data as any).password);
+    toast.success("Nova senha gerada. Copie e envie ao mentorado.");
+  };
+
+  const copyCredentials = async () => {
+    if (!newPassword || !selected) return;
+    const txt = `Acesso ao portal:\nE-mail: ${selected.email}\nSenha: ${newPassword}\nLogin: ${window.location.origin}/mentorados/login`;
+    await navigator.clipboard.writeText(txt);
+    toast.success("Credenciais copiadas.");
+  };
 
   const loadMentees = async () => {
     setLoading(true);
@@ -235,10 +262,37 @@ export default function MenteesAdmin() {
           </div>
         ) : (
           <div className="space-y-6">
-            <div>
-              <h2 className="font-serif text-2xl">{selected.full_name}</h2>
-              <p className="text-sm text-muted-foreground">{selected.email} · {selected.plan_name}</p>
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <div className="min-w-0">
+                <h2 className="font-serif text-2xl">{selected.full_name}</h2>
+                <p className="text-sm text-muted-foreground">{selected.email} · {selected.plan_name}</p>
+              </div>
+              <Button size="sm" variant="outline" onClick={resetPassword} disabled={resettingPwd} className="gap-1.5">
+                {resettingPwd ? <Loader2 size={14} className="animate-spin" /> : <KeyRound size={14} />}
+                Redefinir senha
+              </Button>
             </div>
+
+            {newPassword && (
+              <div className="border-2 border-primary/40 bg-primary/5 rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs uppercase tracking-wider text-primary font-semibold">Nova senha gerada</p>
+                  <Button size="sm" variant="ghost" onClick={() => setNewPassword(null)} className="h-7 text-xs">Fechar</Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Por segurança, senhas são armazenadas com hash irreversível. Esta senha aparece <strong>uma única vez</strong>. Copie agora e envie ao mentorado.
+                </p>
+                <div className="bg-background border border-border rounded p-3 font-mono text-sm break-all select-all">{newPassword}</div>
+                <div className="flex gap-2 flex-wrap">
+                  <Button size="sm" onClick={copyCredentials} className="gap-1.5"><Copy size={14} /> Copiar credenciais</Button>
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(`Acesso ao portal:\nE-mail: ${selected.email}\nSenha: ${newPassword}\nLogin: ${window.location.origin}/mentorados/login`)}`}
+                    target="_blank" rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 border border-border rounded-md hover:bg-secondary"
+                  >Enviar por WhatsApp</a>
+                </div>
+              </div>
+            )}
 
             <MenteePaymentCard menteeId={selected.id} onChange={() => loadDetail(selected.id)} />
             <AdminNotesCard menteeId={selected.id} />
