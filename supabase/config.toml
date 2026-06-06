@@ -13,3 +13,6 @@ project_id = "xhzsdnbztsnupbukmdjg"
     verify_jwt = false
   [functions.send-bulk-email]
     verify_jwt = true
+  [functions.admin-invite-mentee]
+    verify_jwt = false
+
