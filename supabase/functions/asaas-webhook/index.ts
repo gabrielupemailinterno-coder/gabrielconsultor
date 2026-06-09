@@ -135,6 +135,19 @@ Deno.serve(async (req) => {
       console.warn("welcome email send failed:", mailErr);
     }
 
+    // Send "schedule first meeting" prompt right after
+    try {
+      await supabase.functions.invoke("send-app-email", {
+        body: {
+          template: "schedule-first-meeting",
+          to: email,
+          data: { fullName },
+        },
+      });
+    } catch (mailErr) {
+      console.warn("schedule-first-meeting send failed:", mailErr);
+    }
+
     return new Response(JSON.stringify({ ok: true, mentee_id: menteeId }),
       { status: 200, headers: { "Content-Type": "application/json" } });
   } catch (err) {
