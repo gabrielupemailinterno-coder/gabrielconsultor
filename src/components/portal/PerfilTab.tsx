@@ -138,6 +138,26 @@ export default function PerfilTab({ menteeId, onOpenCheckout, onPasswordChanged 
         )}
       </Card>
 
+      <Card className="p-5 space-y-4" id="seguranca">
+        <h3 className="text-sm font-semibold flex items-center gap-2"><ShieldCheck size={15} /> Segurança · Definir sua senha</h3>
+        <p className="text-xs text-muted-foreground">
+          Defina ou troque sua senha de acesso ao portal. Use no mínimo 8 caracteres.
+        </p>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="newpwd" className="text-xs">Nova senha</Label>
+            <Input id="newpwd" type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} autoComplete="new-password" />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="newpwd2" className="text-xs">Confirmar nova senha</Label>
+            <Input id="newpwd2" type="password" value={pwd2} onChange={(e) => setPwd2(e.target.value)} autoComplete="new-password" />
+          </div>
+        </div>
+        <Button size="sm" onClick={savePassword} disabled={savingPwd || !pwd || !pwd2}>
+          {savingPwd ? <Loader2 className="animate-spin" size={14} /> : "Salvar nova senha"}
+        </Button>
+      </Card>
+
       <Card className="p-5 space-y-3">
         <h3 className="text-sm font-semibold flex items-center gap-2"><FileCheck2 size={15} /> Termo de Adesão</h3>
         {p.terms_accepted_at ? (
