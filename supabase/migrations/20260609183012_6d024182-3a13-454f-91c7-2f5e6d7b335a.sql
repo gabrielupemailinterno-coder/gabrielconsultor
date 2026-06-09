@@ -1,0 +1,1 @@
+ALTER TABLE public.mentees ADD COLUMN IF NOT EXISTS password_changed_at timestamptz;

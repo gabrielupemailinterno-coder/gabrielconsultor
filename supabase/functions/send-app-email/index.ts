@@ -8,6 +8,7 @@ import { MeetingAvailableEmail } from '../_shared/app-email-templates/meeting-av
 import { ActivityAvailableEmail } from '../_shared/app-email-templates/activity-available.tsx'
 import { BlogInsightEmail } from '../_shared/app-email-templates/blog-insight.tsx'
 import { ProspectingEmail } from '../_shared/app-email-templates/prospecting.tsx'
+import { ScheduleFirstMeetingEmail } from '../_shared/app-email-templates/schedule-first-meeting.tsx'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -39,6 +40,10 @@ const TEMPLATES: Record<string, { component: React.ComponentType<any>; subject: 
   'prospecting': {
     component: ProspectingEmail,
     subject: (d) => d.headline || 'Uma ideia comercial para a sua operação',
+  },
+  'schedule-first-meeting': {
+    component: ScheduleFirstMeetingEmail,
+    subject: () => 'Agende sua 1ª reunião da mentoria',
   },
 }
 

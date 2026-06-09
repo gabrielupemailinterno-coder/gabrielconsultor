@@ -101,6 +101,19 @@ Deno.serve(async (req) => {
       await admin.from("leads").update({ converted_mentee_id: menteeId }).eq("id", lead_id);
     }
 
+    // Schedule-first-meeting nudge (welcome email is handled by the invite flow / asaas-webhook)
+    try {
+      await admin.functions.invoke("send-app-email", {
+        body: {
+          template: "schedule-first-meeting",
+          to: email,
+          data: { fullName: full_name },
+        },
+      });
+    } catch (mailErr) {
+      console.warn("schedule-first-meeting send failed:", mailErr);
+    }
+
     return new Response(JSON.stringify({ ok: true, mentee_id: menteeId, invited: !found }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

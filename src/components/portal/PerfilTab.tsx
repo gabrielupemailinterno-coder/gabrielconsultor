@@ -3,8 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, User, MapPin, CreditCard, FileCheck2, Pencil, Download } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2, User, MapPin, CreditCard, FileCheck2, Pencil, Download, ShieldCheck } from "lucide-react";
 import { downloadTermoPdf } from "@/components/TermoAdesao";
+import { toast } from "@/hooks/use-toast";
 
 type Profile = {
   full_name: string;
@@ -42,9 +45,12 @@ function Field({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
-export default function PerfilTab({ menteeId, onOpenCheckout }: { menteeId: string; onOpenCheckout?: () => void }) {
+export default function PerfilTab({ menteeId, onOpenCheckout, onPasswordChanged }: { menteeId: string; onOpenCheckout?: () => void; onPasswordChanged?: () => void }) {
   const [p, setP] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pwd, setPwd] = useState("");
+  const [pwd2, setPwd2] = useState("");
+  const [savingPwd, setSavingPwd] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -57,6 +63,24 @@ export default function PerfilTab({ menteeId, onOpenCheckout }: { menteeId: stri
       setLoading(false);
     })();
   }, [menteeId]);
+
+  const savePassword = async () => {
+    if (pwd.length < 8) { toast({ title: "Senha curta", description: "Mínimo de 8 caracteres.", variant: "destructive" }); return; }
+    if (pwd !== pwd2) { toast({ title: "Senhas diferentes", description: "A confirmação não confere.", variant: "destructive" }); return; }
+    setSavingPwd(true);
+    const { error } = await supabase.auth.updateUser({ password: pwd });
+    if (error) {
+      setSavingPwd(false);
+      toast({ title: "Não foi possível alterar", description: error.message, variant: "destructive" });
+      return;
+    }
+    await supabase.from("mentees").update({ password_changed_at: new Date().toISOString() } as any).eq("id", menteeId);
+    setSavingPwd(false);
+    setPwd(""); setPwd2("");
+    toast({ title: "Senha atualizada", description: "Use a nova senha no próximo login." });
+    onPasswordChanged?.();
+  };
+
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div>;
   if (!p) return <p className="text-sm text-muted-foreground">Perfil não encontrado.</p>;
@@ -112,6 +136,26 @@ export default function PerfilTab({ menteeId, onOpenCheckout }: { menteeId: stri
         {!paid && p.access_mode !== "full" && onOpenCheckout && (
           <Button size="sm" onClick={onOpenCheckout}>Fazer pagamento</Button>
         )}
+      </Card>
+
+      <Card className="p-5 space-y-4" id="seguranca">
+        <h3 className="text-sm font-semibold flex items-center gap-2"><ShieldCheck size={15} /> Segurança · Definir sua senha</h3>
+        <p className="text-xs text-muted-foreground">
+          Defina ou troque sua senha de acesso ao portal. Use no mínimo 8 caracteres.
+        </p>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="newpwd" className="text-xs">Nova senha</Label>
+            <Input id="newpwd" type="password" value={pwd} onChange={(e) => setPwd(e.target.value)} autoComplete="new-password" />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="newpwd2" className="text-xs">Confirmar nova senha</Label>
+            <Input id="newpwd2" type="password" value={pwd2} onChange={(e) => setPwd2(e.target.value)} autoComplete="new-password" />
+          </div>
+        </div>
+        <Button size="sm" onClick={savePassword} disabled={savingPwd || !pwd || !pwd2}>
+          {savingPwd ? <Loader2 className="animate-spin" size={14} /> : "Salvar nova senha"}
+        </Button>
       </Card>
 
       <Card className="p-5 space-y-3">

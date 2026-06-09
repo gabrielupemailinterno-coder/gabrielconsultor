@@ -16,10 +16,11 @@ import CheckoutDialog from "@/components/CheckoutDialog";
 
 export default function PortalDashboard() {
   const navigate = useNavigate();
-  const { mentee, loading, error } = useMentee();
+  const { mentee, loading, error, reload } = useMentee();
   const [meetingsDone, setMeetingsDone] = useState(0);
   const [meetingsTotal, setMeetingsTotal] = useState(6);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [tab, setTab] = useState("cronograma");
 
   useEffect(() => {
     document.documentElement.classList.add("portal-theme");
@@ -117,11 +118,20 @@ export default function PortalDashboard() {
           {mentee.access_mode !== "full" && mentee.payment_status === "paid" && (
             <p className="mt-3 text-xs text-emerald-500">✓ Pagamento confirmado — todos os encontros liberados.</p>
           )}
+          {!mentee.password_changed_at && (
+            <div className="mt-4 rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-amber-600">Primeiro acesso? Defina sua senha pessoal.</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Você está usando a senha temporária enviada por e-mail. Troque agora para uma de sua preferência.</p>
+              </div>
+              <Button size="sm" variant="outline" className="shrink-0" onClick={() => setTab("perfil")}>Definir minha senha</Button>
+            </div>
+          )}
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
-        <Tabs defaultValue="cronograma" className="w-full">
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="grid grid-cols-3 md:grid-cols-5 w-full h-auto p-1 bg-muted">
             <TabsTrigger value="cronograma" className="gap-2 py-2.5"><CalendarDays size={15} /><span className="hidden sm:inline">Cronograma</span></TabsTrigger>
             <TabsTrigger value="tarefas" className="gap-2 py-2.5"><ListChecks size={15} /><span className="hidden sm:inline">Tarefas</span></TabsTrigger>
@@ -139,7 +149,7 @@ export default function PortalDashboard() {
           <TabsContent value="tarefas" className="mt-6"><TarefasTab menteeId={mentee.id} /></TabsContent>
           <TabsContent value="repositorio" className="mt-6"><RepositorioTab menteeId={mentee.id} /></TabsContent>
           <TabsContent value="metricas" className="mt-6"><MetricasTab menteeId={mentee.id} /></TabsContent>
-          <TabsContent value="perfil" className="mt-6"><PerfilTab menteeId={mentee.id} onOpenCheckout={() => setCheckoutOpen(true)} /></TabsContent>
+          <TabsContent value="perfil" className="mt-6"><PerfilTab menteeId={mentee.id} onOpenCheckout={() => setCheckoutOpen(true)} onPasswordChanged={reload} /></TabsContent>
         </Tabs>
       </div>
       <CheckoutDialog
