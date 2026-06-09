@@ -45,9 +45,12 @@ function Field({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
-export default function PerfilTab({ menteeId, onOpenCheckout }: { menteeId: string; onOpenCheckout?: () => void }) {
+export default function PerfilTab({ menteeId, onOpenCheckout, onPasswordChanged }: { menteeId: string; onOpenCheckout?: () => void; onPasswordChanged?: () => void }) {
   const [p, setP] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pwd, setPwd] = useState("");
+  const [pwd2, setPwd2] = useState("");
+  const [savingPwd, setSavingPwd] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -60,6 +63,24 @@ export default function PerfilTab({ menteeId, onOpenCheckout }: { menteeId: stri
       setLoading(false);
     })();
   }, [menteeId]);
+
+  const savePassword = async () => {
+    if (pwd.length < 8) { toast({ title: "Senha curta", description: "Mínimo de 8 caracteres.", variant: "destructive" }); return; }
+    if (pwd !== pwd2) { toast({ title: "Senhas diferentes", description: "A confirmação não confere.", variant: "destructive" }); return; }
+    setSavingPwd(true);
+    const { error } = await supabase.auth.updateUser({ password: pwd });
+    if (error) {
+      setSavingPwd(false);
+      toast({ title: "Não foi possível alterar", description: error.message, variant: "destructive" });
+      return;
+    }
+    await supabase.from("mentees").update({ password_changed_at: new Date().toISOString() } as any).eq("id", menteeId);
+    setSavingPwd(false);
+    setPwd(""); setPwd2("");
+    toast({ title: "Senha atualizada", description: "Use a nova senha no próximo login." });
+    onPasswordChanged?.();
+  };
+
 
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div>;
   if (!p) return <p className="text-sm text-muted-foreground">Perfil não encontrado.</p>;
