@@ -20,6 +20,7 @@ export function useMentee() {
   const [mentee, setMentee] = useState<Mentee | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tick, setTick] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -38,7 +39,7 @@ export function useMentee() {
     };
     load();
     return () => { active = false; };
-  }, []);
+  }, [tick]);
 
-  return { mentee, loading, error };
+  return { mentee, loading, error, reload: () => setTick((t) => t + 1) };
 }
