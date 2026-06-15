@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2, LogOut, CalendarDays, ListChecks, FolderOpen, BarChart3, UserCircle2 } from "lucide-react";
 import { useMentee } from "@/hooks/useMentee";
+import { useMenteePresence } from "@/hooks/useMenteePresence";
 import CronogramaTab from "@/components/portal/CronogramaTab";
 import TarefasTab from "@/components/portal/TarefasTab";
 import RepositorioTab from "@/components/portal/RepositorioTab";
