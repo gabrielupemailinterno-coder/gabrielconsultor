@@ -35,6 +35,7 @@ export default function MenteesAdmin() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [activeMeetingId, setActiveMeetingId] = useState<string | null>(null);
   const [meetingsDone, setMeetingsDone] = useState<Record<string, number>>({});
+  const [presence, setPresence] = useState<Record<string, PresenceStat>>({});
 
   const [taskForm, setTaskForm] = useState({ title: "", description: "" });
   const [linkForm, setLinkForm] = useState({ kind: "pdf", title: "", url: "" });
