@@ -81,15 +81,25 @@ export default function MenteesAdmin() {
     const list = (data ?? []).map((m: any) => ({ ...m, plan_name: m.mentorship_plans?.name }));
     setMentees(list);
     if (list.length) {
-      const { data: ms } = await supabase
-        .from("meetings")
-        .select("mentee_id,status")
-        .in("mentee_id", list.map((m: Mentee) => m.id));
+      const ids = list.map((m: Mentee) => m.id);
+      const [{ data: ms }, { data: sess }] = await Promise.all([
+        supabase.from("meetings").select("mentee_id,status").in("mentee_id", ids),
+        supabase.from("mentee_sessions").select("mentee_id,last_seen_at,duration_seconds").in("mentee_id", ids),
+      ]);
       const counts: Record<string, number> = {};
       (ms ?? []).forEach((m: any) => {
         if (m.status === "completed") counts[m.mentee_id] = (counts[m.mentee_id] ?? 0) + 1;
       });
       setMeetingsDone(counts);
+      const pres: Record<string, PresenceStat> = {};
+      (sess ?? []).forEach((s: any) => {
+        const p = pres[s.mentee_id] ?? { last_seen_at: null, total_seconds: 0, sessions: 0 };
+        p.total_seconds += s.duration_seconds || 0;
+        p.sessions += 1;
+        if (!p.last_seen_at || new Date(s.last_seen_at) > new Date(p.last_seen_at)) p.last_seen_at = s.last_seen_at;
+        pres[s.mentee_id] = p;
+      });
+      setPresence(pres);
     }
     setLoading(false);
   };
