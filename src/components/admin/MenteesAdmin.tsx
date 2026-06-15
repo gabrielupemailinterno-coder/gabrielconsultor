@@ -299,6 +299,11 @@ export default function MenteesAdmin() {
               <div className="min-w-0">
                 <h2 className="font-serif text-2xl">{selected.full_name}</h2>
                 <p className="text-sm text-muted-foreground">{selected.email} · {selected.plan_name}</p>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-2">
+                  <span>Último acesso: <strong className="text-foreground">{fmtRelative(presence[selected.id]?.last_seen_at ?? null)}</strong>{presence[selected.id]?.last_seen_at && <span className="opacity-60"> ({new Date(presence[selected.id]!.last_seen_at!).toLocaleString("pt-BR")})</span>}</span>
+                  <span>Tempo online: <strong className="text-foreground">{fmtDuration(presence[selected.id]?.total_seconds ?? 0)}</strong></span>
+                  <span>Sessões: <strong className="text-foreground">{presence[selected.id]?.sessions ?? 0}</strong></span>
+                </div>
               </div>
               <Button size="sm" variant="outline" onClick={resetPassword} disabled={resettingPwd} className="gap-1.5">
                 {resettingPwd ? <Loader2 size={14} className="animate-spin" /> : <KeyRound size={14} />}
