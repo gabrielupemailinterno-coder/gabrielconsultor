@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Loader2, LogOut, CalendarDays, ListChecks, FolderOpen, BarChart3, UserCircle2 } from "lucide-react";
 import { useMentee } from "@/hooks/useMentee";
+import { useMenteePresence } from "@/hooks/useMenteePresence";
 import CronogramaTab from "@/components/portal/CronogramaTab";
 import TarefasTab from "@/components/portal/TarefasTab";
 import RepositorioTab from "@/components/portal/RepositorioTab";
@@ -21,6 +22,8 @@ export default function PortalDashboard() {
   const [meetingsTotal, setMeetingsTotal] = useState(6);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [tab, setTab] = useState("cronograma");
+
+  useMenteePresence(mentee?.id, mentee?.user_id);
 
   useEffect(() => {
     document.documentElement.classList.add("portal-theme");

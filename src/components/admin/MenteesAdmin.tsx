@@ -11,6 +11,7 @@ import MenteePaymentCard from "./MenteePaymentCard";
 import InviteMenteeDialog from "./InviteMenteeDialog";
 
 type Mentee = { id: string; full_name: string; email: string; status: string; plan_id: string; plan_name?: string };
+type PresenceStat = { last_seen_at: string | null; total_seconds: number; sessions: number };
 type Meeting = { id: string; sequence: number; title: string; description: string | null; status: string; scheduled_at: string | null };
 type Task = { id: string; title: string; description: string | null; meeting_id: string | null; completed: boolean };
 type Resource = { id: string; title: string; kind: string; url: string; meeting_id: string };
@@ -24,6 +25,24 @@ const statusLabel: Record<string, string> = {
   completed: "Concluído",
 };
 
+function fmtDuration(sec: number): string {
+  if (!sec || sec < 60) return `${sec || 0}s`;
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function fmtRelative(iso: string | null): string {
+  if (!iso) return "Nunca acessou";
+  const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (diff < 60) return "agora há pouco";
+  if (diff < 3600) return `há ${Math.floor(diff / 60)}min`;
+  if (diff < 86400) return `há ${Math.floor(diff / 3600)}h`;
+  if (diff < 86400 * 30) return `há ${Math.floor(diff / 86400)}d`;
+  return new Date(iso).toLocaleDateString("pt-BR");
+}
+
 export default function MenteesAdmin() {
   const [mentees, setMentees] = useState<Mentee[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,6 +53,7 @@ export default function MenteesAdmin() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [activeMeetingId, setActiveMeetingId] = useState<string | null>(null);
   const [meetingsDone, setMeetingsDone] = useState<Record<string, number>>({});
+  const [presence, setPresence] = useState<Record<string, PresenceStat>>({});
 
   const [taskForm, setTaskForm] = useState({ title: "", description: "" });
   const [linkForm, setLinkForm] = useState({ kind: "pdf", title: "", url: "" });
@@ -79,15 +99,25 @@ export default function MenteesAdmin() {
     const list = (data ?? []).map((m: any) => ({ ...m, plan_name: m.mentorship_plans?.name }));
     setMentees(list);
     if (list.length) {
-      const { data: ms } = await supabase
-        .from("meetings")
-        .select("mentee_id,status")
-        .in("mentee_id", list.map((m: Mentee) => m.id));
+      const ids = list.map((m: Mentee) => m.id);
+      const [{ data: ms }, { data: sess }] = await Promise.all([
+        supabase.from("meetings").select("mentee_id,status").in("mentee_id", ids),
+        supabase.from("mentee_sessions").select("mentee_id,last_seen_at,duration_seconds").in("mentee_id", ids),
+      ]);
       const counts: Record<string, number> = {};
       (ms ?? []).forEach((m: any) => {
         if (m.status === "completed") counts[m.mentee_id] = (counts[m.mentee_id] ?? 0) + 1;
       });
       setMeetingsDone(counts);
+      const pres: Record<string, PresenceStat> = {};
+      (sess ?? []).forEach((s: any) => {
+        const p = pres[s.mentee_id] ?? { last_seen_at: null, total_seconds: 0, sessions: 0 };
+        p.total_seconds += s.duration_seconds || 0;
+        p.sessions += 1;
+        if (!p.last_seen_at || new Date(s.last_seen_at) > new Date(p.last_seen_at)) p.last_seen_at = s.last_seen_at;
+        pres[s.mentee_id] = p;
+      });
+      setPresence(pres);
     }
     setLoading(false);
   };
@@ -249,6 +279,9 @@ export default function MenteesAdmin() {
               <p className="text-xs text-muted-foreground mt-1">
                 {m.plan_name ?? "—"} · {meetingsDone[m.id] ?? 0}/6
               </p>
+              <p className="text-[11px] text-muted-foreground/80 mt-0.5">
+                Acesso: {fmtRelative(presence[m.id]?.last_seen_at ?? null)}
+              </p>
             </button>
           ))}
         </div>
@@ -266,6 +299,11 @@ export default function MenteesAdmin() {
               <div className="min-w-0">
                 <h2 className="font-serif text-2xl">{selected.full_name}</h2>
                 <p className="text-sm text-muted-foreground">{selected.email} · {selected.plan_name}</p>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground mt-2">
+                  <span>Último acesso: <strong className="text-foreground">{fmtRelative(presence[selected.id]?.last_seen_at ?? null)}</strong>{presence[selected.id]?.last_seen_at && <span className="opacity-60"> ({new Date(presence[selected.id]!.last_seen_at!).toLocaleString("pt-BR")})</span>}</span>
+                  <span>Tempo online: <strong className="text-foreground">{fmtDuration(presence[selected.id]?.total_seconds ?? 0)}</strong></span>
+                  <span>Sessões: <strong className="text-foreground">{presence[selected.id]?.sessions ?? 0}</strong></span>
+                </div>
               </div>
               <Button size="sm" variant="outline" onClick={resetPassword} disabled={resettingPwd} className="gap-1.5">
                 {resettingPwd ? <Loader2 size={14} className="animate-spin" /> : <KeyRound size={14} />}

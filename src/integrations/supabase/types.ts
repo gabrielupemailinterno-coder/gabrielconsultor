@@ -429,6 +429,47 @@ export type Database = {
         }
         Relationships: []
       }
+      mentee_sessions: {
+        Row: {
+          created_at: string
+          duration_seconds: number
+          id: string
+          last_seen_at: string
+          mentee_id: string
+          started_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number
+          id?: string
+          last_seen_at?: string
+          mentee_id: string
+          started_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number
+          id?: string
+          last_seen_at?: string
+          mentee_id?: string
+          started_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentee_sessions_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "mentees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentees: {
         Row: {
           access_mode: string
