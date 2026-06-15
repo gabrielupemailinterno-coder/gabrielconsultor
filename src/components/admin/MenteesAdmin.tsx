@@ -279,6 +279,9 @@ export default function MenteesAdmin() {
               <p className="text-xs text-muted-foreground mt-1">
                 {m.plan_name ?? "—"} · {meetingsDone[m.id] ?? 0}/6
               </p>
+              <p className="text-[11px] text-muted-foreground/80 mt-0.5">
+                Acesso: {fmtRelative(presence[m.id]?.last_seen_at ?? null)}
+              </p>
             </button>
           ))}
         </div>
