@@ -11,6 +11,7 @@ import MenteePaymentCard from "./MenteePaymentCard";
 import InviteMenteeDialog from "./InviteMenteeDialog";
 
 type Mentee = { id: string; full_name: string; email: string; status: string; plan_id: string; plan_name?: string };
+type PresenceStat = { last_seen_at: string | null; total_seconds: number; sessions: number };
 type Meeting = { id: string; sequence: number; title: string; description: string | null; status: string; scheduled_at: string | null };
 type Task = { id: string; title: string; description: string | null; meeting_id: string | null; completed: boolean };
 type Resource = { id: string; title: string; kind: string; url: string; meeting_id: string };
