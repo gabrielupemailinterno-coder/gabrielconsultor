@@ -23,6 +23,8 @@ export default function PortalDashboard() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [tab, setTab] = useState("cronograma");
 
+  useMenteePresence(mentee?.id, mentee?.user_id);
+
   useEffect(() => {
     document.documentElement.classList.add("portal-theme");
     return () => document.documentElement.classList.remove("portal-theme");
