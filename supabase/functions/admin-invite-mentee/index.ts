@@ -59,21 +59,32 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Find or create auth user
+    // Find or create auth user — always email-confirmed, with temp password
     let authUserId: string | undefined;
+    let tempPassword: string | undefined;
+    let isNewUser = false;
     const { data: list } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 });
     const found = list?.users?.find((u: any) => (u.email ?? "").toLowerCase() === email.toLowerCase());
     if (found) {
       authUserId = found.id;
+      if (!found.email_confirmed_at) {
+        await admin.auth.admin.updateUserById(found.id, { email_confirm: true });
+      }
     } else {
-      const redirectTo = `${req.headers.get("origin") ?? ""}/mentorados/login`;
-      const { data: inv, error: invErr } = await admin.auth.admin.inviteUserByEmail(email, { redirectTo });
-      if (invErr) {
-        return new Response(JSON.stringify({ error: `Falha ao convidar: ${invErr.message}` }), {
+      isNewUser = true;
+      tempPassword = generatePassword(14);
+      const { data: created, error: createErr } = await admin.auth.admin.createUser({
+        email,
+        password: tempPassword,
+        email_confirm: true,
+        user_metadata: { full_name },
+      });
+      if (createErr || !created.user) {
+        return new Response(JSON.stringify({ error: `Falha ao criar usuário: ${createErr?.message ?? "desconhecido"}` }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      authUserId = inv.user?.id;
+      authUserId = created.user.id;
     }
 
     if (!authUserId) {
@@ -101,7 +112,22 @@ Deno.serve(async (req) => {
       await admin.from("leads").update({ converted_mentee_id: menteeId }).eq("id", lead_id);
     }
 
-    // Schedule-first-meeting nudge (welcome email is handled by the invite flow / asaas-webhook)
+    // Welcome email with temp password (only for new users)
+    if (isNewUser && tempPassword) {
+      try {
+        await admin.functions.invoke("send-app-email", {
+          body: {
+            template: "welcome-mentee",
+            to: email,
+            data: { fullName: full_name, email, tempPassword },
+          },
+        });
+      } catch (mailErr) {
+        console.warn("welcome-mentee send failed:", mailErr);
+      }
+    }
+
+    // Schedule-first-meeting nudge
     try {
       await admin.functions.invoke("send-app-email", {
         body: {
