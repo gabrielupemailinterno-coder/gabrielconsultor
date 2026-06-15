@@ -149,3 +149,10 @@ Deno.serve(async (req) => {
     });
   }
 });
+
+function generatePassword(len: number) {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%";
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, (n) => chars[n % chars.length]).join("");
+}
