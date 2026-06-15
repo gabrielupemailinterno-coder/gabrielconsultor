@@ -25,6 +25,24 @@ const statusLabel: Record<string, string> = {
   completed: "Concluído",
 };
 
+function fmtDuration(sec: number): string {
+  if (!sec || sec < 60) return `${sec || 0}s`;
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function fmtRelative(iso: string | null): string {
+  if (!iso) return "Nunca acessou";
+  const diff = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (diff < 60) return "agora há pouco";
+  if (diff < 3600) return `há ${Math.floor(diff / 60)}min`;
+  if (diff < 86400) return `há ${Math.floor(diff / 3600)}h`;
+  if (diff < 86400 * 30) return `há ${Math.floor(diff / 86400)}d`;
+  return new Date(iso).toLocaleDateString("pt-BR");
+}
+
 export default function MenteesAdmin() {
   const [mentees, setMentees] = useState<Mentee[]>([]);
   const [loading, setLoading] = useState(true);
