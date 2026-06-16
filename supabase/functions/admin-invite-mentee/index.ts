@@ -67,8 +67,17 @@ Deno.serve(async (req) => {
     const found = list?.users?.find((u: any) => (u.email ?? "").toLowerCase() === email.toLowerCase());
     if (found) {
       authUserId = found.id;
-      if (!found.email_confirmed_at) {
-        await admin.auth.admin.updateUserById(found.id, { email_confirm: true });
+      // Sempre redefine a senha e confirma o e-mail para que o admin possa enviar credenciais válidas
+      tempPassword = generatePassword(14);
+      isNewUser = true;
+      const { error: updErr } = await admin.auth.admin.updateUserById(found.id, {
+        password: tempPassword,
+        email_confirm: true,
+      });
+      if (updErr) {
+        return new Response(JSON.stringify({ error: `Falha ao reativar usuário: ${updErr.message}` }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
     } else {
       isNewUser = true;
