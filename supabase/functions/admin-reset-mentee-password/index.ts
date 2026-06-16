@@ -58,7 +58,10 @@ Deno.serve(async (req) => {
     }
 
     const newPassword = genPassword();
-    const { error: updErr } = await admin.auth.admin.updateUserById(mentee.user_id, { password: newPassword });
+    const { error: updErr } = await admin.auth.admin.updateUserById(mentee.user_id, {
+      password: newPassword,
+      email_confirm: true,
+    });
     if (updErr) {
       return new Response(JSON.stringify({ error: `Falha ao redefinir: ${updErr.message}` }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
