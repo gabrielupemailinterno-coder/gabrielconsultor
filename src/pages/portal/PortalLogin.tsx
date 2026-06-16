@@ -51,15 +51,15 @@ export default function PortalLogin() {
     setLoading(true);
     setError(null);
     setInfo(null);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/mentorados/redefinir-senha`,
+    const { error } = await supabase.functions.invoke("mentee-forgot-password", {
+      body: { email },
     });
     setLoading(false);
     if (error) {
-      setError("Não foi possível enviar o e-mail. Verifique o endereço informado.");
+      setError("Não foi possível processar o pedido. Tente novamente em instantes.");
       return;
     }
-    setInfo("Enviamos um link para o seu e-mail. Verifique a caixa de entrada (e o spam) para definir uma nova senha.");
+    setInfo("Se este e-mail estiver cadastrado, enviamos uma nova senha temporária. Verifique a caixa de entrada (e o spam).");
   };
 
   return (
