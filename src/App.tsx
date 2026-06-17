@@ -34,6 +34,7 @@ const App = () => (
             <Route path="/mentoria-profissional" element={<MentoriaProfissional />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/parceiros" element={<Parceiros />} />
             <Route path="/mentorados/login" element={<PortalLogin />} />
             <Route path="/mentorados/redefinir-senha" element={<PortalResetPassword />} />
             <Route path="/mentorados" element={<PortalDashboard />} />
