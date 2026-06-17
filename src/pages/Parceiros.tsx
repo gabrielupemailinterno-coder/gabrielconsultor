@@ -5,6 +5,7 @@ import { ArrowRight, BadgeCheck, ExternalLink, Handshake, Percent, ShieldCheck, 
 import SiteHeader from "@/components/SiteHeader";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
+import acidelLogo from "@/assets/acidel-rei-logo.webp.asset.json";
 
 const ACIDEL_URL = "https://acidelrei.com.br/";
 
@@ -218,15 +219,18 @@ const Parceiros = () => {
                   </div>
                 </div>
 
-                <div className="relative">
-                  <div className="aspect-square rounded-2xl border border-white/[0.08] bg-[radial-gradient(circle_at_30%_20%,hsl(var(--primary)/0.18),transparent_60%)] flex items-center justify-center p-10">
-                    <div className="text-center">
-                      <div className="font-serif text-5xl md:text-6xl tracking-tight">ACIDEL</div>
-                      <div className="font-mono text-[11px] uppercase tracking-[0.4em] text-primary mt-2">Rei</div>
-                      <div className="mt-6 inline-flex items-center gap-2 text-xs text-muted-foreground">
-                        <Handshake size={14} className="text-primary" />
-                        Parceiro oficial
-                      </div>
+                <div className="relative flex justify-center">
+                  <div className="aspect-square w-full max-w-[320px] rounded-2xl border border-white/[0.08] bg-white p-6 flex flex-col items-center justify-between shadow-lg overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+                    <div className="flex-1 flex items-center justify-center">
+                      <img 
+                        src={acidelLogo.url} 
+                        alt="Logo ACIDEL REI" 
+                        className="max-h-[180px] w-auto object-contain"
+                      />
+                    </div>
+                    <div className="mt-4 inline-flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
+                      <Handshake size={14} className="text-[#C4632D]" />
+                      Parceiro oficial
                     </div>
                   </div>
                 </div>
