@@ -1,13 +1,28 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { ArrowRight, BadgeCheck, ExternalLink, Handshake, Percent, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  CheckCircle2,
+  ExternalLink,
+  Handshake,
+  LineChart,
+  Quote,
+  Sparkles,
+  Tag,
+  Target,
+  TrendingUp,
+  Users,
+} from "lucide-react";
 import SiteHeader from "@/components/SiteHeader";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import acidelLogo from "@/assets/acidel-rei-logo.webp.asset.json";
+import gabrielPhoto from "@/assets/gabriel-g4-hero.jpg.asset.json";
 
 const ACIDEL_URL = "https://acidelrei.com.br/";
+const DESCONTO = "15%";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -23,11 +38,11 @@ const Parceiros = () => {
   useAnalytics("/parceiros");
 
   useEffect(() => {
-    document.title = "Parceiros | Gabriel Consultor — Vantagens exclusivas para a rede";
+    document.title = "Associado ACIDEL REI tem desconto | Gabriel Consultor";
   }, []);
 
-  const openForm = () => {
-    trackClick("cta", "parceiros_open_lead_form");
+  const openForm = (label: string) => {
+    trackClick("cta", label);
     setFormOpen(true);
   };
 
@@ -36,48 +51,66 @@ const Parceiros = () => {
     window.open(ACIDEL_URL, "_blank", "noopener,noreferrer");
   };
 
-  const beneficios = [
+  const servicos = [
     {
-      icon: Percent,
-      title: "Descontos exclusivos",
-      body: "Condições especiais negociadas para clientes, mentorados e parceiros da rede Gabriel Consultor.",
+      icon: Target,
+      tag: "Consultoria comercial",
+      title: "Consultoria de 4 semanas",
+      body:
+        "Diagnóstico + reestruturação do processo comercial: funil, qualificação, abordagem, follow-up e métricas. Saída com playbook implementado e time treinado.",
+      bullets: [
+        "Mapa do funil e gargalos atuais",
+        "Scripts e cadência de prospecção",
+        "Painel de indicadores comerciais",
+      ],
     },
     {
-      icon: ShieldCheck,
-      title: "Curadoria de marcas",
-      body: "Parceiros selecionados pela qualidade do produto, atendimento e tradição no mercado em que atuam.",
+      icon: TrendingUp,
+      tag: "Mentoria estratégica",
+      title: "Mentoria de 8 a 12 semanas",
+      body:
+        "Acompanhamento executivo semanal com dono e liderança. Foco em decisão, prioridade e execução do que move receita.",
+      bullets: [
+        "Sessões 1:1 com o dono",
+        "Rituais de gestão e cadência",
+        "Plano de crescimento trimestral",
+      ],
     },
-    {
-      icon: Handshake,
-      title: "Rede que gera negócio",
-      body: "Conexões diretas com empresas, associações e lideranças que ampliam oportunidades comerciais.",
-    },
+  ];
+
+  const resultados = [
+    { kpi: "+38%", label: "ticket médio em 90 dias" },
+    { kpi: "2,4x", label: "taxa de conversão do funil" },
+    { kpi: "15+", label: "empresas reestruturadas" },
   ];
 
   return (
     <>
       <Helmet>
-        <title>Parceiros | Gabriel Consultor</title>
+        <title>Associado ACIDEL REI tem desconto | Gabriel Consultor</title>
         <meta
           name="description"
-          content="Conheça os parceiros oficiais do Gabriel Consultor. Descontos exclusivos e vantagens negociadas para clientes e mentorados — começando pela ACIDEL REI."
+          content={`Sou associado ACIDEL REI. Associados têm ${DESCONTO} de desconto na consultoria comercial e na mentoria estratégica do Gabriel Consultor. Processo, execução e resultado.`}
         />
         <link rel="canonical" href="https://gabrielconsultor.com/parceiros" />
-        <meta property="og:title" content="Parceiros | Gabriel Consultor" />
+        <meta property="og:title" content="Associado ACIDEL REI tem desconto | Gabriel Consultor" />
         <meta
           property="og:description"
-          content="Vantagens exclusivas com parceiros selecionados. Sou associado ACIDEL REI — descontos para a rede."
+          content={`Desconto exclusivo de ${DESCONTO} para associados da ACIDEL REI na consultoria e mentoria do Gabriel Consultor.`}
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://gabrielconsultor.com/parceiros" />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "WebPage",
-            name: "Parceiros — Gabriel Consultor",
+            "@type": "Offer",
+            name: "Desconto para associados ACIDEL REI",
+            description: `Desconto de ${DESCONTO} na consultoria comercial e na mentoria estratégica do Gabriel Consultor para associados da ACIDEL REI.`,
             url: "https://gabrielconsultor.com/parceiros",
-            description:
-              "Parceiros oficiais com descontos exclusivos para a rede Gabriel Consultor.",
+            seller: {
+              "@type": "Person",
+              name: "Gabriel Consultor",
+            },
           })}
         </script>
       </Helmet>
@@ -87,191 +120,274 @@ const Parceiros = () => {
       <LeadFormDialog
         open={formOpen}
         onClose={() => setFormOpen(false)}
-        successTitle="Tudo certo."
-        successBody="Recebi seus dados. Em breve te envio o acesso às vantagens dos parceiros."
+        successTitle="Recebi seus dados."
+        successBody="Em breve te envio as condições com o desconto de associado ACIDEL REI."
       />
 
       <main className="bg-background text-foreground">
         {/* HERO */}
         <section className="relative overflow-hidden border-b border-white/[0.06]">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(var(--primary)/0.12),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,hsl(var(--primary)/0.15),transparent_60%)]" />
           <div className="container max-w-6xl relative py-20 md:py-28">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={0}
-              className="max-w-3xl"
-            >
-              <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[12px] font-medium text-primary">
-                <Sparkles size={14} /> Programa de Parceiros
-              </span>
-              <h1 className="mt-5 font-serif text-4xl md:text-6xl leading-[1.05] tracking-tight">
-                Vantagens reais com quem a gente confia.
-              </h1>
-              <p className="mt-5 text-lg md:text-xl text-muted-foreground max-w-2xl">
-                Parceiros selecionados oferecem condições exclusivas para a rede Gabriel Consultor — clientes, mentorados e indicados. Curadoria curta, benefício direto.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <button
-                  onClick={openForm}
-                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground text-sm font-medium px-5 py-3 rounded-full hover:bg-primary/90 active:scale-[0.97] transition-all shadow-[0_6px_20px_-4px_hsl(var(--primary)/0.5)]"
-                >
-                  Quero acessar as vantagens <ArrowRight size={16} />
-                </button>
-                <a
-                  href="#parceiros"
-                  className="inline-flex items-center gap-2 border border-white/15 bg-white/[0.03] text-foreground text-sm font-medium px-5 py-3 rounded-full hover:bg-white/[0.08] transition-all"
-                >
-                  Ver parceiros
-                </a>
-              </div>
-            </motion.div>
+            <div className="grid lg:grid-cols-[1.15fr_1fr] gap-12 items-center">
+              <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
+                <div className="inline-flex items-center gap-3 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5">
+                  <img src={acidelLogo.url} alt="ACIDEL REI" className="h-5 w-auto" />
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-primary">
+                    Parceria oficial
+                  </span>
+                </div>
+                <h1 className="mt-5 font-serif text-4xl md:text-6xl leading-[1.05] tracking-tight">
+                  Associado ACIDEL REI tem{" "}
+                  <span className="text-primary">{DESCONTO} de desconto</span> na minha consultoria e mentoria.
+                </h1>
+                <p className="mt-5 text-lg md:text-xl text-muted-foreground max-w-2xl">
+                  Sou associado da ACIDEL REI. Como reconhecimento à rede empresarial de São João del-Rei e região, ofereço uma condição exclusiva para associados que querem reestruturar o comercial e crescer com método.
+                </p>
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <button
+                    onClick={() => openForm("parceiros_hero_quero_desconto")}
+                    className="inline-flex items-center gap-2 bg-primary text-primary-foreground text-sm font-medium px-5 py-3 rounded-full hover:bg-primary/90 active:scale-[0.97] transition-all shadow-[0_6px_20px_-4px_hsl(var(--primary)/0.5)]"
+                  >
+                    Quero meu desconto de associado <ArrowRight size={16} />
+                  </button>
+                  <a
+                    href="#servicos"
+                    onClick={() => trackClick("cta", "parceiros_hero_ver_servicos")}
+                    className="inline-flex items-center gap-2 border border-white/15 bg-white/[0.03] text-foreground text-sm font-medium px-5 py-3 rounded-full hover:bg-white/[0.08] transition-all"
+                  >
+                    Ver o que está incluso
+                  </a>
+                </div>
+                <p className="mt-4 text-xs text-muted-foreground font-mono">
+                  Válido mediante apresentação da carteirinha ou comprovante de associado.
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                custom={1}
+                className="relative"
+              >
+                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.02]">
+                  <img
+                    src={gabrielPhoto.url}
+                    alt="Gabriel Consultor"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+                  <div className="absolute bottom-5 left-5 right-5 flex items-center gap-3 rounded-xl border border-white/15 bg-background/70 backdrop-blur p-3">
+                    <div className="w-12 h-12 rounded-lg bg-white p-1.5 flex items-center justify-center shrink-0">
+                      <img src={acidelLogo.url} alt="ACIDEL REI" className="max-h-full w-auto object-contain" />
+                    </div>
+                    <div className="text-xs">
+                      <div className="font-mono uppercase tracking-wider text-primary text-[10px]">Associado</div>
+                      <div className="text-foreground font-medium">ACIDEL REI · São João del-Rei</div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </section>
 
-        {/* BENEFÍCIOS */}
+        {/* SOBRE / CASE */}
         <section className="border-b border-white/[0.06]">
           <div className="container max-w-6xl py-16 md:py-20">
-            <div className="grid md:grid-cols-3 gap-5">
-              {beneficios.map((b, i) => (
+            <div className="grid md:grid-cols-[1fr_1.4fr] gap-10 md:gap-16 items-start">
+              <div>
+                <p className="text-[12px] uppercase tracking-[0.18em] text-primary font-mono">Quem está por trás</p>
+                <h2 className="mt-2 font-serif text-3xl md:text-4xl leading-tight">
+                  Processo comercial é o que separa empresa que cresce de empresa que vive de sorte.
+                </h2>
+              </div>
+              <div className="space-y-4 text-base md:text-lg text-muted-foreground leading-relaxed">
+                <p>
+                  Sou Gabriel, consultor e mentor de empresários que querem profissionalizar a operação comercial. Trabalho com dono, não só com vendedor. Foco em <strong className="text-foreground">processo, métrica e execução</strong> — não em teoria de palco.
+                </p>
+                <p>
+                  Já reestruturei o comercial de mais de 15 empresas em setores como serviços, indústria, varejo e B2B técnico. O resultado vem do mesmo lugar todas as vezes: funil claro, time treinado, ritual de gestão e métrica honesta.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-12 grid sm:grid-cols-3 gap-4">
+              {resultados.map((r, i) => (
                 <motion.div
-                  key={b.title}
+                  key={r.label}
                   initial="hidden"
                   whileInView="visible"
-                  viewport={{ once: true, amount: 0.3 }}
+                  viewport={{ once: true, amount: 0.4 }}
                   variants={fadeUp}
                   custom={i}
                   className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6"
                 >
-                  <div className="w-11 h-11 rounded-xl bg-primary/15 text-primary inline-flex items-center justify-center">
-                    <b.icon size={20} />
-                  </div>
-                  <h3 className="mt-4 font-serif text-xl">{b.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{b.body}</p>
+                  <div className="font-mono text-4xl text-primary tracking-tight">{r.kpi}</div>
+                  <div className="mt-2 text-sm text-muted-foreground">{r.label}</div>
                 </motion.div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* PARCEIROS */}
-        <section id="parceiros" className="border-b border-white/[0.06]">
+        {/* SERVIÇOS */}
+        <section id="servicos" className="border-b border-white/[0.06]">
           <div className="container max-w-6xl py-16 md:py-24">
             <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
               <div>
-                <p className="text-[12px] uppercase tracking-[0.18em] text-primary font-mono">Parceiros oficiais</p>
-                <h2 className="mt-2 font-serif text-3xl md:text-4xl">Quem está com a gente</h2>
+                <p className="text-[12px] uppercase tracking-[0.18em] text-primary font-mono">O que está incluso no desconto</p>
+                <h2 className="mt-2 font-serif text-3xl md:text-4xl">Meus produtos</h2>
               </div>
-              <p className="text-sm text-muted-foreground max-w-md">
-                Lista em expansão. Novos parceiros são anunciados aqui à medida que os acordos são fechados.
-              </p>
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm">
+                <Tag size={15} className="text-primary" />
+                <span className="text-foreground">
+                  <span className="text-primary font-mono font-semibold">{DESCONTO} OFF</span> para associados
+                </span>
+              </div>
             </div>
 
-            {/* ACIDEL REI */}
-            <motion.article
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.2 }}
-              variants={fadeUp}
-              custom={0}
-              className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-br from-white/[0.04] to-white/[0.01] p-8 md:p-12"
-            >
-              <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-primary/15 blur-3xl pointer-events-none" />
-              <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 items-center relative">
-                <div>
-                  <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-mono uppercase tracking-wider text-primary">
-                    <BadgeCheck size={13} /> Sou associado
+            <div className="grid md:grid-cols-2 gap-5">
+              {servicos.map((s, i) => (
+                <motion.article
+                  key={s.title}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.2 }}
+                  variants={fadeUp}
+                  custom={i}
+                  className="relative rounded-2xl border border-white/[0.08] bg-white/[0.02] p-7 flex flex-col"
+                >
+                  <div className="absolute top-5 right-5 inline-flex items-center gap-1 rounded-full bg-primary/15 text-primary px-2.5 py-1 text-[11px] font-mono uppercase tracking-wider">
+                    <BadgeCheck size={12} /> -{DESCONTO}
                   </div>
-                  <h3 className="mt-4 font-serif text-3xl md:text-4xl">ACIDEL REI</h3>
-                  <p className="mt-2 text-sm text-muted-foreground font-mono">
-                    Associação Comercial, Industrial e de Serviços de Del Rei
-                  </p>
-                  <p className="mt-5 text-base md:text-lg text-foreground/85 leading-relaxed max-w-xl">
-                    Como associado da <strong>ACIDEL REI</strong>, ofereço acesso às vantagens negociadas pela associação: <strong>descontos exclusivos</strong>, convênios com fornecedores, eventos de relacionamento e a rede empresarial da região.
-                  </p>
-                  <ul className="mt-6 grid sm:grid-cols-2 gap-3 text-sm">
-                    {[
-                      "Descontos em convênios da rede",
-                      "Acesso a eventos e workshops",
-                      "Networking com associados",
-                      "Suporte jurídico e empresarial",
-                    ].map((it) => (
-                      <li key={it} className="flex items-start gap-2">
-                        <span className="mt-1 w-1.5 h-1.5 rounded-full bg-primary" />
-                        <span className="text-muted-foreground">{it}</span>
+                  <div className="w-11 h-11 rounded-xl bg-primary/15 text-primary inline-flex items-center justify-center">
+                    <s.icon size={20} />
+                  </div>
+                  <p className="mt-4 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">{s.tag}</p>
+                  <h3 className="mt-1 font-serif text-2xl">{s.title}</h3>
+                  <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{s.body}</p>
+                  <ul className="mt-5 space-y-2 text-sm">
+                    {s.bullets.map((b) => (
+                      <li key={b} className="flex items-start gap-2">
+                        <CheckCircle2 size={16} className="text-primary mt-0.5 shrink-0" />
+                        <span className="text-foreground/85">{b}</span>
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-8 flex flex-wrap gap-3">
-                    <button
-                      onClick={() => goAcidel("parceiros_acidel_site")}
-                      className="inline-flex items-center gap-2 bg-primary text-primary-foreground text-sm font-medium px-5 py-3 rounded-full hover:bg-primary/90 active:scale-[0.97] transition-all shadow-[0_6px_20px_-4px_hsl(var(--primary)/0.5)]"
-                    >
-                      Acessar acidelrei.com.br <ExternalLink size={15} />
-                    </button>
-                    <button
-                      onClick={openForm}
-                      className="inline-flex items-center gap-2 border border-white/15 bg-white/[0.03] text-foreground text-sm font-medium px-5 py-3 rounded-full hover:bg-white/[0.08] transition-all"
-                    >
-                      Quero o desconto
-                    </button>
-                  </div>
-                </div>
+                  <button
+                    onClick={() => openForm(`parceiros_servico_${s.tag.toLowerCase().replace(/\s+/g, "_")}`)}
+                    className="mt-6 inline-flex items-center gap-2 self-start border border-white/15 bg-white/[0.03] text-foreground text-sm font-medium px-4 py-2.5 rounded-full hover:bg-white/[0.08] transition-all"
+                  >
+                    Quero esse com desconto <ArrowRight size={15} />
+                  </button>
+                </motion.article>
+              ))}
+            </div>
+          </div>
+        </section>
 
-                <div className="relative flex justify-center">
-                  <div className="aspect-square w-full max-w-[320px] rounded-2xl border border-white/[0.08] bg-white p-6 flex flex-col items-center justify-between shadow-lg overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-                    <div className="flex-1 flex items-center justify-center">
-                      <img 
-                        src={acidelLogo.url} 
-                        alt="Logo ACIDEL REI" 
-                        className="max-h-[180px] w-auto object-contain"
-                      />
-                    </div>
-                    <div className="mt-4 inline-flex items-center gap-2 text-xs font-medium text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
-                      <Handshake size={14} className="text-[#C4632D]" />
-                      Parceiro oficial
-                    </div>
+        {/* COMO FUNCIONA O DESCONTO */}
+        <section className="border-b border-white/[0.06]">
+          <div className="container max-w-6xl py-16 md:py-20">
+            <div className="grid lg:grid-cols-[1fr_1.2fr] gap-10 items-center">
+              <div className="rounded-3xl border border-white/[0.08] bg-white p-8 flex flex-col items-center text-center">
+                <img src={acidelLogo.url} alt="ACIDEL REI" className="max-h-32 w-auto" />
+                <p className="mt-4 text-xs font-mono uppercase tracking-[0.2em] text-slate-500">
+                  Associação Comercial · São João del-Rei
+                </p>
+                <button
+                  onClick={() => goAcidel("parceiros_acidel_site")}
+                  className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-[#C4632D] hover:underline"
+                >
+                  acidelrei.com.br <ExternalLink size={14} />
+                </button>
+              </div>
+
+              <div>
+                <p className="text-[12px] uppercase tracking-[0.18em] text-primary font-mono">Como funciona</p>
+                <h2 className="mt-2 font-serif text-3xl md:text-4xl">Três passos para garantir o desconto</h2>
+                <ol className="mt-8 space-y-5">
+                  {[
+                    {
+                      n: "01",
+                      t: "Confirme que você é associado",
+                      d: "Carteirinha, e-mail institucional ou comprovante da ACIDEL REI.",
+                    },
+                    {
+                      n: "02",
+                      t: "Conversa de diagnóstico",
+                      d: "Entendo o momento da sua empresa e indico consultoria ou mentoria — sem empurrar pacote.",
+                    },
+                    {
+                      n: "03",
+                      t: "Proposta com {DESCONTO} já aplicado",
+                      d: "Você recebe a proposta com o desconto de associado já no valor final. Sem letra miúda.",
+                    },
+                  ].map((p) => (
+                    <li key={p.n} className="flex gap-4">
+                      <div className="font-mono text-primary text-sm pt-1 shrink-0">{p.n}</div>
+                      <div>
+                        <div className="font-serif text-lg">{p.t.replace("{DESCONTO}", DESCONTO)}</div>
+                        <p className="text-sm text-muted-foreground mt-1">{p.d}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* PROVA SOCIAL */}
+        <section className="border-b border-white/[0.06]">
+          <div className="container max-w-4xl py-16 md:py-20">
+            <div className="rounded-3xl border border-white/[0.08] bg-white/[0.02] p-8 md:p-12 relative">
+              <Quote size={36} className="text-primary/40" />
+              <blockquote className="mt-4 font-serif text-2xl md:text-3xl leading-snug">
+                "Em três meses o comercial virou outra empresa. Parou de depender de mim para cada negociação. Hoje tenho funil, métrica e previsibilidade."
+              </blockquote>
+              <div className="mt-6 flex items-center gap-3 text-sm">
+                <div className="w-9 h-9 rounded-full bg-primary/15 text-primary inline-flex items-center justify-center font-mono">
+                  <Users size={16} />
+                </div>
+                <div>
+                  <div className="font-medium">Empresário do setor de serviços</div>
+                  <div className="text-muted-foreground text-xs font-mono uppercase tracking-wider">
+                    Mentoria estratégica · 12 semanas
                   </div>
                 </div>
               </div>
-            </motion.article>
-
-            {/* Placeholder próximos */}
-            <div className="mt-6 rounded-2xl border border-dashed border-white/[0.08] bg-white/[0.01] p-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Novos parceiros em breve. Quer ser um parceiro?{" "}
-                <button onClick={openForm} className="text-primary hover:underline font-medium">
-                  Fale com a gente
-                </button>
-                .
-              </p>
             </div>
           </div>
         </section>
 
         {/* CTA FINAL */}
         <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,hsl(var(--primary)/0.15),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,hsl(var(--primary)/0.18),transparent_60%)]" />
           <div className="container max-w-4xl relative py-20 md:py-28 text-center">
-            <h2 className="font-serif text-3xl md:text-5xl tracking-tight">
-              Pegue o desconto. Use a rede.
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-mono uppercase tracking-wider text-primary">
+              <Sparkles size={13} /> Exclusivo associados ACIDEL REI
+            </div>
+            <h2 className="mt-5 font-serif text-3xl md:text-5xl tracking-tight">
+              É associado? Então é seu por <span className="text-primary">{DESCONTO} a menos</span>.
             </h2>
             <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-              Deixe seu contato e te envio as instruções de acesso às vantagens com os parceiros — começando pela ACIDEL REI.
+              Deixe seu contato. Te chamo para uma conversa de diagnóstico e te mando a proposta com o desconto já aplicado.
             </p>
             <div className="mt-8 flex flex-wrap gap-3 justify-center">
               <button
-                onClick={openForm}
+                onClick={() => openForm("parceiros_cta_final")}
                 className="inline-flex items-center gap-2 bg-primary text-primary-foreground text-sm font-medium px-6 py-3.5 rounded-full hover:bg-primary/90 active:scale-[0.97] transition-all shadow-[0_6px_20px_-4px_hsl(var(--primary)/0.5)]"
               >
-                Quero acessar agora <ArrowRight size={16} />
+                Quero meu desconto <ArrowRight size={16} />
               </button>
               <button
                 onClick={() => goAcidel("parceiros_cta_acidel")}
                 className="inline-flex items-center gap-2 border border-white/15 bg-white/[0.03] text-foreground text-sm font-medium px-6 py-3.5 rounded-full hover:bg-white/[0.08] transition-all"
               >
-                Visitar ACIDEL REI <ExternalLink size={15} />
+                Conheça a ACIDEL REI <ExternalLink size={15} />
               </button>
             </div>
           </div>
