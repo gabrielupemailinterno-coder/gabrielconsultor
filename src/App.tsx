@@ -15,6 +15,7 @@ import BlogPost from "./pages/BlogPost";
 import PortalLogin from "./pages/portal/PortalLogin";
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import PortalResetPassword from "./pages/portal/PortalResetPassword";
+import Parceiros from "./pages/Parceiros";
 
 const queryClient = new QueryClient();
 
