@@ -15,6 +15,7 @@ import BlogPost from "./pages/BlogPost";
 import PortalLogin from "./pages/portal/PortalLogin";
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import PortalResetPassword from "./pages/portal/PortalResetPassword";
+import Parceiros from "./pages/Parceiros";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/mentoria-profissional" element={<MentoriaProfissional />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/parceiros" element={<Parceiros />} />
             <Route path="/mentorados/login" element={<PortalLogin />} />
             <Route path="/mentorados/redefinir-senha" element={<PortalResetPassword />} />
             <Route path="/mentorados" element={<PortalDashboard />} />
