@@ -5,6 +5,7 @@ import { ArrowRight, BadgeCheck, ExternalLink, Handshake, Percent, ShieldCheck, 
 import SiteHeader from "@/components/SiteHeader";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
+import acidelLogo from "@/assets/acidel-rei-logo.webp.asset.json";
 
 const ACIDEL_URL = "https://acidelrei.com.br/";
 
