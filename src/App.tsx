@@ -16,6 +16,7 @@ import PortalLogin from "./pages/portal/PortalLogin";
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import PortalResetPassword from "./pages/portal/PortalResetPassword";
 import Parceiros from "./pages/Parceiros";
+import WhatsAppFloatButton from "./components/WhatsAppFloatButton";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <LanguageSwitcher />
+          <WhatsAppFloatButton />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
