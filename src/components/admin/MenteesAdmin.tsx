@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Trash2, Upload, CheckCircle2, Unlock, Pencil, Link2, KeyRound, Copy } from "lucide-react";
+import { Loader2, Plus, Trash2, Upload, CheckCircle2, Unlock, Pencil, Link2, KeyRound, Copy, FileCheck2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
