@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Trash2, Upload, CheckCircle2, Unlock, Pencil, Link2, KeyRound, Copy } from "lucide-react";
+import { Loader2, Plus, Trash2, Upload, CheckCircle2, Unlock, Pencil, Link2, KeyRound, Copy, FileCheck2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,7 +13,7 @@ import InviteMenteeDialog from "./InviteMenteeDialog";
 type Mentee = { id: string; full_name: string; email: string; status: string; plan_id: string; plan_name?: string };
 type PresenceStat = { last_seen_at: string | null; total_seconds: number; sessions: number };
 type Meeting = { id: string; sequence: number; title: string; description: string | null; status: string; scheduled_at: string | null };
-type Task = { id: string; title: string; description: string | null; meeting_id: string | null; completed: boolean };
+type Task = { id: string; title: string; description: string | null; meeting_id: string | null; completed: boolean; completed_at: string | null; evidence_url: string | null };
 type Resource = { id: string; title: string; kind: string; url: string; meeting_id: string };
 
 const SPIN_PDF_URL = "/__l5e/assets-v1/0758221d-f958-42c2-9c7b-feef035826cd/spin-selling.pdf";
@@ -125,7 +125,7 @@ export default function MenteesAdmin() {
   const loadDetail = async (menteeId: string) => {
     const [m, t, r] = await Promise.all([
       supabase.from("meetings").select("id,sequence,title,description,status,scheduled_at").eq("mentee_id", menteeId).order("sequence"),
-      supabase.from("homework_tasks").select("id,title,description,meeting_id,completed").eq("mentee_id", menteeId),
+      supabase.from("homework_tasks").select("id,title,description,meeting_id,completed,completed_at,evidence_url").eq("mentee_id", menteeId),
       supabase.from("meeting_resources").select("id,title,kind,url,meeting_id,meetings!inner(mentee_id)").eq("meetings.mentee_id", menteeId),
     ]);
     const meetingList = (m.data as Meeting[]) ?? [];
@@ -197,6 +197,15 @@ export default function MenteesAdmin() {
     await supabase.from("homework_tasks").delete().eq("id", id);
     loadDetail(selectedId!);
   };
+
+  const viewEvidence = async (path: string) => {
+    if (/^https?:\/\//.test(path)) { window.open(path, "_blank"); return; }
+    const { data, error } = await supabase.storage.from("mentee-evidence").createSignedUrl(path, 60 * 10);
+    if (error || !data?.signedUrl) return toast.error("Não foi possível abrir a evidência.");
+    window.open(data.signedUrl, "_blank");
+  };
+
+
 
   const addLinkResource = async () => {
     if (!activeMeetingId) return toast.error("Selecione um encontro.");
@@ -409,9 +418,26 @@ export default function MenteesAdmin() {
                   <ul className="space-y-2">
                     {meetingTasks.map((t) => (
                       <li key={t.id} className="flex items-start gap-2 p-2 rounded bg-secondary/30">
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 space-y-1">
                           <p className={`text-sm ${t.completed ? "line-through text-muted-foreground" : ""}`}>{t.title}</p>
-                          {t.description && <p className="text-xs text-muted-foreground mt-0.5">{t.description}</p>}
+                          {t.description && <p className="text-xs text-muted-foreground">{t.description}</p>}
+                          <div className="flex items-center gap-3 flex-wrap text-xs">
+                            {t.completed ? (
+                              <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 size={12} /> Concluída{t.completed_at ? ` em ${new Date(t.completed_at).toLocaleDateString("pt-BR")}` : ""}</span>
+                            ) : (
+                              <span className="text-muted-foreground">Pendente</span>
+                            )}
+                            {t.evidence_url ? (
+                              <button
+                                onClick={() => viewEvidence(t.evidence_url!)}
+                                className="text-primary hover:underline flex items-center gap-1"
+                              >
+                                <FileCheck2 size={12} /> Ver evidência <ExternalLink size={10} />
+                              </button>
+                            ) : (
+                              <span className="text-muted-foreground/70">Sem evidência</span>
+                            )}
+                          </div>
                         </div>
                         <button onClick={() => deleteTask(t.id)} className="text-muted-foreground hover:text-destructive">
                           <Trash2 size={14} />
