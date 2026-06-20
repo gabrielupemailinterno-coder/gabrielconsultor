@@ -19,10 +19,9 @@ import SiteHeader from "@/components/SiteHeader";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import acidelLogo from "@/assets/acidel-rei-logo.webp.asset.json";
-import gabrielPhoto from "@/assets/gabriel-g4-hero.jpg.asset.json";
 
 const ACIDEL_URL = "https://acidelrei.com.br/";
-const DESCONTO = "15%";
+const DESCONTO = "até 30%";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -171,21 +170,30 @@ const Parceiros = () => {
                 custom={1}
                 className="relative"
               >
-                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-white/[0.08] bg-white/[0.02]">
-                  <img
-                    src={gabrielPhoto.url}
-                    alt="Gabriel Consultor"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
-                  <div className="absolute bottom-5 left-5 right-5 flex items-center gap-3 rounded-xl border border-white/15 bg-background/70 backdrop-blur p-3">
-                    <div className="w-12 h-12 rounded-lg bg-white p-1.5 flex items-center justify-center shrink-0">
-                      <img src={acidelLogo.url} alt="ACIDEL REI" className="max-h-full w-auto object-contain" />
-                    </div>
-                    <div className="text-xs">
-                      <div className="font-mono uppercase tracking-wider text-primary text-[10px]">Associado</div>
-                      <div className="text-foreground font-medium">ACIDEL REI · São João del-Rei</div>
-                    </div>
+                <div className="relative rounded-3xl border-2 border-dashed border-primary/30 bg-white/[0.02] p-8 md:p-10 flex flex-col items-center justify-center text-center overflow-hidden min-h-[380px] shadow-[inset_0_0_40px_rgba(196,99,45,0.05)]">
+                  {/* Decorative circles to look like a ticket */}
+                  <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background border-r border-primary/20" />
+                  <div className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background border-l border-primary/20" />
+                  
+                  <div className="w-24 h-24 rounded-2xl bg-white p-4 flex items-center justify-center mb-6 shadow-lg">
+                    <img src={acidelLogo.url} alt="ACIDEL REI" className="max-h-full max-w-full object-contain" />
+                  </div>
+                  
+                  <div className="font-mono uppercase tracking-[0.2em] text-primary text-xs font-semibold">
+                    BENEFÍCIO PARCEIRO
+                  </div>
+                  
+                  <h3 className="mt-3 font-serif text-3xl text-foreground font-semibold">
+                    Até 30% OFF
+                  </h3>
+                  
+                  <p className="mt-2 text-sm text-muted-foreground max-w-xs">
+                    Exclusivo para empresários e profissionais associados à ACIDEL REI
+                  </p>
+                  
+                  <div className="mt-8 pt-6 border-t border-white/[0.08] w-full flex flex-col items-center gap-1 font-mono text-[11px] text-muted-foreground">
+                    <div>CÓDIGO: PARCERIA_ACIDEL</div>
+                    <div>SÃO JOÃO DEL-REI · MG</div>
                   </div>
                 </div>
               </motion.div>
@@ -260,7 +268,7 @@ const Parceiros = () => {
                   className="relative rounded-2xl border border-white/[0.08] bg-white/[0.02] p-7 flex flex-col"
                 >
                   <div className="absolute top-5 right-5 inline-flex items-center gap-1 rounded-full bg-primary/15 text-primary px-2.5 py-1 text-[11px] font-mono uppercase tracking-wider">
-                    <BadgeCheck size={12} /> -{DESCONTO}
+                    <BadgeCheck size={12} /> {DESCONTO} OFF
                   </div>
                   <div className="w-11 h-11 rounded-xl bg-primary/15 text-primary inline-flex items-center justify-center">
                     <s.icon size={20} />
