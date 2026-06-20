@@ -31,7 +31,6 @@ export default function NewCampaignDialog({
   const removeStep = (i: number) => setSteps((s) => s.filter((_, idx) => idx !== i));
 
   const submit = async () => {
-    if (!name.trim()) return toast.error("Nome obrigatório");
     if (!message.trim() && mode === "single") return toast.error("Mensagem obrigatória");
     if (destType === "group" && !groupId.trim()) return toast.error("Group ID obrigatório");
 
@@ -47,9 +46,11 @@ export default function NewCampaignDialog({
         if (parsed.invalid.length) toast.warning(`${parsed.invalid.length} linhas inválidas ignoradas`);
       }
 
+      const campaignName = name.trim() || `Campanha ${new Date().toLocaleString("pt-BR")}`;
+
       const { data: camp, error: e1 } = await (supabase as any).from("campaigns").insert({
         user_id: user.id,
-        name,
+        name: campaignName,
         message: message || "(sequência)",
         kind: "social",
         destination_type: destType,
