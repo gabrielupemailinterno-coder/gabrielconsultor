@@ -125,7 +125,7 @@ export default function MenteesAdmin() {
   const loadDetail = async (menteeId: string) => {
     const [m, t, r] = await Promise.all([
       supabase.from("meetings").select("id,sequence,title,description,status,scheduled_at").eq("mentee_id", menteeId).order("sequence"),
-      supabase.from("homework_tasks").select("id,title,description,meeting_id,completed").eq("mentee_id", menteeId),
+      supabase.from("homework_tasks").select("id,title,description,meeting_id,completed,completed_at,evidence_url").eq("mentee_id", menteeId),
       supabase.from("meeting_resources").select("id,title,kind,url,meeting_id,meetings!inner(mentee_id)").eq("meetings.mentee_id", menteeId),
     ]);
     const meetingList = (m.data as Meeting[]) ?? [];
