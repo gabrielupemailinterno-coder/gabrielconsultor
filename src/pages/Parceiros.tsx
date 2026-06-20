@@ -19,10 +19,9 @@ import SiteHeader from "@/components/SiteHeader";
 import LeadFormDialog from "@/components/LeadFormDialog";
 import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
 import acidelLogo from "@/assets/acidel-rei-logo.webp.asset.json";
-import gabrielPhoto from "@/assets/gabriel-g4-hero.jpg.asset.json";
 
 const ACIDEL_URL = "https://acidelrei.com.br/";
-const DESCONTO = "15%";
+const DESCONTO = "até 30%";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
