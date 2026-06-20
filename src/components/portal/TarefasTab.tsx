@@ -3,7 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Loader2, Upload, FileCheck2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Loader2, Upload, FileCheck2, Link2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 type Task = { id: string; title: string; description: string | null; completed: boolean; completed_at: string | null; evidence_url: string | null; meeting_id: string | null };
@@ -14,6 +16,9 @@ export default function TarefasTab({ menteeId }: { menteeId: string }) {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [linkTask, setLinkTask] = useState<Task | null>(null);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [savingLink, setSavingLink] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -46,6 +51,25 @@ export default function TarefasTab({ menteeId }: { menteeId: string }) {
     load();
   };
 
+  const openLinkDialog = (task: Task) => {
+    setLinkTask(task);
+    setLinkUrl(task.evidence_url && /^https?:\/\//i.test(task.evidence_url) ? task.evidence_url : "");
+  };
+
+  const saveLink = async () => {
+    if (!linkTask) return;
+    const url = linkUrl.trim();
+    if (!/^https?:\/\//i.test(url)) { toast.error("Cole uma URL válida começando com http:// ou https://"); return; }
+    setSavingLink(true);
+    const { error } = await supabase.from("homework_tasks").update({ evidence_url: url }).eq("id", linkTask.id);
+    setSavingLink(false);
+    if (error) { toast.error("Falha ao salvar o link."); return; }
+    toast.success("Link salvo como evidência.");
+    setLinkTask(null);
+    setLinkUrl("");
+    load();
+  };
+
   if (loading) return <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div>;
 
   const visibleMeetings = meetings.filter((m) => m.status !== "blocked");
@@ -74,13 +98,35 @@ export default function TarefasTab({ menteeId }: { menteeId: string }) {
                   <div className="flex-1 min-w-0">
                     <p className={`font-medium text-sm ${t.completed ? "line-through text-muted-foreground" : ""}`}>{t.title}</p>
                     {t.description && <p className="text-xs text-muted-foreground mt-0.5">{t.description}</p>}
-                    <div className="mt-2 flex items-center gap-3">
+                    <div className="mt-2 flex items-center gap-3 flex-wrap">
                       <label className="text-xs text-primary hover:underline cursor-pointer flex items-center gap-1.5">
                         {uploadingId === t.id ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-                        {t.evidence_url ? "Substituir evidência" : "Enviar evidência"}
+                        {t.evidence_url ? "Substituir arquivo" : "Enviar arquivo"}
                         <input type="file" className="hidden" onChange={(e) => e.target.files?.[0] && upload(t, e.target.files[0])} />
                       </label>
-                      {t.evidence_url && <span className="text-xs text-emerald-400 flex items-center gap-1"><FileCheck2 size={12} /> enviada</span>}
+                      <button
+                        type="button"
+                        onClick={() => openLinkDialog(t)}
+                        className="text-xs text-primary hover:underline flex items-center gap-1.5"
+                      >
+                        <Link2 size={12} />
+                        {t.evidence_url && /^https?:\/\//i.test(t.evidence_url) ? "Editar link" : "Colar link"}
+                      </button>
+                      {t.evidence_url && (
+                        <span className="text-xs text-emerald-400 flex items-center gap-1">
+                          <FileCheck2 size={12} /> enviada
+                        </span>
+                      )}
+                      {t.evidence_url && /^https?:\/\//i.test(t.evidence_url) && (
+                        <a
+                          href={t.evidence_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary hover:underline flex items-center gap-1"
+                        >
+                          <ExternalLink size={12} /> abrir
+                        </a>
+                      )}
                     </div>
                   </div>
                 </li>
@@ -89,6 +135,32 @@ export default function TarefasTab({ menteeId }: { menteeId: string }) {
           </Card>
         );
       })}
+
+      <Dialog open={!!linkTask} onOpenChange={(o) => !o && setLinkTask(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Enviar link como evidência</DialogTitle>
+            <DialogDescription>
+              Cole qualquer URL (Google Drive, Dropbox, OneDrive, etc.). Garanta que o link esteja acessível para quem for revisar.
+            </DialogDescription>
+          </DialogHeader>
+          <Input
+            type="url"
+            placeholder="https://drive.google.com/..."
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            autoFocus
+          />
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setLinkTask(null)}>Cancelar</Button>
+            <Button onClick={saveLink} disabled={savingLink}>
+              {savingLink && <Loader2 className="animate-spin mr-2" size={14} />}
+              Salvar link
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
