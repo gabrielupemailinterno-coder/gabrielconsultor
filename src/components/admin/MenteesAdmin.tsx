@@ -13,7 +13,7 @@ import InviteMenteeDialog from "./InviteMenteeDialog";
 type Mentee = { id: string; full_name: string; email: string; status: string; plan_id: string; plan_name?: string };
 type PresenceStat = { last_seen_at: string | null; total_seconds: number; sessions: number };
 type Meeting = { id: string; sequence: number; title: string; description: string | null; status: string; scheduled_at: string | null };
-type Task = { id: string; title: string; description: string | null; meeting_id: string | null; completed: boolean };
+type Task = { id: string; title: string; description: string | null; meeting_id: string | null; completed: boolean; completed_at: string | null; evidence_url: string | null };
 type Resource = { id: string; title: string; kind: string; url: string; meeting_id: string };
 
 const SPIN_PDF_URL = "/__l5e/assets-v1/0758221d-f958-42c2-9c7b-feef035826cd/spin-selling.pdf";
