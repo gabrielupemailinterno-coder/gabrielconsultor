@@ -203,6 +203,9 @@ export default function MenteesAdmin() {
     const { data, error } = await supabase.storage.from("mentee-evidence").createSignedUrl(path, 60 * 10);
     if (error || !data?.signedUrl) return toast.error("Não foi possível abrir a evidência.");
     window.open(data.signedUrl, "_blank");
+  };
+
+
 
   const addLinkResource = async () => {
     if (!activeMeetingId) return toast.error("Selecione um encontro.");
