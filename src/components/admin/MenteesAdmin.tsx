@@ -198,6 +198,12 @@ export default function MenteesAdmin() {
     loadDetail(selectedId!);
   };
 
+  const viewEvidence = async (path: string) => {
+    if (/^https?:\/\//.test(path)) { window.open(path, "_blank"); return; }
+    const { data, error } = await supabase.storage.from("mentee-evidence").createSignedUrl(path, 60 * 10);
+    if (error || !data?.signedUrl) return toast.error("Não foi possível abrir a evidência.");
+    window.open(data.signedUrl, "_blank");
+
   const addLinkResource = async () => {
     if (!activeMeetingId) return toast.error("Selecione um encontro.");
     const title = linkForm.title.trim();
