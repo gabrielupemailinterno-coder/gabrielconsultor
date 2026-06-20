@@ -3,7 +3,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Loader2, Upload, FileCheck2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Loader2, Upload, FileCheck2, Link2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 type Task = { id: string; title: string; description: string | null; completed: boolean; completed_at: string | null; evidence_url: string | null; meeting_id: string | null };
@@ -14,6 +16,9 @@ export default function TarefasTab({ menteeId }: { menteeId: string }) {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
+  const [linkTask, setLinkTask] = useState<Task | null>(null);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [savingLink, setSavingLink] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -43,6 +48,25 @@ export default function TarefasTab({ menteeId }: { menteeId: string }) {
     await supabase.from("homework_tasks").update({ evidence_url: path }).eq("id", task.id);
     toast.success("Evidência enviada.");
     setUploadingId(null);
+    load();
+  };
+
+  const openLinkDialog = (task: Task) => {
+    setLinkTask(task);
+    setLinkUrl(task.evidence_url && /^https?:\/\//i.test(task.evidence_url) ? task.evidence_url : "");
+  };
+
+  const saveLink = async () => {
+    if (!linkTask) return;
+    const url = linkUrl.trim();
+    if (!/^https?:\/\//i.test(url)) { toast.error("Cole uma URL válida começando com http:// ou https://"); return; }
+    setSavingLink(true);
+    const { error } = await supabase.from("homework_tasks").update({ evidence_url: url }).eq("id", linkTask.id);
+    setSavingLink(false);
+    if (error) { toast.error("Falha ao salvar o link."); return; }
+    toast.success("Link salvo como evidência.");
+    setLinkTask(null);
+    setLinkUrl("");
     load();
   };
 
