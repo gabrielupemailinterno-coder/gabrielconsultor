@@ -268,7 +268,7 @@ const Parceiros = () => {
                   className="relative rounded-2xl border border-white/[0.08] bg-white/[0.02] p-7 flex flex-col"
                 >
                   <div className="absolute top-5 right-5 inline-flex items-center gap-1 rounded-full bg-primary/15 text-primary px-2.5 py-1 text-[11px] font-mono uppercase tracking-wider">
-                    <BadgeCheck size={12} /> -{DESCONTO}
+                    <BadgeCheck size={12} /> {DESCONTO} OFF
                   </div>
                   <div className="w-11 h-11 rounded-xl bg-primary/15 text-primary inline-flex items-center justify-center">
                     <s.icon size={20} />
