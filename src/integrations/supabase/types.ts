@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      blocklist: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          phone_e164: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          phone_e164: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          phone_e164?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           content: string
@@ -52,6 +76,199 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      campaign_logs: {
+        Row: {
+          campaign_id: string
+          contact_id: string | null
+          created_at: string
+          id: string
+          message: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          contact_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          status: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          contact_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      campaign_steps: {
+        Row: {
+          add_optout: boolean
+          campaign_id: string
+          created_at: string
+          error_message: string | null
+          id: string
+          message: string
+          scheduled_at: string
+          sent_at: string | null
+          status: string
+          step_order: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          add_optout?: boolean
+          campaign_id: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message: string
+          scheduled_at: string
+          sent_at?: string | null
+          status?: string
+          step_order: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          add_optout?: boolean
+          campaign_id?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message?: string
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: string
+          step_order?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_steps_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaigns: {
+        Row: {
+          add_optout: boolean
+          add_to_agent_context: boolean
+          cancelled_count: number
+          created_at: string
+          destination_type: string | null
+          error_count: number
+          group_id: string | null
+          id: string
+          kind: string
+          message: string
+          name: string
+          sent_count: number
+          status: string
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          add_optout?: boolean
+          add_to_agent_context?: boolean
+          cancelled_count?: number
+          created_at?: string
+          destination_type?: string | null
+          error_count?: number
+          group_id?: string | null
+          id?: string
+          kind?: string
+          message: string
+          name: string
+          sent_count?: number
+          status?: string
+          total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          add_optout?: boolean
+          add_to_agent_context?: boolean
+          cancelled_count?: number
+          created_at?: string
+          destination_type?: string | null
+          error_count?: number
+          group_id?: string | null
+          id?: string
+          kind?: string
+          message?: string
+          name?: string
+          sent_count?: number
+          status?: string
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      contacts: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          empresa: string | null
+          error_message: string | null
+          id: string
+          name: string | null
+          phone_e164: string
+          phone_raw: string
+          sent_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          empresa?: string | null
+          error_message?: string | null
+          id?: string
+          name?: string | null
+          phone_e164: string
+          phone_raw: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          empresa?: string | null
+          error_message?: string | null
+          id?: string
+          name?: string | null
+          phone_e164?: string
+          phone_raw?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contacts_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       email_send_log: {
         Row: {
@@ -663,6 +880,27 @@ export type Database = {
           },
         ]
       }
+      optouts: {
+        Row: {
+          created_at: string
+          id: string
+          phone_e164: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          phone_e164: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          phone_e164?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       page_clicks: {
         Row: {
           created_at: string
@@ -750,6 +988,45 @@ export type Database = {
           screen_size?: string | null
           session_id?: string
           user_agent?: string | null
+        }
+        Relationships: []
+      }
+      settings: {
+        Row: {
+          add_to_agent_context: boolean
+          agent_id: string | null
+          batch_limit: number
+          channel_id: string | null
+          created_at: string
+          delay_seconds: number
+          id: string
+          optout_text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          add_to_agent_context?: boolean
+          agent_id?: string | null
+          batch_limit?: number
+          channel_id?: string | null
+          created_at?: string
+          delay_seconds?: number
+          id?: string
+          optout_text?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          add_to_agent_context?: boolean
+          agent_id?: string | null
+          batch_limit?: number
+          channel_id?: string | null
+          created_at?: string
+          delay_seconds?: number
+          id?: string
+          optout_text?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
