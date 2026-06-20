@@ -409,9 +409,26 @@ export default function MenteesAdmin() {
                   <ul className="space-y-2">
                     {meetingTasks.map((t) => (
                       <li key={t.id} className="flex items-start gap-2 p-2 rounded bg-secondary/30">
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 space-y-1">
                           <p className={`text-sm ${t.completed ? "line-through text-muted-foreground" : ""}`}>{t.title}</p>
-                          {t.description && <p className="text-xs text-muted-foreground mt-0.5">{t.description}</p>}
+                          {t.description && <p className="text-xs text-muted-foreground">{t.description}</p>}
+                          <div className="flex items-center gap-3 flex-wrap text-xs">
+                            {t.completed ? (
+                              <span className="text-emerald-400 flex items-center gap-1"><CheckCircle2 size={12} /> Concluída{t.completed_at ? ` em ${new Date(t.completed_at).toLocaleDateString("pt-BR")}` : ""}</span>
+                            ) : (
+                              <span className="text-muted-foreground">Pendente</span>
+                            )}
+                            {t.evidence_url ? (
+                              <button
+                                onClick={() => viewEvidence(t.evidence_url!)}
+                                className="text-primary hover:underline flex items-center gap-1"
+                              >
+                                <FileCheck2 size={12} /> Ver evidência <ExternalLink size={10} />
+                              </button>
+                            ) : (
+                              <span className="text-muted-foreground/70">Sem evidência</span>
+                            )}
+                          </div>
                         </div>
                         <button onClick={() => deleteTask(t.id)} className="text-muted-foreground hover:text-destructive">
                           <Trash2 size={14} />
