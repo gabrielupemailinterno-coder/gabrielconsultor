@@ -7,6 +7,7 @@ import MenteesAdmin from "@/components/admin/MenteesAdmin";
 import InviteMenteeDialog from "@/components/admin/InviteMenteeDialog";
 import MenteeEmailComposer from "@/components/admin/MenteeEmailComposer";
 import ProspectingBulk from "@/components/admin/ProspectingBulk";
+import WhatsAppAdmin from "@/components/admin/whatsapp/WhatsAppAdmin";
 import { FORM_LABELS, type FormType } from "@/lib/qualifying-forms";
 
 type Lead = {
@@ -47,7 +48,7 @@ const Admin = () => {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [clicks, setClicks] = useState<Click[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [tab, setTab] = useState<"mentees" | "emails" | "prospect" | "leads" | "visits" | "clicks" | "sessions" | "blog">("mentees");
+  const [tab, setTab] = useState<"mentees" | "emails" | "prospect" | "whatsapp" | "leads" | "visits" | "clicks" | "sessions" | "blog">("mentees");
   const [leadFilter, setLeadFilter] = useState<FormType | "all">("all");
 
   useEffect(() => {
@@ -139,6 +140,7 @@ const Admin = () => {
             { id: "mentees", label: "Mentorados" },
             { id: "emails", label: "E-mails" },
             { id: "prospect", label: "Prospecção" },
+            { id: "whatsapp", label: "WhatsApp" },
             { id: "leads", label: `Cadastros (${leads.length})` },
             { id: "visits", label: `Visitas (${visits.length})` },
             { id: "clicks", label: `Cliques (${clicks.length})` },
@@ -158,6 +160,7 @@ const Admin = () => {
         {tab === "mentees" && <MenteesAdmin />}
         {tab === "emails" && <MenteeEmailComposer />}
         {tab === "prospect" && <ProspectingBulk />}
+        {tab === "whatsapp" && <WhatsAppAdmin />}
 
         {tab === "leads" && (() => {
           const types: Array<FormType | "all"> = ["all", "contato", "mentoria_1a1_vendedores", "consultoria_operacional", "mentoria_estrategica"];
