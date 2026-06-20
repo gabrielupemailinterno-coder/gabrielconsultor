@@ -30,8 +30,6 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (!TOKEN) return json({ error: "GPT_MAKER_API_TOKEN não configurado" }, 400);
 
-  console.log("[discover] token len=", TOKEN.length, "prefix=", TOKEN.slice(0, 6), "suffix=", TOKEN.slice(-4), "hasSpace=", /\s/.test(TOKEN));
-
   try {
     const wsResp = await api("/v2/workspaces");
     const workspaces: any[] = Array.isArray(wsResp) ? wsResp : wsResp.data ?? wsResp.workspaces ?? [];
