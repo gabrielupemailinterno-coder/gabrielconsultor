@@ -35,6 +35,19 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
   const [scheduleFor, setScheduleFor] = useState<Meeting | null>(null);
   const [scheduledAt, setScheduledAt] = useState("");
   const [busy, setBusy] = useState(false);
+  const [drivingId, setDrivingId] = useState<string | null>(null);
+
+  const sendToDrive = async (m: Meeting) => {
+    setDrivingId(m.id);
+    const { data, error } = await supabase.functions.invoke("meeting-to-drive", { body: { meeting_id: m.id } });
+    setDrivingId(null);
+    if (error || (data as any)?.error) {
+      toast.error("Não foi possível enviar para o Drive.");
+      return;
+    }
+    const link = (data as any)?.file?.webViewLink;
+    toast.success("Agenda enviada para o seu Google Drive!", link ? { action: { label: "Abrir", onClick: () => window.open(link, "_blank") } } : undefined);
+  };
 
   const load = async () => {
     setLoading(true);
