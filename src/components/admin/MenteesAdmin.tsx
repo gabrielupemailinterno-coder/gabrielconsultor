@@ -357,6 +357,11 @@ export default function MenteesAdmin() {
                     <p className="text-xs font-mono text-muted-foreground">#{mt.sequence}</p>
                     <p className="text-sm font-medium truncate">{mt.title}</p>
                     <p className="text-[10px] uppercase tracking-wider mt-1 text-muted-foreground">{statusLabel[mt.status]}</p>
+                    {mt.scheduled_at && (
+                      <p className="text-[10px] font-mono text-primary mt-1">
+                        {new Date(mt.scheduled_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    )}
                   </button>
                 ))}
               </div>
