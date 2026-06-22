@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Loader2, Video, FileText, Link as LinkIcon, Lock, CheckCircle2, CalendarDays } from "lucide-react";
+import { Loader2, Video, FileText, Link as LinkIcon, Lock, CheckCircle2, CalendarDays, HardDriveUpload } from "lucide-react";
 import { toast } from "sonner";
 
 type Meeting = {
