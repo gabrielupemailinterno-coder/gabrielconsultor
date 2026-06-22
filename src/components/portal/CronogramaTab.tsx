@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Loader2, Video, FileText, Link as LinkIcon, Lock, CheckCircle2, CalendarDays, HardDriveUpload } from "lucide-react";
+import { Loader2, Video, FileText, Link as LinkIcon, Lock, CheckCircle2, CalendarDays, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 type Meeting = {
@@ -20,6 +20,8 @@ type Meeting = {
 };
 type Resource = { id: string; meeting_id: string; kind: string; title: string; url: string };
 
+const BOOKING_URL = "https://calendar.app.google/ZAXUC21NXxJqNAuDA";
+
 const statusMeta: Record<Meeting["status"], { label: string; cls: string }> = {
   completed: { label: "Concluído", cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" },
   scheduled: { label: "Agendado", cls: "bg-sky-500/15 text-sky-400 border-sky-500/30" },
@@ -32,22 +34,10 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
   const [resources, setResources] = useState<Resource[]>([]);
   const [templates, setTemplates] = useState<Record<number, { title: string; description: string | null }>>({});
   const [loading, setLoading] = useState(true);
-  const [scheduleFor, setScheduleFor] = useState<Meeting | null>(null);
-  const [scheduledAt, setScheduledAt] = useState("");
+  const [confirmFor, setConfirmFor] = useState<Meeting | null>(null);
+  const [confirmAt, setConfirmAt] = useState("");
+  const [confirmLink, setConfirmLink] = useState("");
   const [busy, setBusy] = useState(false);
-  const [drivingId, setDrivingId] = useState<string | null>(null);
-
-  const sendToDrive = async (m: Meeting) => {
-    setDrivingId(m.id);
-    const { data, error } = await supabase.functions.invoke("meeting-to-drive", { body: { meeting_id: m.id } });
-    setDrivingId(null);
-    if (error || (data as any)?.error) {
-      toast.error("Não foi possível enviar para o Drive.");
-      return;
-    }
-    const link = (data as any)?.file?.webViewLink;
-    toast.success("Agenda enviada para o seu Google Drive!", link ? { action: { label: "Abrir", onClick: () => window.open(link, "_blank") } } : undefined);
-  };
 
   const load = async () => {
     setLoading(true);
@@ -67,27 +57,32 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
   };
   useEffect(() => { load(); }, [menteeId]);
 
-  const submitSchedule = async () => {
-    if (!scheduleFor || !scheduledAt) return;
+  const submitConfirm = async () => {
+    if (!confirmFor || !confirmAt) return;
     setBusy(true);
-    const { data, error } = await supabase.functions.invoke("schedule-meeting", {
-      body: { meeting_id: scheduleFor.id, scheduled_at: new Date(scheduledAt).toISOString(), mentee_email: menteeEmail },
-    });
+    const { error } = await supabase
+      .from("meetings")
+      .update({
+        scheduled_at: new Date(confirmAt).toISOString(),
+        meet_link: confirmLink.trim() || null,
+        status: "scheduled",
+      })
+      .eq("id", confirmFor.id);
     setBusy(false);
-    if (error || (data as any)?.error) {
-      toast.error("Não foi possível agendar agora. Tente novamente em instantes.");
+    if (error) {
+      toast.error("Não foi possível confirmar agora. Tente novamente.");
       return;
     }
-    toast.success("Reunião agendada! Você receberá o convite no Google Agenda.");
-    setScheduleFor(null);
-    setScheduledAt("");
+    toast.success("Encontro confirmado!");
+    setConfirmFor(null);
+    setConfirmAt("");
+    setConfirmLink("");
     await load();
     onChange();
   };
 
   const markCompleted = async (m: Meeting) => {
     await supabase.from("meetings").update({ status: "completed" }).eq("id", m.id);
-    // unlock next meeting
     const next = meetings.find((x) => x.sequence === m.sequence + 1);
     if (next && next.status === "blocked") {
       await supabase.from("meetings").update({ status: "available" }).eq("id", next.id);
@@ -159,7 +154,16 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
                     <div className="flex flex-wrap gap-2 pt-1">
                       {isLocked && <span className="text-xs text-muted-foreground flex items-center gap-1.5"><Lock size={12} /> Liberado em breve</span>}
                       {m.status === "available" && (
-                        <Button size="sm" onClick={() => setScheduleFor(m)}>Agendar reunião</Button>
+                        <>
+                          <Button size="sm" asChild className="gap-1.5">
+                            <a href={BOOKING_URL} target="_blank" rel="noreferrer">
+                              <ExternalLink size={14} /> Agendar no Google Agenda
+                            </a>
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => setConfirmFor(m)}>
+                            Já agendei — confirmar data
+                          </Button>
+                        </>
                       )}
                       {m.status === "scheduled" && m.meet_link && (
                         <Button size="sm" asChild><a href={m.meet_link} target="_blank" rel="noreferrer">Entrar no Meet</a></Button>
@@ -167,11 +171,6 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
                       {m.status === "scheduled" && (
                         <Button size="sm" variant="outline" onClick={() => markCompleted(m)} className="gap-1.5">
                           <CheckCircle2 size={14} /> Marcar concluído
-                        </Button>
-                      )}
-                      {m.status === "scheduled" && (
-                        <Button size="sm" variant="outline" onClick={() => sendToDrive(m)} disabled={drivingId === m.id} className="gap-1.5">
-                          {drivingId === m.id ? <Loader2 className="animate-spin" size={14} /> : <HardDriveUpload size={14} />} Enviar agenda no Drive
                         </Button>
                       )}
                     </div>
@@ -183,20 +182,28 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
         );
       })}
 
-      <Dialog open={!!scheduleFor} onOpenChange={(o) => !o && setScheduleFor(null)}>
+      <Dialog open={!!confirmFor} onOpenChange={(o) => !o && setConfirmFor(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Agendar: {scheduleFor?.title}</DialogTitle>
+            <DialogTitle>Confirmar agendamento: {confirmFor?.title}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Data e horário</label>
-            <Input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} />
-            <p className="text-xs text-muted-foreground">Você receberá o convite por e-mail com o link do Google Meet.</p>
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground">
+              Preencha com a data/horário que você escolheu no Google Agenda e cole o link do Meet que veio no convite.
+            </p>
+            <div className="space-y-1.5">
+              <label className="text-sm text-muted-foreground">Data e horário</label>
+              <Input type="datetime-local" value={confirmAt} onChange={(e) => setConfirmAt(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm text-muted-foreground">Link do Google Meet (opcional)</label>
+              <Input type="url" placeholder="https://meet.google.com/..." value={confirmLink} onChange={(e) => setConfirmLink(e.target.value)} />
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setScheduleFor(null)}>Cancelar</Button>
-            <Button onClick={submitSchedule} disabled={!scheduledAt || busy}>
-              {busy ? <Loader2 className="animate-spin" size={14} /> : "Confirmar agendamento"}
+            <Button variant="outline" onClick={() => setConfirmFor(null)}>Cancelar</Button>
+            <Button onClick={submitConfirm} disabled={!confirmAt || busy}>
+              {busy ? <Loader2 className="animate-spin" size={14} /> : "Confirmar"}
             </Button>
           </DialogFooter>
         </DialogContent>
