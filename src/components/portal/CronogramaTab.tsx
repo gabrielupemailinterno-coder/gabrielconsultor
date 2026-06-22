@@ -169,6 +169,11 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
                           <CheckCircle2 size={14} /> Marcar concluído
                         </Button>
                       )}
+                      {m.status === "scheduled" && (
+                        <Button size="sm" variant="outline" onClick={() => sendToDrive(m)} disabled={drivingId === m.id} className="gap-1.5">
+                          {drivingId === m.id ? <Loader2 className="animate-spin" size={14} /> : <HardDriveUpload size={14} />} Enviar agenda no Drive
+                        </Button>
+                      )}
                     </div>
                   </Card>
                 );
