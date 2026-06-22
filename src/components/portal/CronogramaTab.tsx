@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Loader2, Video, FileText, Link as LinkIcon, Lock, CheckCircle2, CalendarDays } from "lucide-react";
+import { Loader2, Video, FileText, Link as LinkIcon, Lock, CheckCircle2, CalendarDays, HardDriveUpload } from "lucide-react";
 import { toast } from "sonner";
 
 type Meeting = {
@@ -35,6 +35,19 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
   const [scheduleFor, setScheduleFor] = useState<Meeting | null>(null);
   const [scheduledAt, setScheduledAt] = useState("");
   const [busy, setBusy] = useState(false);
+  const [drivingId, setDrivingId] = useState<string | null>(null);
+
+  const sendToDrive = async (m: Meeting) => {
+    setDrivingId(m.id);
+    const { data, error } = await supabase.functions.invoke("meeting-to-drive", { body: { meeting_id: m.id } });
+    setDrivingId(null);
+    if (error || (data as any)?.error) {
+      toast.error("Não foi possível enviar para o Drive.");
+      return;
+    }
+    const link = (data as any)?.file?.webViewLink;
+    toast.success("Agenda enviada para o seu Google Drive!", link ? { action: { label: "Abrir", onClick: () => window.open(link, "_blank") } } : undefined);
+  };
 
   const load = async () => {
     setLoading(true);
@@ -154,6 +167,11 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
                       {m.status === "scheduled" && (
                         <Button size="sm" variant="outline" onClick={() => markCompleted(m)} className="gap-1.5">
                           <CheckCircle2 size={14} /> Marcar concluído
+                        </Button>
+                      )}
+                      {m.status === "scheduled" && (
+                        <Button size="sm" variant="outline" onClick={() => sendToDrive(m)} disabled={drivingId === m.id} className="gap-1.5">
+                          {drivingId === m.id ? <Loader2 className="animate-spin" size={14} /> : <HardDriveUpload size={14} />} Enviar agenda no Drive
                         </Button>
                       )}
                     </div>
