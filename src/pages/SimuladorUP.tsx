@@ -409,7 +409,7 @@ export default function SimuladorUP() {
                         const n = parseInt(e.target.value, 10);
                         setSemanas(Number.isFinite(n) && n >= 1 ? n : 1);
                       }}
-                      className="h-11 text-center text-lg font-semibold num-tabular rounded-sm"
+                      className="h-11 text-center text-lg font-semibold num-tabular rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418]"
                     />
                     <Button
                       type="button"
