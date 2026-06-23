@@ -366,7 +366,7 @@ export default function SimuladorUP() {
 
                 <div className="pt-2 border-t up-rule">
                   <div className="flex items-baseline justify-between">
-                    <Label className="text-xs font-semibold uppercase tracking-wider">
+                    <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: petroleo }}>
                       Taxa de conversão
                     </Label>
                     <span className="num-tabular text-lg font-bold" style={{ color: laranja }}>
