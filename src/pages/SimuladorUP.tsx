@@ -620,7 +620,7 @@ export default function SimuladorUP() {
         {/* Cards mobile */}
         <div className="mt-6 grid gap-3 md:hidden">
           {PRODUTOS.map((p) => (
-            <Card key={p.id} className="p-4 rounded-sm border up-rule shadow-none bg-white">
+            <Card key={p.id} className="p-4 rounded-sm border up-rule shadow-none bg-white" style={{ color: grafite }}>
               <div className="flex items-center justify-between">
                 <div className="font-semibold">{p.nome}</div>
                 {p.lancamento && (
