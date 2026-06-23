@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { ArrowDown, Minus, Plus, Target, TrendingUp } from "lucide-react";
+import { ArrowDown, Minus, Plus, Target, TrendingUp, BookOpen, Users, Award, Laptop, Calendar, Megaphone, Compass, Cpu } from "lucide-react";
 
 type Origem = "marketing" | "captacao";
 
@@ -563,6 +563,129 @@ export default function SimuladorUP() {
                 oportunidades qualificadas, maior pode ser sua receita —
                 e menor o número de leads que precisa abordar.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* O QUE A UP FORNECE */}
+      <section style={{ background: petroleo, color: off }} className="border-t border-b border-[rgba(244,239,232,0.1)]">
+        <div className="mx-auto max-w-6xl px-5 py-16 sm:py-24">
+          <div className="text-[11px] uppercase tracking-[0.2em] font-semibold up-mark" style={{ color: laranja }}>
+            Ecossistema UP
+          </div>
+          <h2 className="ff-display mt-3 text-3xl sm:text-4xl font-bold leading-tight">
+            Tudo o que a UP fornece para você
+            <br />
+            focar no que importa: <span className="up-accent">vender</span>
+          </h2>
+          <p className="mt-4 max-w-2xl text-sm sm:text-base" style={{ color: "rgba(244,239,232,0.65)" }}>
+            Garantimos a estrutura, a tecnologia, os produtos e a inteligência de mercado. Sua única missão é a execução prática de alta performance.
+          </p>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Card 1 */}
+            <div className="up-card-dark rounded-sm p-6 flex flex-col justify-between transition-all hover:translate-y-[-4px] hover:border-[rgba(196,99,45,0.4)]">
+              <div>
+                <div className="h-10 w-10 rounded-sm flex items-center justify-center mb-5" style={{ background: "rgba(196,99,45,0.12)", color: laranja }}>
+                  <Award className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-bold" style={{ color: off }}>Treinamento</h3>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: "rgba(244,239,232,0.6)" }}>
+                  Capacitação comercial contínua e técnica, focada no processo prático de vendas e no portfólio de alta liquidez.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 2 */}
+            <div className="up-card-dark rounded-sm p-6 flex flex-col justify-between transition-all hover:translate-y-[-4px] hover:border-[rgba(196,99,45,0.4)]">
+              <div>
+                <div className="h-10 w-10 rounded-sm flex items-center justify-center mb-5" style={{ background: "rgba(196,99,45,0.12)", color: laranja }}>
+                  <Users className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-bold" style={{ color: off }}>Acompanhamento</h3>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: "rgba(244,239,232,0.6)" }}>
+                  Mentoria especializada direta de quem executa no campo. Suporte ponta a ponta para fechar seus contratos.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 3 */}
+            <div className="up-card-dark rounded-sm p-6 flex flex-col justify-between transition-all hover:translate-y-[-4px] hover:border-[rgba(196,99,45,0.4)]">
+              <div>
+                <div className="h-10 w-10 rounded-sm flex items-center justify-center mb-5" style={{ background: "rgba(196,99,45,0.12)", color: laranja }}>
+                  <Compass className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-bold" style={{ color: off }}>Produtos de Qualidade</h3>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: "rgba(244,239,232,0.6)" }}>
+                  Portfólio com empreendimentos de altíssima qualidade diretamente na planta, com condições facilitadas e alta demanda.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 4 */}
+            <div className="up-card-dark rounded-sm p-6 flex flex-col justify-between transition-all hover:translate-y-[-4px] hover:border-[rgba(196,99,45,0.4)]">
+              <div>
+                <div className="h-10 w-10 rounded-sm flex items-center justify-center mb-5" style={{ background: "rgba(196,99,45,0.12)", color: laranja }}>
+                  <Laptop className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-bold" style={{ color: off }}>Tablet para Vendas</h3>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: "rgba(244,239,232,0.6)" }}>
+                  Equipamento tecnológico completo fornecido pela UP com todas as ferramentas e tabelas para apresentações de alto impacto.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 5 */}
+            <div className="up-card-dark rounded-sm p-6 flex flex-col justify-between transition-all hover:translate-y-[-4px] hover:border-[rgba(196,99,45,0.4)]">
+              <div>
+                <div className="h-10 w-10 rounded-sm flex items-center justify-center mb-5" style={{ background: "rgba(196,99,45,0.12)", color: laranja }}>
+                  <Calendar className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-bold" style={{ color: off }}>Ativação de Carteira</h3>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: "rgba(244,239,232,0.6)" }}>
+                  Eventos exclusivos e estratégias desenhadas sob medida para reaquecer e rentabilizar a sua base de contatos.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 6 */}
+            <div className="up-card-dark rounded-sm p-6 flex flex-col justify-between transition-all hover:translate-y-[-4px] hover:border-[rgba(196,99,45,0.4)]">
+              <div>
+                <div className="h-10 w-10 rounded-sm flex items-center justify-center mb-5" style={{ background: "rgba(196,99,45,0.12)", color: laranja }}>
+                  <Megaphone className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-bold" style={{ color: off }}>Tráfego Direcionado</h3>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: "rgba(244,239,232,0.6)" }}>
+                  Campanhas de marketing digital robustas rodando diariamente para encaminhar leads extremamente quentes aos corretores.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 7 */}
+            <div className="up-card-dark rounded-sm p-6 flex flex-col justify-between transition-all hover:translate-y-[-4px] hover:border-[rgba(196,99,45,0.4)]">
+              <div>
+                <div className="h-10 w-10 rounded-sm flex items-center justify-center mb-5" style={{ background: "rgba(196,99,45,0.12)", color: laranja }}>
+                  <BookOpen className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-bold" style={{ color: off }}>Estratégias Sob Medida</h3>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: "rgba(244,239,232,0.6)" }}>
+                  Traçamos e executamos planejamentos comerciais direcionados, adaptados para o seu perfil e sua região de atuação.
+                </p>
+              </div>
+            </div>
+
+            {/* Card 8 */}
+            <div className="up-card-dark rounded-sm p-6 flex flex-col justify-between transition-all hover:translate-y-[-4px] hover:border-[rgba(196,99,45,0.4)]">
+              <div>
+                <div className="h-10 w-10 rounded-sm flex items-center justify-center mb-5" style={{ background: "rgba(196,99,45,0.12)", color: laranja }}>
+                  <Cpu className="h-5 w-5" />
+                </div>
+                <h3 className="text-lg font-bold" style={{ color: off }}>Estrutura Enxuta</h3>
+                <p className="mt-2 text-xs leading-relaxed" style={{ color: "rgba(244,239,232,0.6)" }}>
+                  Infraestrutura 100% otimizada, integrada com sistemas avançados de CRM, marketing e vendas prontos para você faturar.
+                </p>
+              </div>
             </div>
           </div>
         </div>
