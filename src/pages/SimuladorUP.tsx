@@ -262,7 +262,7 @@ export default function SimuladorUP() {
                 <div>
                   <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: petroleo }}>Produto</Label>
                   <Select value={produtoId} onValueChange={setProdutoId}>
-                    <SelectTrigger className="mt-2 h-11 rounded-sm">
+                    <SelectTrigger className="mt-2 h-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
