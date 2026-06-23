@@ -211,11 +211,11 @@ export default function SimuladorUP() {
         </div>
 
         <div className="mt-9 grid gap-4 sm:grid-cols-2">
-          <Card className="p-7 rounded-sm border up-rule shadow-none bg-white">
+          <Card className="p-7 rounded-sm border up-rule shadow-none bg-white" style={{ color: grafite }}>
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "rgba(17,20,24,0.5)" }}>
               Origem 1 — Marketing
             </div>
-            <div className="ff-display mt-3 text-2xl font-bold">Lead Marketing</div>
+            <div className="ff-display mt-3 text-2xl font-bold" style={{ color: petroleo }}>Lead Marketing</div>
             <div className="mt-6 flex items-baseline gap-3">
               <span className="ff-display num-tabular text-5xl font-bold" style={{ color: grafite }}>2%</span>
               <span style={{ color: "rgba(17,20,24,0.4)" }}>—</span>
@@ -257,7 +257,7 @@ export default function SimuladorUP() {
 
           <div className="mt-8 grid gap-6 lg:grid-cols-5">
             {/* FORM */}
-            <Card className="lg:col-span-2 p-6 sm:p-7 rounded-sm border up-rule shadow-none bg-white">
+            <Card className="lg:col-span-2 p-6 sm:p-7 rounded-sm border up-rule shadow-none bg-white" style={{ color: grafite }}>
               <div className="space-y-6">
                 <div>
                   <Label className="text-xs font-semibold uppercase tracking-wider">Produto</Label>
@@ -620,7 +620,7 @@ export default function SimuladorUP() {
         {/* Cards mobile */}
         <div className="mt-6 grid gap-3 md:hidden">
           {PRODUTOS.map((p) => (
-            <Card key={p.id} className="p-4 rounded-sm border up-rule shadow-none bg-white">
+            <Card key={p.id} className="p-4 rounded-sm border up-rule shadow-none bg-white" style={{ color: grafite }}>
               <div className="flex items-center justify-between">
                 <div className="font-semibold">{p.nome}</div>
                 {p.lancamento && (
