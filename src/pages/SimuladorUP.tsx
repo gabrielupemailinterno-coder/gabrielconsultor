@@ -262,7 +262,7 @@ export default function SimuladorUP() {
                 <div>
                   <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: petroleo }}>Produto</Label>
                   <Select value={produtoId} onValueChange={setProdutoId}>
-                    <SelectTrigger className="mt-2 h-11 rounded-sm">
+                    <SelectTrigger className="mt-2 h-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -332,7 +332,7 @@ export default function SimuladorUP() {
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-11 w-11 rounded-sm"
+                      className="h-11 w-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] hover:bg-[rgba(17,20,24,0.04)] hover:text-[#111418]"
                       onClick={() => setQtd((q) => Math.max(1, q - 1))}
                       aria-label="Diminuir"
                     >
@@ -346,13 +346,13 @@ export default function SimuladorUP() {
                         const n = parseInt(e.target.value, 10);
                         setQtd(Number.isFinite(n) && n >= 1 ? n : 1);
                       }}
-                      className="h-11 text-center text-lg font-semibold num-tabular rounded-sm"
+                      className="h-11 text-center text-lg font-semibold num-tabular rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418]"
                     />
                     <Button
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-11 w-11 rounded-sm"
+                      className="h-11 w-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] hover:bg-[rgba(17,20,24,0.04)] hover:text-[#111418]"
                       onClick={() => setQtd((q) => q + 1)}
                       aria-label="Aumentar"
                     >
@@ -395,7 +395,7 @@ export default function SimuladorUP() {
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-11 w-11 rounded-sm"
+                      className="h-11 w-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] hover:bg-[rgba(17,20,24,0.04)] hover:text-[#111418]"
                       onClick={() => setSemanas((s) => Math.max(1, s - 1))}
                       aria-label="Menos semanas"
                     >
@@ -409,13 +409,13 @@ export default function SimuladorUP() {
                         const n = parseInt(e.target.value, 10);
                         setSemanas(Number.isFinite(n) && n >= 1 ? n : 1);
                       }}
-                      className="h-11 text-center text-lg font-semibold num-tabular rounded-sm"
+                      className="h-11 text-center text-lg font-semibold num-tabular rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418]"
                     />
                     <Button
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-11 w-11 rounded-sm"
+                      className="h-11 w-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] hover:bg-[rgba(17,20,24,0.04)] hover:text-[#111418]"
                       onClick={() => setSemanas((s) => s + 1)}
                       aria-label="Mais semanas"
                     >
