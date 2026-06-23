@@ -332,7 +332,7 @@ export default function SimuladorUP() {
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-11 w-11 rounded-sm"
+                      className="h-11 w-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] hover:bg-[rgba(17,20,24,0.04)] hover:text-[#111418]"
                       onClick={() => setQtd((q) => Math.max(1, q - 1))}
                       aria-label="Diminuir"
                     >
@@ -352,7 +352,7 @@ export default function SimuladorUP() {
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-11 w-11 rounded-sm"
+                      className="h-11 w-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] hover:bg-[rgba(17,20,24,0.04)] hover:text-[#111418]"
                       onClick={() => setQtd((q) => q + 1)}
                       aria-label="Aumentar"
                     >
@@ -395,7 +395,7 @@ export default function SimuladorUP() {
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-11 w-11 rounded-sm"
+                      className="h-11 w-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] hover:bg-[rgba(17,20,24,0.04)] hover:text-[#111418]"
                       onClick={() => setSemanas((s) => Math.max(1, s - 1))}
                       aria-label="Menos semanas"
                     >
@@ -415,7 +415,7 @@ export default function SimuladorUP() {
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-11 w-11 rounded-sm"
+                      className="h-11 w-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] hover:bg-[rgba(17,20,24,0.04)] hover:text-[#111418]"
                       onClick={() => setSemanas((s) => s + 1)}
                       aria-label="Mais semanas"
                     >
