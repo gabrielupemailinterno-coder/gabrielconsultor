@@ -387,7 +387,7 @@ export default function SimuladorUP() {
                 </div>
 
                 <div>
-                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                  <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: petroleo }}>
                     Prazo (semanas)
                   </Label>
                   <div className="mt-2 flex items-stretch gap-2">
