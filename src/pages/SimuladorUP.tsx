@@ -257,7 +257,7 @@ export default function SimuladorUP() {
 
           <div className="mt-8 grid gap-6 lg:grid-cols-5">
             {/* FORM */}
-            <Card className="lg:col-span-2 p-6 sm:p-7 rounded-sm border up-rule shadow-none bg-white">
+            <Card className="lg:col-span-2 p-6 sm:p-7 rounded-sm border up-rule shadow-none bg-white" style={{ color: grafite }}>
               <div className="space-y-6">
                 <div>
                   <Label className="text-xs font-semibold uppercase tracking-wider">Produto</Label>
