@@ -16,6 +16,7 @@ import PortalLogin from "./pages/portal/PortalLogin";
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import PortalResetPassword from "./pages/portal/PortalResetPassword";
 import Parceiros from "./pages/Parceiros";
+import SimuladorUP from "./pages/SimuladorUP";
 import WhatsAppFloatButton from "./components/WhatsAppFloatButton";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/mentorados/login" element={<PortalLogin />} />
             <Route path="/mentorados/redefinir-senha" element={<PortalResetPassword />} />
             <Route path="/mentorados" element={<PortalDashboard />} />
+            <Route path="/simulador-up" element={<SimuladorUP />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
