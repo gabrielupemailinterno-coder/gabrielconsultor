@@ -260,7 +260,7 @@ export default function SimuladorUP() {
             <Card className="lg:col-span-2 p-6 sm:p-7 rounded-sm border up-rule shadow-none bg-white" style={{ color: grafite }}>
               <div className="space-y-6">
                 <div>
-                  <Label className="text-xs font-semibold uppercase tracking-wider">Produto</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: petroleo }}>Produto</Label>
                   <Select value={produtoId} onValueChange={setProdutoId}>
                     <SelectTrigger className="mt-2 h-11 rounded-sm">
                       <SelectValue />
@@ -286,7 +286,7 @@ export default function SimuladorUP() {
                 </div>
 
                 <div>
-                  <Label className="text-xs font-semibold uppercase tracking-wider">Origem da venda</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: petroleo }}>Origem da venda</Label>
                   <RadioGroup
                     value={origem}
                     onValueChange={(v) => setOrigem(v as Origem)}
@@ -324,7 +324,7 @@ export default function SimuladorUP() {
                 </div>
 
                 <div>
-                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                  <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: petroleo }}>
                     Meta de vendas
                   </Label>
                   <div className="mt-2 flex items-stretch gap-2">
@@ -366,7 +366,7 @@ export default function SimuladorUP() {
 
                 <div className="pt-2 border-t up-rule">
                   <div className="flex items-baseline justify-between">
-                    <Label className="text-xs font-semibold uppercase tracking-wider">
+                    <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: petroleo }}>
                       Taxa de conversão
                     </Label>
                     <span className="num-tabular text-lg font-bold" style={{ color: laranja }}>
@@ -387,7 +387,7 @@ export default function SimuladorUP() {
                 </div>
 
                 <div>
-                  <Label className="text-xs font-semibold uppercase tracking-wider">
+                  <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: petroleo }}>
                     Prazo (semanas)
                   </Label>
                   <div className="mt-2 flex items-stretch gap-2">
