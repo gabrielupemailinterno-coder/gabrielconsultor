@@ -286,7 +286,7 @@ export default function SimuladorUP() {
                 </div>
 
                 <div>
-                  <Label className="text-xs font-semibold uppercase tracking-wider">Origem da venda</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: petroleo }}>Origem da venda</Label>
                   <RadioGroup
                     value={origem}
                     onValueChange={(v) => setOrigem(v as Origem)}
