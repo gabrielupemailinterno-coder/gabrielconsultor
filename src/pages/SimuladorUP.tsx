@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { ArrowDown, Minus, Plus, Target, TrendingUp } from "lucide-react";
+import { ArrowDown, Minus, Plus, Target, TrendingUp, BookOpen, Users, Award, Laptop, Calendar, Megaphone, Compass, Cpu } from "lucide-react";
 
 type Origem = "marketing" | "captacao";
 
