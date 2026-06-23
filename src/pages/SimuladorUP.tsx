@@ -260,7 +260,7 @@ export default function SimuladorUP() {
             <Card className="lg:col-span-2 p-6 sm:p-7 rounded-sm border up-rule shadow-none bg-white" style={{ color: grafite }}>
               <div className="space-y-6">
                 <div>
-                  <Label className="text-xs font-semibold uppercase tracking-wider">Produto</Label>
+                  <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: petroleo }}>Produto</Label>
                   <Select value={produtoId} onValueChange={setProdutoId}>
                     <SelectTrigger className="mt-2 h-11 rounded-sm">
                       <SelectValue />
