@@ -150,26 +150,6 @@ const MentoriaProfissional = () => {
             {c.heroDesc}
           </motion.p>
 
-          {/* Price card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="inline-flex flex-col items-center bg-card border border-primary/40 rounded-2xl px-10 py-6 mb-10"
-          >
-            <span className="text-primary text-[10px] tracking-[0.3em] uppercase font-medium mb-2">
-              {c.priceLabel}
-            </span>
-            <div className="flex items-baseline gap-2">
-              <span className="font-serif text-5xl md:text-6xl font-bold text-foreground">
-                {formatPrice(457.90)}
-              </span>
-              <span className="text-muted-foreground text-sm">{c.pricePeriod}</span>
-            </div>
-            <span className="text-muted-foreground text-xs mt-2">
-              {c.priceFootnote}
-            </span>
-          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
