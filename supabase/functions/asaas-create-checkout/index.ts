@@ -2,7 +2,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const ASAAS_BASE = "https://api.asaas.com/v3";
-const BASE_PRICE = 187.00;
+const BASE_PRICE = 457.90;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });

@@ -118,7 +118,7 @@ export default function MenteePaymentCard({ menteeId, onChange }: { menteeId: st
       <p className="text-xs text-muted-foreground">
         <strong>Acesso completo:</strong> mentorado vê todos os encontros liberados normalmente.<br />
         <strong>3 primeiros grátis:</strong> encontros 4–6 ficam bloqueados até você marcar como Pago.<br />
-        <strong>Amigos — promoção especial:</strong> 1ª mensalidade cortesia e 15% de desconto nas 2 próximas (2x R$ 158,95).
+        <strong>Amigos — promoção especial:</strong> 1ª mensalidade cortesia e 15% de desconto nas 2 próximas (2x R$ 389,22).
       </p>
     </div>
   );
