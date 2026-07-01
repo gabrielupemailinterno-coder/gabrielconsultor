@@ -295,7 +295,7 @@ export const indexCopy = {
 
 export const mentoriaCopy = {
   pt: {
-    metaTitle: "Mentoria Profissional 1:1 para Vendas e CS · R$197/mês | Gabriel Vieira",
+    metaTitle: "Mentoria Profissional 1:1 para Vendas e CS · R$457,90/mês | Gabriel Vieira",
     metaDesc: "Mentoria individual mensal para vendedores, SDRs e profissionais de customer success que querem bater meta, evoluir na carreira e destravar performance pessoal com método.",
 
     backHome: "Voltar para a página inicial",

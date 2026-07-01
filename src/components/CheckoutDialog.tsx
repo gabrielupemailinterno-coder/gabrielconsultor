@@ -19,7 +19,7 @@ type CheckoutMentee = {
   accessMode?: AccessMode;
 };
 
-const PRICE = 187;
+const PRICE = 457.90;
 
 function planFor(mode: AccessMode | undefined) {
   if (mode === "trial_then_paid") {

@@ -44,7 +44,7 @@ const formatDataExtenso = (iso?: string | null) => {
 
 export function buildTermoSections(d: TermoData) {
   const inst = d.installments ?? 3;
-  const valor = d.installmentValue ?? 187;
+  const valor = d.installmentValue ?? 457.90;
   const total = d.totalValue ?? valor * inst;
   const modalidadeNota =
     d.accessMode === "friend_promo"

@@ -874,7 +874,7 @@ const Index = () => {
                 </span>
                 <div className="flex items-baseline">
                   <span className="font-serif text-4xl md:text-5xl font-bold text-foreground">
-                    {formatPrice(187)}
+                    {formatPrice(457.90)}
                   </span>
                 </div>
                 <span className="text-muted-foreground text-xs mt-1">{c.mpPriceSuffix}</span>

@@ -111,7 +111,7 @@ export default function PortalDashboard() {
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {mentee.access_mode === "friend_promo"
-                    ? "Finalize o cadastro de pagamento para liberar todos os encontros (2x R$ 158,95 com 15% off)."
+                    ? "Finalize o cadastro de pagamento para liberar todos os encontros (2x R$ 389,22 com 15% off)."
                     : "Após o 3º encontro, finalize o pagamento para liberar os próximos 3 encontros da jornada."}
                 </p>
               </div>
