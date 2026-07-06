@@ -160,6 +160,7 @@ const Admin = () => {
         </div>
 
         {tab === "mentees" && <MenteesAdmin />}
+        {tab === "score" && <ScoreAdmin />}
         {tab === "emails" && <MenteeEmailComposer />}
         {tab === "prospect" && <ProspectingBulk />}
         {tab === "whatsapp" && <WhatsAppAdmin />}
