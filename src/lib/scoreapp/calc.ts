@@ -82,6 +82,26 @@ export function computeScore(logs: DailyLog[], goals: ScoreGoals | null): { scor
   return { score, faixa };
 }
 
+export function computeDayScore(log: DailyLog, goals: ScoreGoals | null): { score: number; label: string } {
+  const alvoAtiv = Math.max(1, (goals?.ligacoes_dia || 20) + (goals?.whatsapps_dia || 20));
+  const atividades = (log.ligacoes || 0) + (log.whatsapps || 0);
+  const vol = Math.min(1, atividades / alvoAtiv) * 30;
+  const prosp = Math.min(1, (log.prospeccoes || 0) / 5) * 15;
+  const reun = Math.min(1, (log.reunioes_agendadas || 0) / 2) * 20;
+  const fech =
+    (log.vendas || 0) > 0
+      ? 35
+      : (log.propostas || 0) > 0
+      ? 15
+      : (log.apresentacoes || 0) > 0
+      ? 8
+      : 0;
+  const score = Math.round(vol + prosp + reun + fech);
+  const label =
+    score < 30 ? "Fraco" : score < 55 ? "Regular" : score < 75 ? "Bom" : score < 90 ? "Ótimo" : "Excelente";
+  return { score, label };
+}
+
 export const BADGES: Record<string, string> = {
   primeiro_registro: "Primeiro registro",
   streak_7: "7 dias de consistência",

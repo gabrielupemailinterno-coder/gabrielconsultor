@@ -6,8 +6,8 @@ import { Loader2, Download, Upload, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { CurrencyInput, IntegerInput } from "@/components/scoreapp/MaskedInputs";
-import { fmtBRL } from "@/lib/scoreapp/calc";
-import type { DailyLog } from "@/lib/scoreapp/types";
+import { fmtBRL, computeDayScore } from "@/lib/scoreapp/calc";
+import type { DailyLog, ScoreGoals } from "@/lib/scoreapp/types";
 
 const numFields: { k: keyof DailyLog; label: string }[] = [
   { k: "ligacoes", label: "Ligações" },
@@ -67,6 +67,7 @@ export default function ScoreRegistrar() {
   const [valor, setValor] = useState(0);
   const [obs, setObs] = useState("");
   const [logs, setLogs] = useState<DailyLog[]>([]);
+  const [goals, setGoals] = useState<ScoreGoals | null>(null);
   const [reloadTick, setReloadTick] = useState(0);
   const [importing, setImporting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -96,6 +97,8 @@ export default function ScoreRegistrar() {
     if (!uid) return;
     supabase.from("score_daily_logs").select("*").eq("user_id", uid).order("date", { ascending: false }).limit(180)
       .then(({ data }) => setLogs((data as any) || []));
+    supabase.from("score_goals").select("*").eq("user_id", uid).order("effective_from", { ascending: false }).limit(1).maybeSingle()
+      .then(({ data }) => setGoals((data as any) || null));
   }, [uid, reloadTick]);
 
   const submit = async (e: React.FormEvent) => {
@@ -300,23 +303,37 @@ export default function ScoreRegistrar() {
                     <th className="text-left p-3">Data</th>
                     {numFields.map((f) => <th key={f.k as string} className="text-right p-3">{f.label}</th>)}
                     <th className="text-right p-3">Valor</th>
+                    <th className="text-right p-3">Score</th>
                     <th className="p-3"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {logs.map((l) => (
-                    <tr key={l.id} className="border-t border-border hover:bg-secondary/20">
-                      <td className="p-3 whitespace-nowrap">{new Date(l.date + "T00:00:00").toLocaleDateString("pt-BR")}</td>
-                      {numFields.map((f) => (
-                        <td key={f.k as string} className="p-3 text-right font-mono text-xs">{(l as any)[f.k] || 0}</td>
-                      ))}
-                      <td className="p-3 text-right font-mono text-xs">{fmtBRL(l.valor_vendido || 0)}</td>
-                      <td className="p-3 text-right whitespace-nowrap">
-                        <button onClick={() => setDate(l.date)} className="text-muted-foreground hover:text-primary mr-2" title="Editar"><Pencil size={14} /></button>
-                        <button onClick={() => removeLog(l.date)} className="text-muted-foreground hover:text-destructive" title="Excluir"><Trash2 size={14} /></button>
-                      </td>
-                    </tr>
-                  ))}
+                  {logs.map((l) => {
+                    const ds = computeDayScore(l, goals);
+                    const color =
+                      ds.score < 30 ? "bg-destructive/20 text-destructive"
+                      : ds.score < 55 ? "bg-orange-500/20 text-orange-400"
+                      : ds.score < 75 ? "bg-yellow-500/20 text-yellow-400"
+                      : "bg-emerald-500/20 text-emerald-400";
+                    return (
+                      <tr key={l.id} className="border-t border-border hover:bg-secondary/20">
+                        <td className="p-3 whitespace-nowrap">{new Date(l.date + "T00:00:00").toLocaleDateString("pt-BR")}</td>
+                        {numFields.map((f) => (
+                          <td key={f.k as string} className="p-3 text-right font-mono text-xs">{(l as any)[f.k] || 0}</td>
+                        ))}
+                        <td className="p-3 text-right font-mono text-xs">{fmtBRL(l.valor_vendido || 0)}</td>
+                        <td className="p-3 text-right whitespace-nowrap">
+                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded font-mono text-xs ${color}`} title={ds.label}>
+                            {ds.score}
+                          </span>
+                        </td>
+                        <td className="p-3 text-right whitespace-nowrap">
+                          <button onClick={() => setDate(l.date)} className="text-muted-foreground hover:text-primary mr-2" title="Editar"><Pencil size={14} /></button>
+                          <button onClick={() => removeLog(l.date)} className="text-muted-foreground hover:text-destructive" title="Excluir"><Trash2 size={14} /></button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
                 <tfoot className="border-t border-border bg-secondary/20 text-xs">
                   <tr>
@@ -325,6 +342,9 @@ export default function ScoreRegistrar() {
                       <td key={f.k as string} className="p-3 text-right font-mono">{(totals as any)[f.k]}</td>
                     ))}
                     <td className="p-3 text-right font-mono">{fmtBRL(totals.valor_vendido)}</td>
+                    <td className="p-3 text-right font-mono text-muted-foreground">
+                      {logs.length > 0 ? Math.round(logs.reduce((a, l) => a + computeDayScore(l, goals).score, 0) / logs.length) : 0}
+                    </td>
                     <td />
                   </tr>
                 </tfoot>
