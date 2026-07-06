@@ -1,0 +1,1 @@
+ALTER TABLE public.settings ADD COLUMN IF NOT EXISTS webhook_only_mode boolean NOT NULL DEFAULT false;
