@@ -34,14 +34,24 @@ async function requireAdmin(req: Request): Promise<{ userId: string } | Response
   return { userId: u.user.id };
 }
 
-async function getAgentId(): Promise<string | null> {
+async function getAgentId(userId: string): Promise<string | null> {
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
-  const { data: adminRole } = await admin
-    .from("user_roles").select("user_id").eq("role", "admin").limit(1).maybeSingle();
-  if (!adminRole) return null;
   const { data } = await admin
-    .from("settings").select("agent_id").eq("user_id", adminRole.user_id).maybeSingle();
-  return data?.agent_id || null;
+    .from("settings")
+    .select("agent_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (data?.agent_id) return data.agent_id;
+
+  const { data: configured } = await admin
+    .from("settings")
+    .select("agent_id, updated_at")
+    .not("agent_id", "is", null)
+    .neq("agent_id", "")
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return configured?.agent_id || null;
 }
 
 Deno.serve(async (req) => {
@@ -50,7 +60,7 @@ Deno.serve(async (req) => {
   if (check instanceof Response) return check;
   if (!GPT_TOKEN) return json({ error: "GPT_MAKER_API_TOKEN não configurado" }, 500);
 
-  const agentId = await getAgentId();
+  const agentId = await getAgentId(check.userId);
   if (!agentId) return json({ error: "agent_id não configurado em settings" }, 400);
 
   if (req.method === "GET") {
