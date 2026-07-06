@@ -1,0 +1,1 @@
+DELETE FROM public.bot_sessions WHERE phone LIKE '%553298583933%' OR phone = '553298583933';

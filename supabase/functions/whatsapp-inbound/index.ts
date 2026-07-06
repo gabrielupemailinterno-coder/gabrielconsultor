@@ -508,13 +508,34 @@ Deno.serve(async (req) => {
   const message: string = pickMessage(body);
   const chatIdIn = pickChatId(body);
   const messageId = pickMessageId(body);
+
+  // Filtra echo: a GPT Maker dispara o webhook também para as mensagens
+  // do próprio agente/assistente. Só processamos mensagens de entrada do
+  // contato (role user/contact/human). Qualquer coisa como assistant/bot/agent
+  // é ignorada para evitar loop de auto-resposta.
+  const roleRaw = firstString(
+    valueAtPath(body, "role"),
+    valueAtPath(body, "sender"),
+    valueAtPath(body, "senderType"),
+    valueAtPath(body, "from.role"),
+    valueAtPath(body, "message.role"),
+    valueAtPath(body, "direction"),
+    valueAtPath(body, "type"),
+  ).toLowerCase();
+  const isEchoRole = /(assistant|agent|bot|system|out|outbound|ai)/.test(roleRaw);
   console.log(
     "[inbound:parsed] keys=", JSON.stringify(topLevelKeys(body)),
     "hasPhone=", !!rawPhone,
     "hasEmail=", !!email,
     "hasMessage=", !!message,
     "hasChatId=", !!chatIdIn,
+    "role=", roleRaw || "(none)",
+    "isEcho=", isEchoRole,
   );
+  if (isEchoRole) {
+    console.log("[inbound] ignorando echo do próprio agente role=", roleRaw);
+    return json({ ok: true, ignored: "echo", role: roleRaw });
+  }
   if ((!rawPhone && !email && !chatIdIn) || !message) {
     // Registra payload não reconhecido para diagnóstico
     try {
