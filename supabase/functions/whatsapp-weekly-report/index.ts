@@ -14,7 +14,7 @@ function json(b: unknown, s = 200) {
   return new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 }
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const pct = (a: number, b: number) => (b > 0 ? Math.round((a / b) * 100) : 0);
+const pct = (a: number, b: number) => (b > 0 ? Math.min(100, Math.round((a / b) * 100)) : 0);
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 function summarize(logs: any[]) {
