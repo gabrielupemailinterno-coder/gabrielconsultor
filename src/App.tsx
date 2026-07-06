@@ -19,6 +19,7 @@ import Parceiros from "./pages/Parceiros";
 import SimuladorUP from "./pages/SimuladorUP";
 import WhatsAppFloatButton from "./components/WhatsAppFloatButton";
 import ScoreLanding from "./pages/scoreapp/Landing";
+import ConhecaScoreApp from "./pages/scoreapp/ConhecaScoreApp";
 import ScoreLogin from "./pages/scoreapp/Login";
 import ScoreSignup from "./pages/scoreapp/Signup";
 import ScoreOnboarding from "./pages/scoreapp/Onboarding";
