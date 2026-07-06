@@ -68,6 +68,32 @@ export default function WhatsAppSettingsTab() {
     }
   };
 
+  const checkAgent = async () => {
+    setAgentLoading(true);
+    const { data, error } = await supabase.functions.invoke("gpt-maker-agent-toggle", { method: "GET" });
+    setAgentLoading(false);
+    if (error) return toast.error("Erro: " + error.message);
+    if ((data as any)?.error) return toast.error((data as any).error);
+    setAgentStatus({ isActive: !!(data as any)?.isActive });
+  };
+
+  const toggleAgent = async (active: boolean) => {
+    setAgentLoading(true);
+    const { data, error } = await supabase.functions.invoke("gpt-maker-agent-toggle", {
+      method: "POST", body: { active },
+    });
+    setAgentLoading(false);
+    if (error) return toast.error("Erro: " + error.message);
+    if ((data as any)?.ok) {
+      toast.success(active ? "Agente reativado" : "Agente desligado ✅");
+      await checkAgent();
+    } else {
+      toast.error("Falhou: " + JSON.stringify((data as any)?.response || data));
+    }
+  };
+
+
+
 
   const save = async () => {
     setSaving(true);
