@@ -67,6 +67,7 @@ export default function ScoreRegistrar() {
   const [valor, setValor] = useState(0);
   const [obs, setObs] = useState("");
   const [logs, setLogs] = useState<DailyLog[]>([]);
+  const [goals, setGoals] = useState<ScoreGoals | null>(null);
   const [reloadTick, setReloadTick] = useState(0);
   const [importing, setImporting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
