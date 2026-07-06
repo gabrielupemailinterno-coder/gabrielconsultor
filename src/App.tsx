@@ -28,6 +28,7 @@ import ScoreConteudos from "./pages/scoreapp/Conteudos";
 import ScoreModulo from "./pages/scoreapp/Modulo";
 import ScorePerfil from "./pages/scoreapp/Perfil";
 import ScorePlanos from "./pages/scoreapp/Planos";
+import ScoreCheckoutPix from "./pages/scoreapp/CheckoutPix";
 
 const queryClient = new QueryClient();
 
