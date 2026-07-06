@@ -189,6 +189,19 @@ export default function ScorePlanos() {
             </div>
           ))}
         </div>
+
+        {profile?.cora_invoice_id && (
+          <div className="mt-8 text-sm text-muted-foreground">
+            Já pagou e não liberou?{" "}
+            <button
+              onClick={verifyPayment}
+              disabled={verifying}
+              className="text-primary underline underline-offset-4 disabled:opacity-50"
+            >
+              {verifying ? "Verificando..." : "Verificar pagamento agora"}
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );
