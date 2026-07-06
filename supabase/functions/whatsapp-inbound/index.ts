@@ -64,50 +64,105 @@ const SCORE_FIELDS = [
 ];
 
 function pickEmail(body: any): string {
-  return String(
-    body.email ||
-    body.user?.email ||
-    body.contact?.email ||
-    body.chat?.email ||
-    body.customer?.email ||
-    body.message?.contact?.email ||
-    body.data?.email ||
-    body.data?.contact?.email ||
-    ""
+  return firstString(
+    body.email,
+    body.user?.email,
+    body.contact?.email,
+    body.chat?.email,
+    body.customer?.email,
+    body.message?.contact?.email,
+    body.data?.email,
+    body.data?.contact?.email,
+    deepPick(body, ["email"]),
   ).trim().toLowerCase();
 }
 
 function pickPhone(body: any): string {
-  return String(
-    body.phone ||
-    body.from ||
-    body.contact?.phone ||
-    body.chat?.phone ||
-    body.customer?.phone ||
-    body.message?.from ||
-    body.message?.contact?.phone ||
-    body.message?.chat?.phone ||
-    body.data?.phone ||
-    body.data?.from ||
-    body.data?.contact?.phone ||
-    ""
+  return firstString(
+    body.phone,
+    body.from,
+    body.contactIdentifier,
+    body.contact?.phone,
+    body.contact?.identifier,
+    body.chat?.phone,
+    body.customer?.phone,
+    body.message?.from,
+    body.message?.contact?.phone,
+    body.message?.chat?.phone,
+    body.data?.phone,
+    body.data?.from,
+    body.data?.contact?.phone,
+    body.data?.contactIdentifier,
+    deepPick(body, ["phone", "from", "contactIdentifier", "whatsapp"]),
   );
 }
 
 function pickMessage(body: any): string {
-  return String(
-    body.message ||
-    body.text ||
-    body.body ||
-    body.content ||
-    body.message?.text ||
-    body.message?.body ||
-    body.message?.content ||
-    body.data?.message ||
-    body.data?.text ||
-    body.data?.body ||
-    ""
+  return firstString(
+    body.text,
+    body.body,
+    body.content,
+    body.message?.text,
+    body.message?.body,
+    body.message?.content,
+    body.message?.message,
+    body.data?.text,
+    body.data?.body,
+    body.data?.content,
+    body.data?.message?.text,
+    body.data?.message?.body,
+    body.data?.message?.content,
+    typeof body.message === "string" ? body.message : undefined,
+    typeof body.data?.message === "string" ? body.data.message : undefined,
+    deepPick(body, ["text", "body", "content", "message", "mensagem"]),
   );
+}
+
+function firstString(...values: unknown[]): string {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  }
+  return "";
+}
+
+function deepPick(input: unknown, keys: string[], depth = 0): string {
+  if (!input || typeof input !== "object" || depth > 5) return "";
+  const record = input as Record<string, unknown>;
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  }
+  for (const value of Object.values(record)) {
+    const found = deepPick(value, keys, depth + 1);
+    if (found) return found;
+  }
+  return "";
+}
+
+async function parseWebhookBody(req: Request, url: URL): Promise<any> {
+  if (req.method === "GET") return Object.fromEntries(url.searchParams.entries());
+
+  const contentType = req.headers.get("content-type") || "";
+  const raw = await req.text();
+  if (!raw.trim()) return {};
+
+  if (contentType.includes("application/json") || /^[\[{]/.test(raw.trim())) {
+    return JSON.parse(raw);
+  }
+
+  if (contentType.includes("application/x-www-form-urlencoded") || raw.includes("=")) {
+    const parsed = Object.fromEntries(new URLSearchParams(raw).entries());
+    for (const [key, value] of Object.entries(parsed)) {
+      if (typeof value === "string" && /^[\[{]/.test(value.trim())) {
+        try { parsed[key] = JSON.parse(value); } catch { /* keep text */ }
+      }
+    }
+    return parsed;
+  }
+
+  return { text: raw, raw };
 }
 
 function pickChatId(body: any): string | null {
@@ -298,17 +353,31 @@ async function persistAndReply(
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST") return json({ error: "method not allowed" }, 405);
+  if (req.method !== "POST" && req.method !== "GET") return json({ error: "method not allowed" }, 405);
   if (!WEBHOOK_TOKEN) return json({ error: "webhook token not configured" }, 500);
   const url = new URL(req.url);
   const token =
     req.headers.get("x-webhook-token") ??
     req.headers.get("X-Webhook-Token") ??
-    url.searchParams.get("token");
-  if (token !== WEBHOOK_TOKEN) return json({ error: "unauthorized" }, 401);
+    req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
+    url.searchParams.get("token") ??
+    url.pathname.split("/").filter(Boolean).at(-1);
+  console.log("[inbound:req] method=", req.method, "contentType=", req.headers.get("content-type") || "", "auth=", token ? "present" : "missing");
+  if (token !== WEBHOOK_TOKEN) {
+    console.warn("[inbound:req] unauthorized auth=", token ? "invalid" : "missing");
+    return json({ error: "unauthorized" }, 401);
+  }
 
   let body: any;
-  try { body = await req.json(); } catch { return json({ error: "invalid json" }, 400); }
+  try { body = await parseWebhookBody(req, url); } catch (error) {
+    console.error("[inbound:req] invalid body", error instanceof Error ? error.message : String(error));
+    return json({ error: "invalid body" }, 400);
+  }
+  const bodyToken = firstString(body.token, body.webhook_token, body.webhookToken);
+  if (bodyToken && bodyToken !== WEBHOOK_TOKEN) {
+    console.warn("[inbound:req] invalid body token");
+    return json({ error: "unauthorized" }, 401);
+  }
 
   const rawPhone: string = pickPhone(body);
   const email = pickEmail(body);
