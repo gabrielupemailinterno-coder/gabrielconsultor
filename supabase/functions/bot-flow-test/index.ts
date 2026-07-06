@@ -70,11 +70,13 @@ Deno.serve(async (req) => {
     });
   }
 
-  const sent: { message: string; ok: boolean; error?: string }[] = [];
+  const sent: { message: string; ok: boolean; error?: string; status?: number; endpoint?: string; chatId?: string }[] = [];
+  let chatId: string | null = null;
   for (const msg of step.messages) {
     const preview = `[TESTE ${flow.name}]\n\n${msg}`;
-    const result = await sendWhatsApp(channelId, normalized, preview);
-    sent.push({ message: preview, ...result });
+    const result = await sendWhatsApp(channelId, normalized, preview, { chatId });
+    if (!chatId && result.chatId) chatId = result.chatId;
+    sent.push({ message: preview, ok: result.ok, error: result.error, status: result.status, endpoint: result.endpoint, chatId: result.chatId });
     if (step.messages.length > 1) {
       await new Promise((r) => setTimeout(r, (settings?.delay_seconds ?? 2) * 1000));
     }
@@ -85,6 +87,7 @@ Deno.serve(async (req) => {
     error: failed?.error || null,
     phone: normalized,
     channelId,
+    chatId,
     sent,
   });
 });
