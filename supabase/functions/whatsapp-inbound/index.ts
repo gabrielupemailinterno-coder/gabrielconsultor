@@ -78,11 +78,21 @@ function pickEmail(body: any): string {
 }
 
 async function getAdminSettings(admin: any) {
-  const { data: adminRole } = await admin
-    .from("user_roles").select("user_id").eq("role", "admin").limit(1).maybeSingle();
-  if (!adminRole) return null;
-  const { data: settings } = await admin.from("settings").select("*").eq("user_id", adminRole.user_id).maybeSingle();
-  return settings;
+  const { data: settingsRows } = await admin
+    .from("settings")
+    .select("*")
+    .not("channel_id", "is", null)
+    .neq("channel_id", "")
+    .order("updated_at", { ascending: false })
+    .limit(1);
+  if (settingsRows?.[0]) return settingsRows[0];
+
+  const { data: fallbackRows } = await admin
+    .from("settings")
+    .select("*")
+    .order("updated_at", { ascending: false })
+    .limit(1);
+  return fallbackRows?.[0] || null;
 }
 
 async function computeStreak(admin: any, userId: string): Promise<number> {
