@@ -313,6 +313,8 @@ Deno.serve(async (req) => {
   const rawPhone: string = pickPhone(body);
   const email = pickEmail(body);
   const message: string = pickMessage(body);
+  const chatIdIn = pickChatId(body);
+  const messageId = pickMessageId(body);
   if ((!rawPhone && !email) || !message) {
     // Registra payload não reconhecido para diagnóstico
     try {
@@ -329,12 +331,29 @@ Deno.serve(async (req) => {
   const phone = normalizePhone(rawPhone);
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
-  console.log("[inbound] phone=", phone, "email=", email, "message=", JSON.stringify(message));
+  console.log("[inbound] phone=", phone, "email=", email, "chatId=", chatIdIn, "msgId=", messageId, "message=", JSON.stringify(message));
+
+  // Dedup: ignora callback repetido da GPT Maker (mesma message_id nos últimos 5 min)
+  if (messageId) {
+    const since = new Date(Date.now() - 5 * 60_000).toISOString();
+    const { data: dup } = await admin
+      .from("score_whatsapp_messages")
+      .select("id")
+      .eq("direction", "in")
+      .gte("created_at", since)
+      .contains("payload", { message_id: messageId })
+      .limit(1);
+    if (dup && dup.length > 0) {
+      console.log("[inbound] dedup hit message_id=", messageId);
+      return json({ ok: true, deduped: true });
+    }
+  }
 
   await admin.from("score_whatsapp_messages").insert({
     phone: phone || "unknown", direction: "in", kind: "inbound",
-    payload: { message, email, raw: body },
+    payload: { message, email, message_id: messageId, chatId: chatIdIn, raw: body },
   });
+
 
   const { data: profiles } = await admin.from("score_profiles").select("user_id, full_name, email, phone").limit(500);
   const profile = (profiles || []).find((p: any) => {
