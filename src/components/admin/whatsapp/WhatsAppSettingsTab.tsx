@@ -262,6 +262,36 @@ export default function WhatsAppSettingsTab() {
         )}
       </div>
 
+      <div className="bg-card border border-border rounded-lg p-6 space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-serif text-lg">Estado do agente na GPT Maker</h3>
+          <div className="flex gap-2">
+            <button onClick={checkAgent} disabled={agentLoading || !settings.agent_id} className="text-sm px-3 py-1.5 border border-border rounded hover:bg-secondary/40 disabled:opacity-50">
+              {agentLoading ? <Loader2 className="animate-spin" size={14} /> : "Verificar"}
+            </button>
+            {agentStatus?.isActive !== false ? (
+              <button onClick={() => toggleAgent(false)} disabled={agentLoading || !settings.agent_id} className="text-sm px-3 py-1.5 bg-destructive text-destructive-foreground rounded disabled:opacity-50">
+                Desligar agente
+              </button>
+            ) : (
+              <button onClick={() => toggleAgent(true)} disabled={agentLoading || !settings.agent_id} className="text-sm px-3 py-1.5 bg-primary text-primary-foreground rounded disabled:opacity-50">
+                Reativar agente
+              </button>
+            )}
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Com o agente <strong>desligado</strong>, apenas o fluxo do bot desta plataforma responde às mensagens — sem risco de resposta dupla nem consumo de créditos de IA da GPT Maker. Recomendado. <strong>Não precisa treinar o agente</strong>: o fluxo (perguntas, validação, cálculo de score) roda inteiro aqui.
+        </p>
+        {agentStatus && (
+          <div className="text-xs bg-background border border-border rounded p-3 font-mono">
+            Status: {agentStatus.isActive ? "⚠️ ATIVO (pode responder junto)" : "✅ INATIVO (só nosso fluxo responde)"}
+          </div>
+        )}
+      </div>
+
+
+
 
 
       <button onClick={save} disabled={saving} className="bg-primary text-primary-foreground px-6 py-3 rounded text-sm uppercase tracking-wide disabled:opacity-50">
