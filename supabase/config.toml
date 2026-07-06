@@ -17,4 +17,13 @@ project_id = "xhzsdnbztsnupbukmdjg"
     verify_jwt = false
   [functions.admin-reset-mentee-password]
     verify_jwt = false
+  [functions.whatsapp-inbound]
+    verify_jwt = false
+  [functions.whatsapp-daily-checkin]
+    verify_jwt = false
+  [functions.whatsapp-inactivity-alerts]
+    verify_jwt = false
+  [functions.whatsapp-weekly-report]
+    verify_jwt = false
+
 

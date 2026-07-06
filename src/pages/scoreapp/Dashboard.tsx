@@ -4,9 +4,11 @@ import ScoreLayout from "@/components/scoreapp/ScoreLayout";
 import { useScoreData } from "@/hooks/useScoreData";
 import { computeConversions, computeDiagnostics, computeScore, evaluateBadges, monthLogs, fmtBRL, fmtPct, BADGES } from "@/lib/scoreapp/calc";
 import { recommendTrigger } from "@/lib/scoreapp/recommendations";
+import { computeStreakBRT, daysSinceLastLogBRT } from "@/lib/scoreapp/streak";
 import RecommendationCard from "@/components/scoreapp/RecommendationCard";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, TrendingUp, Trophy, Sparkles } from "lucide-react";
+import { Loader2, TrendingUp, Trophy, Sparkles, Flame, AlertTriangle } from "lucide-react";
+
 import { toast } from "sonner";
 
 export default function ScoreDashboard() {
@@ -20,7 +22,7 @@ export default function ScoreDashboard() {
 
   const mLogs = useMemo(() => monthLogs(logs), [logs]);
   const conv = useMemo(() => computeConversions(mLogs), [mLogs]);
-  const { score, faixa } = useMemo(() => computeScore(logs, goals), [logs, goals]);
+  const { score, faixa } = useMemo(() => computeScore(logs, goals, (profile as any)?.inactivity_penalty_days ?? 0), [logs, goals, profile]);
   const diag = useMemo(() => computeDiagnostics(mLogs, goals), [mLogs, goals]);
   const badges = useMemo(() => evaluateBadges(logs, goals), [logs, goals]);
   const recTrigger = useMemo(() => recommendTrigger(logs, goals), [logs, goals]);
@@ -47,7 +49,44 @@ export default function ScoreDashboard() {
         <h1 className="font-serif text-3xl">Seu painel do mês</h1>
       </div>
 
+      {(() => {
+        const streak = computeStreakBRT(logs);
+        const dias = daysSinceLastLogBRT(logs);
+        const penalty = (profile as any)?.inactivity_penalty_days ?? 0;
+        return (
+          <div className="grid md:grid-cols-2 gap-3 mb-6">
+            <div className={`border rounded-lg p-4 flex items-center gap-3 ${streak >= 2 ? "border-primary/40 bg-primary/10" : "border-border bg-card"}`}>
+              <Flame size={22} className={streak >= 2 ? "text-primary" : "text-muted-foreground"} />
+              <div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground">Streak</div>
+                <div className="font-mono text-xl">
+                  {streak} dia{streak === 1 ? "" : "s"}
+                  {streak >= 2 && <span className="ml-2 text-xs text-muted-foreground">não perca hoje</span>}
+                </div>
+              </div>
+            </div>
+            {penalty > 0 || dias >= 2 ? (
+              <div className="border border-destructive/40 bg-destructive/10 rounded-lg p-4 flex items-center gap-3">
+                <AlertTriangle size={22} className="text-destructive" />
+                <div className="text-sm">
+                  {penalty > 0
+                    ? <>Seu Score está penalizado em <b>-{Math.min(20, penalty * 2)} pts</b> por {penalty} dias sem registrar.</>
+                    : <>Você está há <b>{dias} dias</b> sem registrar. Volta hoje pra não perder a sequência.</>}
+                </div>
+              </div>
+            ) : (
+              <div className="border border-border bg-card rounded-lg p-4 flex items-center gap-3">
+                <TrendingUp size={22} className="text-primary" />
+                <div className="text-sm text-muted-foreground">Você está em dia com seus registros.</div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       <RecommendationCard triggerKey={recTrigger} />
+
+
 
 
       <div className="grid md:grid-cols-3 gap-4 mb-6">

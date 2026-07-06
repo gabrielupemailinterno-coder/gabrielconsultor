@@ -61,7 +61,7 @@ export function computeConsistency(logs: DailyLog[]): { streak: number; last30: 
   return { streak, last30 };
 }
 
-export function computeScore(logs: DailyLog[], goals: ScoreGoals | null): { score: number; faixa: string } {
+export function computeScore(logs: DailyLog[], goals: ScoreGoals | null, penaltyDays = 0): { score: number; faixa: string } {
   const mLogs = monthLogs(logs);
   const c = computeConversions(mLogs);
   const cons = computeConsistency(logs);
@@ -73,7 +73,8 @@ export function computeScore(logs: DailyLog[], goals: ScoreGoals | null): { scor
   const conv = Math.min(1, (c.propToVenda / 30)) * 20;
   const volume = Math.min(1, c.atividades / (goals ? (goals.ligacoes_dia + goals.whatsapps_dia) * daysElapsed : 200)) * 15;
   const resultado = Math.min(1, c.vendas / (goals?.meta_vendas || 10)) * 15;
-  const score = Math.round(consistencia + metaBatida + conv + volume + resultado);
+  const penalty = Math.min(20, Math.max(0, penaltyDays) * 2);
+  const score = Math.max(0, Math.round(consistencia + metaBatida + conv + volume + resultado - penalty));
   const faixa = score < 40 ? "Iniciante sem consistência"
     : score < 60 ? "Em construção"
     : score < 75 ? "Comercial em evolução"
@@ -81,6 +82,7 @@ export function computeScore(logs: DailyLog[], goals: ScoreGoals | null): { scor
     : "Vendedor de elite";
   return { score, faixa };
 }
+
 
 export function computeDayScore(log: DailyLog, goals: ScoreGoals | null): { score: number; label: string } {
   const alvoAtiv = Math.max(1, (goals?.ligacoes_dia || 20) + (goals?.whatsapps_dia || 20));

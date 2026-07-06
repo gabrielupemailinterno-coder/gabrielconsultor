@@ -1325,6 +1325,7 @@ export type Database = {
           experience_level: string | null
           full_name: string
           id: string
+          inactivity_penalty_days: number
           last_seen_at: string | null
           lead_origin: string | null
           payment_status: string | null
@@ -1340,6 +1341,8 @@ export type Database = {
           state: string | null
           updated_at: string
           user_id: string
+          whatsapp_last_checkin_at: string | null
+          whatsapp_opt_in: boolean
         }
         Insert: {
           accepted_terms_at?: string | null
@@ -1362,6 +1365,7 @@ export type Database = {
           experience_level?: string | null
           full_name?: string
           id?: string
+          inactivity_penalty_days?: number
           last_seen_at?: string | null
           lead_origin?: string | null
           payment_status?: string | null
@@ -1377,6 +1381,8 @@ export type Database = {
           state?: string | null
           updated_at?: string
           user_id: string
+          whatsapp_last_checkin_at?: string | null
+          whatsapp_opt_in?: boolean
         }
         Update: {
           accepted_terms_at?: string | null
@@ -1399,6 +1405,7 @@ export type Database = {
           experience_level?: string | null
           full_name?: string
           id?: string
+          inactivity_penalty_days?: number
           last_seen_at?: string | null
           lead_origin?: string | null
           payment_status?: string | null
@@ -1414,6 +1421,8 @@ export type Database = {
           state?: string | null
           updated_at?: string
           user_id?: string
+          whatsapp_last_checkin_at?: string | null
+          whatsapp_opt_in?: boolean
         }
         Relationships: []
       }
@@ -1510,6 +1519,39 @@ export type Database = {
         }
         Relationships: []
       }
+      score_whatsapp_messages: {
+        Row: {
+          created_at: string
+          direction: string
+          error: string | null
+          id: string
+          kind: string
+          payload: Json
+          phone: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          error?: string | null
+          id?: string
+          kind: string
+          payload?: Json
+          phone: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          error?: string | null
+          id?: string
+          kind?: string
+          payload?: Json
+          phone?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
           add_to_agent_context: boolean
@@ -1522,6 +1564,8 @@ export type Database = {
           optout_text: string
           updated_at: string
           user_id: string
+          whatsapp_ritual_enabled: boolean
+          whatsapp_templates: Json
         }
         Insert: {
           add_to_agent_context?: boolean
@@ -1534,6 +1578,8 @@ export type Database = {
           optout_text?: string
           updated_at?: string
           user_id: string
+          whatsapp_ritual_enabled?: boolean
+          whatsapp_templates?: Json
         }
         Update: {
           add_to_agent_context?: boolean
@@ -1546,6 +1592,8 @@ export type Database = {
           optout_text?: string
           updated_at?: string
           user_id?: string
+          whatsapp_ritual_enabled?: boolean
+          whatsapp_templates?: Json
         }
         Relationships: []
       }
