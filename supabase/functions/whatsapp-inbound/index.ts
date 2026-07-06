@@ -285,5 +285,15 @@ Deno.serve(async (req) => {
       user_id: profile.user_id, phone, direction: "out", kind: "reply_help", payload: { message: help },
     });
   }
-  return json({ ok: false, error: "no match" });
+  return json({
+    ok: false,
+    error: "no match",
+    debug: {
+      matched_trigger: null,
+      flow_id: null,
+      flow_name: null,
+      flow_priority: null,
+      checked_flows: flows.map((f) => ({ id: f.id, name: f.name, priority: f.priority, triggers: f.triggers })),
+    },
+  });
 });
