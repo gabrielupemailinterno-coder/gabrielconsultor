@@ -38,15 +38,32 @@ function daysSince(dateISO: string | null, today: string): number {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+  const testPhone = req.method === "POST" ? (await req.json().catch(() => ({}))).testPhone : null;
 
   const { data: adminRole } = await admin.from("user_roles").select("user_id").eq("role", "admin").limit(1).maybeSingle();
   const { data: settings } = await admin.from("settings").select("*").eq("user_id", adminRole?.user_id).maybeSingle();
   if (!settings?.channel_id) return json({ error: "channel_id not configured" }, 400);
-  if (!settings.whatsapp_ritual_enabled) return json({ ok: true, skipped: "ritual disabled" });
+  if (!testPhone && !settings.whatsapp_ritual_enabled) return json({ ok: true, skipped: "ritual disabled" });
 
   const templates = (settings.whatsapp_templates as any) || {};
   const today = todayBRT();
   const delay = (settings.delay_seconds ?? 3) * 1000;
+
+  if (testPhone) {
+    const phone = normalizePhone(testPhone);
+    const out: any[] = [];
+    for (const kind of ["alert_2", "alert_5", "alert_10"]) {
+      const msg = (templates[kind] || DEFAULTS[kind]).replaceAll("{{nome}}", "amigo");
+      const r = await sendWhatsApp(settings.channel_id, phone, msg);
+      await admin.from("score_whatsapp_messages").insert({
+        phone, direction: "out", kind: `${kind}_test`,
+        payload: { message: msg }, error: r.ok ? null : r.error,
+      });
+      out.push({ kind, ok: r.ok, error: r.error });
+      if (delay > 0) await sleep(delay);
+    }
+    return json({ ok: true, test: true, results: out });
+  }
 
   const { data: profiles } = await admin
     .from("score_profiles")
