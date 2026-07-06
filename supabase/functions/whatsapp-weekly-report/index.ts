@@ -109,7 +109,7 @@ Quer que eu analise seu funil por 60 min? Responde "quero análise".`;
 `📊 Seu diagnóstico da semana ${first ? `, ${first}` : ""}:
 
 • ${c.atividades} atividades (ligações + WhatsApps)
-• ${c.prospeccoes} prospecções → ${c.contatos} contatos (${c.prospToContato}%)
+• ${c.abordagemBase} abordagens base → ${c.contatos} contatos (${c.prospToContato}%)
 • ${c.reunioes} reuniões · ${c.apresentacoes} apresentações
 • ${c.propostas} propostas → ${c.vendas} vendas (${c.propToVenda}%)
 • Faturamento: ${brl(c.valor)}
