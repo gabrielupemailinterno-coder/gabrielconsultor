@@ -14,9 +14,12 @@ export default function ScoreCheckoutPix() {
 
   useEffect(() => {
     if (!invoiceId) { navigate("/scoreapp/planos", { replace: true }); return; }
+    let stopped = false;
     const check = async () => {
       const { data: sess } = await supabase.auth.getSession();
       if (!sess.session) { navigate("/scoreapp/login", { replace: true }); return; }
+      // Actively ask Cora if the invoice was paid (webhook may be delayed/absent)
+      try { await supabase.functions.invoke("cora-check-invoice", { body: {} }); } catch {}
       const { data } = await supabase
         .from("score_profiles")
         .select("*")
@@ -25,13 +28,14 @@ export default function ScoreCheckoutPix() {
       setProfile(data);
       if (data?.payment_status === "paid" || data?.plan_status === "active") {
         setPaid(true);
-        setTimeout(() => navigate("/scoreapp/app", { replace: true }), 2000);
+        stopped = true;
+        setTimeout(() => navigate("/scoreapp/app", { replace: true }), 1500);
       }
       setLoading(false);
     };
     check();
-    const interval = setInterval(check, 5000);
-    return () => clearInterval(interval);
+    const interval = setInterval(() => { if (!stopped) check(); }, 5000);
+    return () => { stopped = true; clearInterval(interval); };
   }, [invoiceId, navigate]);
 
   const copy = () => {
