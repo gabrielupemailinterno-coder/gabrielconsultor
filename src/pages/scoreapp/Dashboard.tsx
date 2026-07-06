@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import ScoreLayout from "@/components/scoreapp/ScoreLayout";
 import { useScoreData } from "@/hooks/useScoreData";
 import { computeConversions, computeDiagnostics, computeScore, evaluateBadges, monthLogs, fmtBRL, fmtPct, BADGES } from "@/lib/scoreapp/calc";
+import { recommendTrigger } from "@/lib/scoreapp/recommendations";
+import RecommendationCard from "@/components/scoreapp/RecommendationCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, TrendingUp, Trophy, Sparkles } from "lucide-react";
 import { toast } from "sonner";
