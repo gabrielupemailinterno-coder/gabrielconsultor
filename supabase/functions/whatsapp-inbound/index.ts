@@ -1,7 +1,14 @@
 // Webhook público chamado pelo GPT Maker quando o usuário responde no WhatsApp.
 // Requer header X-Webhook-Token = GPT_MAKER_WEBHOOK_TOKEN.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { sendWhatsApp, normalizePhone, todayBRT } from "../_shared/gpt-maker.ts";
+import {
+  sendWhatsApp,
+  normalizePhone,
+  todayBRT,
+  resolveChatId,
+  startHuman,
+  stopHuman,
+} from "../_shared/gpt-maker.ts";
 import { parseWhatsAppLog } from "../_shared/whatsapp-parser.ts";
 import {
   BotFlow,
@@ -103,6 +110,32 @@ function pickMessage(body: any): string {
   );
 }
 
+function pickChatId(body: any): string | null {
+  const id =
+    body?.chatId ||
+    body?.chat?.id ||
+    body?.chat_id ||
+    body?.message?.chatId ||
+    body?.message?.chat?.id ||
+    body?.data?.chatId ||
+    body?.data?.chat?.id ||
+    null;
+  return id ? String(id) : null;
+}
+
+function pickMessageId(body: any): string | null {
+  const id =
+    body?.messageId ||
+    body?.message_id ||
+    body?.id ||
+    body?.message?.id ||
+    body?.data?.messageId ||
+    body?.data?.id ||
+    null;
+  return id ? String(id) : null;
+}
+
+
 function phoneCandidates(raw: string): Set<string> {
   const normalized = normalizePhone(raw);
   const digits = normalized.replace(/\D/g, "");
@@ -184,6 +217,7 @@ async function persistAndReply(
   phone: string,
   profile: any,
   step: StepResult,
+  chatIdHint: string | null,
 ) {
   // 1) Se há log a salvar, salva com merge
   let scoreInfo: { score: number; label: string; streak: number } | null = null;
@@ -205,7 +239,16 @@ async function persistAndReply(
     scoreInfo = { score, label, streak };
   }
 
-  // 2) Persistir sessão (upsert ou delete se encerrou)
+  // 2) Resolve chatId uma vez para todo o step; se sessão continua, silencia o agente.
+  let chatId = chatIdHint;
+  if (channelId && !chatId) {
+    try { chatId = await resolveChatId(channelId, phone); } catch { chatId = null; }
+  }
+  if (chatId && step.session) {
+    try { await startHuman(chatId); } catch { /* best effort */ }
+  }
+
+  // 3) Persistir sessão (upsert ou delete se encerrou)
   if (step.session) {
     await admin.from("bot_sessions").upsert(
       {
@@ -221,7 +264,7 @@ async function persistAndReply(
     await admin.from("bot_sessions").delete().eq("phone", phone);
   }
 
-  // 3) Enviar mensagens (última pode ter placeholders de score)
+  // 4) Enviar mensagens (última pode ter placeholders de score)
   const streakLine = scoreInfo && scoreInfo.streak >= 2 ? `\n🔥 Streak: ${scoreInfo.streak} dias consecutivos!` : "";
   const finalMessages = step.messages.map((m) =>
     m
@@ -230,19 +273,28 @@ async function persistAndReply(
       .replace(/\{\{\s*streak_line\s*\}\}/g, streakLine),
   );
 
-  for (const msg of finalMessages) {
+  for (let i = 0; i < finalMessages.length; i++) {
     if (!channelId) break;
-    const r = await sendWhatsApp(channelId, phone, msg);
+    const msg = finalMessages[i];
+    if (i > 0) await new Promise((r) => setTimeout(r, 300));
+    const r = await sendWhatsApp(channelId, phone, msg, { chatId });
+    if (!chatId && r.chatId) chatId = r.chatId;
     await admin.from("score_whatsapp_messages").insert({
       user_id: profile.user_id,
       phone,
       direction: "out",
       kind: "bot_step",
-      payload: { message: msg, ...(scoreInfo || {}) },
+      payload: { message: msg, chatId: chatId || null, endpoint: r.endpoint, status: r.status, attempts: r.attempts, ...(scoreInfo || {}) },
       error: r.ok ? null : r.error,
     });
   }
+
+  // 5) Se o fluxo terminou, devolve controle ao agente.
+  if (!step.session && chatId) {
+    try { await stopHuman(chatId); } catch { /* best effort */ }
+  }
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -261,6 +313,8 @@ Deno.serve(async (req) => {
   const rawPhone: string = pickPhone(body);
   const email = pickEmail(body);
   const message: string = pickMessage(body);
+  const chatIdIn = pickChatId(body);
+  const messageId = pickMessageId(body);
   if ((!rawPhone && !email) || !message) {
     // Registra payload não reconhecido para diagnóstico
     try {
@@ -277,12 +331,29 @@ Deno.serve(async (req) => {
   const phone = normalizePhone(rawPhone);
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
-  console.log("[inbound] phone=", phone, "email=", email, "message=", JSON.stringify(message));
+  console.log("[inbound] phone=", phone, "email=", email, "chatId=", chatIdIn, "msgId=", messageId, "message=", JSON.stringify(message));
+
+  // Dedup: ignora callback repetido da GPT Maker (mesma message_id nos últimos 5 min)
+  if (messageId) {
+    const since = new Date(Date.now() - 5 * 60_000).toISOString();
+    const { data: dup } = await admin
+      .from("score_whatsapp_messages")
+      .select("id")
+      .eq("direction", "in")
+      .gte("created_at", since)
+      .contains("payload", { message_id: messageId })
+      .limit(1);
+    if (dup && dup.length > 0) {
+      console.log("[inbound] dedup hit message_id=", messageId);
+      return json({ ok: true, deduped: true });
+    }
+  }
 
   await admin.from("score_whatsapp_messages").insert({
     phone: phone || "unknown", direction: "in", kind: "inbound",
-    payload: { message, email, raw: body },
+    payload: { message, email, message_id: messageId, chatId: chatIdIn, raw: body },
   });
+
 
   const { data: profiles } = await admin.from("score_profiles").select("user_id, full_name, email, phone").limit(500);
   const profile = (profiles || []).find((p: any) => {
@@ -326,7 +397,7 @@ Deno.serve(async (req) => {
         variables: sessionRow.variables || {},
       };
       const step = await continueSession(flowRow.graph, session, message, { profileName: profile.full_name });
-      await persistAndReply(admin, channelId, phone, profile, step);
+      await persistAndReply(admin, channelId, phone, profile, step, chatIdIn);
       return json({
         ok: true,
         mode: "continue",
@@ -359,7 +430,7 @@ Deno.serve(async (req) => {
 
   if (matched && matchedDebug) {
     const step = await startSession(matched, phone, profile.user_id, { profileName: profile.full_name });
-    await persistAndReply(admin, channelId, phone, profile, step);
+    await persistAndReply(admin, channelId, phone, profile, step, chatIdIn);
     return json({
       ok: true,
       mode: "start",

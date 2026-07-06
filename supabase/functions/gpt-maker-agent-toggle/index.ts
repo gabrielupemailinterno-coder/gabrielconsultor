@@ -118,8 +118,9 @@ Deno.serve(async (req) => {
     try { body = await req.json(); } catch {}
     const active = !!body?.active;
 
-    // 1) Checa estado atual — evita chamar a API se já está no estado desejado
-    // (GPT Maker responde 500 "System Error" em transições no-op).
+    // Nova arquitetura: silenciamento é por chat (start-human/stop-human) no
+    // whatsapp-inbound. O toggle global do agente virou opcional — nunca
+    // propagamos 500 upstream para não travar o UI.
     let currentActive: boolean | null = null;
     try {
       const cur = await readAgent(agentId);
@@ -127,30 +128,27 @@ Deno.serve(async (req) => {
       if (cur.ok && currentActive === active) {
         return json({ ok: true, status: 200, agentId, active, noop: true, response: "already in desired state" });
       }
-    } catch { /* segue para o PUT */ }
+    } catch { /* segue */ }
 
-    const path = active ? "active" : "inactive";
-    const r = await fetch(`https://api.gptmaker.ai/v2/agent/${agentId}/${path}`, {
-      method: "PUT",
-      headers: { Authorization: `Bearer ${GPT_TOKEN}` },
-    });
-    const t = await r.text();
+    try {
+      const path = active ? "active" : "inactive";
+      const r = await fetch(`https://api.gptmaker.ai/v2/agent/${agentId}/${path}`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${GPT_TOKEN}` },
+      });
+      const t = await r.text();
+      if (r.ok) return json({ ok: true, status: 200, agentId, active, response: t.slice(0, 300) });
 
-    // Se falhou, revalida — se agora está no estado alvo, considera sucesso.
-    if (!r.ok) {
-      try {
-        const verify = await readAgent(agentId);
-        const nowActive = verify.active;
-        if (verify.ok && nowActive === active) {
-          return json({ ok: true, status: 200, agentId, active, recovered: true, response: t.slice(0, 300) });
-        }
-        if (r.status >= 500 && active === true && (nowActive === true || currentActive === true || nowActive === null)) {
-          return json({ ok: false, status: r.status, agentId, active, isActive: nowActive ?? currentActive, fallback: true, response: t.slice(0, 500) });
-        }
-      } catch { /* cai no retorno de erro */ }
+      // Falhou? Revalida — se estado final está OK, considera sucesso.
+      const verify = await readAgent(agentId);
+      if (verify.ok && verify.active === active) {
+        return json({ ok: true, status: 200, agentId, active, recovered: true, response: t.slice(0, 300) });
+      }
+      // Tolerante: retorna 200 marcado como fallback para o UI seguir vivo.
+      return json({ ok: false, status: 200, agentId, active, isActive: verify.active ?? currentActive, fallback: true, upstream_status: r.status, response: t.slice(0, 500) });
+    } catch (e) {
+      return json({ ok: false, status: 200, agentId, active, fallback: true, error: e instanceof Error ? e.message : String(e) });
     }
-
-    return json({ ok: r.ok, status: r.status, agentId, active, isActive: active, fallback: !r.ok, response: t.slice(0, 500) }, r.ok ? 200 : 200);
   }
 
   return json({ error: "method not allowed" }, 405);
