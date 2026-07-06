@@ -117,12 +117,31 @@ export default function ScorePlanos() {
                   key={k}
                   value={form[k] ?? ""}
                   onChange={(e) => setForm((f) => ({ ...f, [k]: e.target.value }))}
+                  onBlur={async (e) => {
+                    if (k !== "postal_code") return;
+                    const cep = e.target.value.replace(/\D/g, "");
+                    if (cep.length !== 8) return;
+                    try {
+                      const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                      const d = await r.json();
+                      if (d.erro) return;
+                      setForm((f) => ({
+                        ...f,
+                        address: d.logradouro || f.address || "",
+                        province: d.bairro || f.province || "",
+                        city: d.localidade || f.city || "",
+                        state: d.uf || f.state || "",
+                        address_complement: d.complemento || f.address_complement || "",
+                      }));
+                    } catch {}
+                  }}
                   placeholder={label}
                   maxLength={k === "state" ? 2 : undefined}
                   className="bg-input border border-border rounded-md px-4 py-3 text-sm"
                 />
               ))}
             </div>
+
           </div>
         )}
 
