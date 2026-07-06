@@ -165,6 +165,8 @@ Deno.serve(async (req) => {
   const phone = normalizePhone(rawPhone);
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
+  console.log("[inbound] phone=", phone, "email=", email, "message=", JSON.stringify(message));
+
   await admin.from("score_whatsapp_messages").insert({
     phone: phone || "unknown", direction: "in", kind: "inbound",
     payload: { message, email, raw: body },
