@@ -1,55 +1,72 @@
-
 ## Objetivo
 
-Garantir que **só o nosso fluxo** (edge function `whatsapp-inbound`) responda mensagens do WhatsApp. O agente da GPT Maker fica desligado — não precisa treinamento nenhum, não vai gerar resposta de IA, não vai duplicar mensagem.
+Fechar o ciclo do WhatsApp: garantir que a GPT Maker entregue todas as mensagens ao nosso webhook e que o fluxo local continue a conversa até o fim, com botões no admin para configurar e testar sem depender de ajustes manuais toda hora.
 
-## Como funciona depois do plano
+## O que muda no admin (WhatsApp → Configurações)
 
-1. Mensagem chega no WhatsApp conectado ao canal GPT Maker.
-2. GPT Maker dispara `onNewMessage` → nosso `whatsapp-inbound`.
-3. Nosso motor de fluxo casa o gatilho, faz as perguntas, salva o score, responde via `sendWhatsApp` (que usa o mesmo canal GPT Maker pra mandar de volta).
-4. O agente da GPT Maker **não participa** da conversa — nem responde por conta própria, nem consome créditos de IA.
+1. **Novo botão "Configurar tudo automaticamente"**
+   - Reativa o agente na GPT Maker.
+   - Reconfigura o webhook `onNewMessage` para apontar para a função correta, preservando outros webhooks já existentes.
+   - Mostra o resultado na tela: agente ativo (sim/não), webhook conectado (sim/não), URL configurada.
 
-## O que muda no código
+2. **Novo botão "Diagnosticar"**
+   - Verifica e mostra em uma lista de checks:
+     - `agent_id` salvo,
+     - `channel_id` salvo,
+     - agente ativo na GPT Maker,
+     - webhook `onNewMessage` apontando para o endereço certo,
+     - se chegou alguma mensagem no webhook nas últimas 24h.
+   - Cada item aparece verde (ok) ou vermelho (com o que fazer).
 
-### 1. Nova edge function `gpt-maker-agent-toggle`
-- `GET`: retorna se o agente está ativo (`GET /v2/agent/{agentId}` → campo `isActive`).
-- `POST { active: false }`: chama `POST /v2/agent/{agentId}/inactive` (rota "Inativar agente" da GPT Maker).
-- `POST { active: true }`: chama `POST /v2/agent/{agentId}/active` (caso queira reativar depois).
-- Autenticação: só admin (mesma checagem que já usamos em `gpt-maker-webhook-setup`).
+3. **Novo botão "Testar fluxo agora"**
+   - Simula uma mensagem `registrar` chegando no webhook usando seu telefone/e-mail cadastrado.
+   - Mostra na tela: qual fluxo casou, qual foi a primeira resposta, se a sessão ficou aberta.
+   - Não precisa mandar zap de verdade.
 
-### 2. Card no painel `WhatsAppSettingsTab.tsx`
-Novo bloco **"Estado do agente"** logo abaixo do card "Webhook de entrada":
+4. **Bloco "Prompt de silêncio"**
+   - Caixa com o texto pronto do prompt de silêncio e um botão "Copiar".
+   - Instrução curta: cole no treinamento do agente na GPT Maker.
 
-- Mostra status atual: `Ativo` / `Inativo`.
-- Botão **"Desligar agente"** (destaque destrutivo) — chama a função acima com `active: false`.
-- Botão **"Reativar"** aparece só se estiver inativo.
-- Texto curto explicando: *"Com o agente desligado, apenas o fluxo do bot responde. Recomendado."*
+5. **Remover o checkbox "Modo somente webhook"**
+   - Ele confundia porque desligava o agente e travava as mensagens seguintes.
+   - No lugar, um aviso curto explicando: agente fica ativo, o silêncio é feito pelo prompt.
 
-### 3. Documentação inline
-Um aviso no topo da aba deixando claro que essa integração é "webhook-driven", não "agent-driven" — o usuário não precisa treinar nada na GPT Maker.
+## O que muda no backend
 
-## Passo a passo depois do plano estar aplicado
+1. **Webhook `whatsapp-inbound` mais tolerante**
+   - Aceita mais formatos de payload que a GPT Maker envia (texto, telefone e e-mail em campos aninhados).
+   - Se o payload não bater com nenhum formato, registra o motivo em `score_whatsapp_messages` para diagnóstico.
 
-1. Em Admin → WhatsApp → Configurações:
-   - **Configurar webhook automaticamente** (já feito).
-   - **Desligar agente** (novo botão).
-2. Enviar `"quero registrar de ontem"` do seu WhatsApp.
-3. Só o nosso fluxo responde, sem duplicação.
+2. **Continuação de sessão mais robusta**
+   - Se existir sessão ativa para o telefone, sempre continua o fluxo em vez de tentar casar gatilho de novo.
+   - Se a sessão apontar para fluxo apagado/inativo, limpa a sessão e responde pedindo para começar de novo.
 
-## O que fica de fora deste plano
+3. **Nova função de teste `bot-flow-selftest`**
+   - Recebe um telefone/e-mail e uma mensagem e roda o mesmo caminho do webhook real.
+   - Retorna passo a passo para o admin.
 
-- Modo "fallback conversacional" (agente responde perguntas soltas fora do fluxo) — não é necessário agora.
-- Modo "silenciar durante fluxo" via API `start-human` / `stop-human` — mais complexo e desnecessário se o agente já fica inativo.
-- Treinamento do agente na GPT Maker — **não precisa** neste modelo. Pode deixar o agente vazio.
+4. **Ajuste em `gpt-maker-webhook-setup` e `gpt-maker-agent-toggle`**
+   - Ao acionar "Configurar tudo automaticamente", executa os dois em sequência e devolve status consolidado.
 
-## Detalhes técnicos
+## O que continua sendo manual (só você consegue fazer)
 
-Endpoints GPT Maker usados:
-- `GET  https://api.gptmaker.ai/v2/agent/{agentId}` — status.
-- `POST https://api.gptmaker.ai/v2/agent/{agentId}/inactive` — desligar.
-- `POST https://api.gptmaker.ai/v2/agent/{agentId}/active` — religar.
+- Colar o prompt de silêncio no treinamento do agente na GPT Maker.
+- Deixar o agente ATIVO na GPT Maker.
 
-Todos usam `Authorization: Bearer $GPT_MAKER_API_TOKEN` (secret já existente).
+Tudo o resto passa a ser botão no admin.
 
-`agent_id` já está salvo em `public.settings.agent_id` (mesmo campo usado pelo `gpt-maker-webhook-setup`).
+## Como você vai usar depois
+
+1. Cola o prompt de silêncio no agente na GPT Maker.
+2. No admin, clica em **Configurar tudo automaticamente**.
+3. Clica em **Diagnosticar** — precisa aparecer tudo verde.
+4. Clica em **Testar fluxo agora** — precisa mostrar o fluxo iniciando.
+5. Manda `registrar` no seu WhatsApp real para confirmar.
+
+## Resultado esperado
+
+- Primeira mensagem chega no webhook.
+- Mensagens seguintes também chegam.
+- Fluxo local conduz a conversa até o fim.
+- Agente da GPT Maker fica calado por causa do prompt.
+- Quando algo quebrar de novo, o botão **Diagnosticar** aponta exatamente onde está o problema, sem precisar me chamar pra investigar do zero.
