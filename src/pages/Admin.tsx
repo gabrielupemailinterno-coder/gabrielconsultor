@@ -9,6 +9,7 @@ import MenteeEmailComposer from "@/components/admin/MenteeEmailComposer";
 import ProspectingBulk from "@/components/admin/ProspectingBulk";
 import WhatsAppAdmin from "@/components/admin/whatsapp/WhatsAppAdmin";
 import ScoreAdmin from "@/components/admin/ScoreAdmin";
+import ContentsAdmin from "@/components/admin/ContentsAdmin";
 import { FORM_LABELS, type FormType } from "@/lib/qualifying-forms";
 
 type Lead = {
@@ -49,7 +50,7 @@ const Admin = () => {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [clicks, setClicks] = useState<Click[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [tab, setTab] = useState<"mentees" | "score" | "emails" | "prospect" | "whatsapp" | "leads" | "visits" | "clicks" | "sessions" | "blog">("mentees");
+  const [tab, setTab] = useState<"mentees" | "score" | "conteudos" | "emails" | "prospect" | "whatsapp" | "leads" | "visits" | "clicks" | "sessions" | "blog">("mentees");
   const [leadFilter, setLeadFilter] = useState<FormType | "all">("all");
 
   useEffect(() => {
@@ -140,6 +141,7 @@ const Admin = () => {
           {[
             { id: "mentees", label: "Mentorados" },
             { id: "score", label: "Score Comercial" },
+            { id: "conteudos", label: "Conteúdos & Recomendações" },
             { id: "emails", label: "E-mails" },
             { id: "prospect", label: "Prospecção" },
             { id: "whatsapp", label: "WhatsApp" },
@@ -161,6 +163,7 @@ const Admin = () => {
 
         {tab === "mentees" && <MenteesAdmin />}
         {tab === "score" && <ScoreAdmin />}
+        {tab === "conteudos" && <ContentsAdmin />}
         {tab === "emails" && <MenteeEmailComposer />}
         {tab === "prospect" && <ProspectingBulk />}
         {tab === "whatsapp" && <WhatsAppAdmin />}

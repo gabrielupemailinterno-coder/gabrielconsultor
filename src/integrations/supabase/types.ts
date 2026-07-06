@@ -1083,6 +1083,80 @@ export type Database = {
           },
         ]
       }
+      score_content_views: {
+        Row: {
+          completed_at: string | null
+          content_id: string
+          id: string
+          user_id: string
+          viewed_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          content_id: string
+          id?: string
+          user_id: string
+          viewed_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          content_id?: string
+          id?: string
+          user_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "score_content_views_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "score_contents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      score_contents: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean
+          short_description: string | null
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          body?: string
+          category: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          short_description?: string | null
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          short_description?: string | null
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       score_daily_logs: {
         Row: {
           apresentacoes: number
@@ -1136,6 +1210,47 @@ export type Database = {
           whatsapps?: number
         }
         Relationships: []
+      }
+      score_feedback_interactions: {
+        Row: {
+          clicked_cta_at: string | null
+          created_at: string
+          feedback_id: string
+          id: string
+          mission_applied_at: string | null
+          updated_at: string
+          user_id: string
+          viewed_at: string | null
+        }
+        Insert: {
+          clicked_cta_at?: string | null
+          created_at?: string
+          feedback_id: string
+          id?: string
+          mission_applied_at?: string | null
+          updated_at?: string
+          user_id: string
+          viewed_at?: string | null
+        }
+        Update: {
+          clicked_cta_at?: string | null
+          created_at?: string
+          feedback_id?: string
+          id?: string
+          mission_applied_at?: string | null
+          updated_at?: string
+          user_id?: string
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "score_feedback_interactions_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "score_smart_feedbacks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       score_goals: {
         Row: {
@@ -1302,6 +1417,48 @@ export type Database = {
         }
         Relationships: []
       }
+      score_smart_feedbacks: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_active: boolean
+          mission: string
+          priority: number
+          short_description: string | null
+          title: string
+          trigger_key: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          mission?: string
+          priority?: number
+          short_description?: string | null
+          title: string
+          trigger_key: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          mission?: string
+          priority?: number
+          short_description?: string | null
+          title?: string
+          trigger_key?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       score_upsell_interests: {
         Row: {
           context: string
@@ -1319,6 +1476,36 @@ export type Database = {
           context?: string
           created_at?: string
           id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      score_upsell_requests: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string | null
+          source: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

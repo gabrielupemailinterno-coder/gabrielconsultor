@@ -27,6 +27,8 @@ import ScoreDashboard from "./pages/scoreapp/Dashboard";
 import ScoreRegistrar from "./pages/scoreapp/Registrar";
 import ScoreConteudos from "./pages/scoreapp/Conteudos";
 import ScoreModulo from "./pages/scoreapp/Modulo";
+import ConteudoBase from "./pages/scoreapp/ConteudoBase";
+import FeedbackDetalhe from "./pages/scoreapp/FeedbackDetalhe";
 import ScorePerfil from "./pages/scoreapp/Perfil";
 import ScorePlanos from "./pages/scoreapp/Planos";
 import ScoreCheckoutPix from "./pages/scoreapp/CheckoutPix";
@@ -62,6 +64,8 @@ const App = () => (
             <Route path="/scoreapp/app" element={<ScoreDashboard />} />
             <Route path="/scoreapp/app/registrar" element={<ScoreRegistrar />} />
             <Route path="/scoreapp/app/conteudos" element={<ScoreConteudos />} />
+            <Route path="/scoreapp/app/conteudos/base/:slug" element={<ConteudoBase />} />
+            <Route path="/scoreapp/app/conteudos/feedback/:trigger" element={<FeedbackDetalhe />} />
             <Route path="/scoreapp/app/conteudos/:slug" element={<ScoreModulo />} />
             <Route path="/scoreapp/app/perfil" element={<ScorePerfil />} />
             <Route path="/scoreapp/planos" element={<ScorePlanos />} />
