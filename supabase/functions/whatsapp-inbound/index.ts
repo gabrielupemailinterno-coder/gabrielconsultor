@@ -1,7 +1,14 @@
 // Webhook público chamado pelo GPT Maker quando o usuário responde no WhatsApp.
 // Requer header X-Webhook-Token = GPT_MAKER_WEBHOOK_TOKEN.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { sendWhatsApp, normalizePhone, todayBRT } from "../_shared/gpt-maker.ts";
+import {
+  sendWhatsApp,
+  normalizePhone,
+  todayBRT,
+  resolveChatId,
+  startHuman,
+  stopHuman,
+} from "../_shared/gpt-maker.ts";
 import { parseWhatsAppLog } from "../_shared/whatsapp-parser.ts";
 import {
   BotFlow,
