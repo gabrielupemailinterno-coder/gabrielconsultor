@@ -32,6 +32,8 @@ export default function WhatsAppSettingsTab() {
   const [discovering, setDiscovering] = useState(false);
   const [settings, setSettings] = useState<Settings>(DEFAULT);
   const [discovery, setDiscovery] = useState<Discovery | null>(null);
+  const [hookStatus, setHookStatus] = useState<any>(null);
+  const [hookLoading, setHookLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -42,6 +44,28 @@ export default function WhatsAppSettingsTab() {
       setLoading(false);
     })();
   }, []);
+
+  const checkHook = async () => {
+    setHookLoading(true);
+    const { data, error } = await supabase.functions.invoke("gpt-maker-webhook-setup", { method: "GET" });
+    setHookLoading(false);
+    if (error) return toast.error("Erro: " + error.message);
+    setHookStatus(data);
+  };
+
+  const configureHook = async () => {
+    setHookLoading(true);
+    const { data, error } = await supabase.functions.invoke("gpt-maker-webhook-setup", { method: "POST" });
+    setHookLoading(false);
+    if (error) return toast.error("Erro: " + error.message);
+    if ((data as any)?.ok) {
+      toast.success("Webhook onNewMessage configurado no GPT Maker ✅");
+      await checkHook();
+    } else {
+      toast.error("Falhou: " + JSON.stringify((data as any)?.response || data));
+    }
+  };
+
 
   const save = async () => {
     setSaving(true);
