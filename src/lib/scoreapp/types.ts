@@ -46,6 +46,7 @@ export type ScoreGoals = {
   apresentacoes_semana: number;
   propostas_semana: number;
   segmento: string | null;
+  descricao_venda: string | null;
   effective_from: string;
 };
 
