@@ -281,7 +281,7 @@ Deno.serve(async (req) => {
   // Se há sessão, continua o fluxo
   if (sessionRow && sessionRow.flow_id) {
     const { data: flowRow } = await admin.from("bot_flows").select("*").eq("id", sessionRow.flow_id).maybeSingle();
-    if (flowRow) {
+    if (flowRow && flowRow.is_active !== false) {
       const session: BotSession = {
         id: sessionRow.id,
         phone,
@@ -303,6 +303,10 @@ Deno.serve(async (req) => {
           matched_trigger: null,
         },
       });
+    } else {
+      // Sessão órfã (fluxo apagado ou desativado) — limpa e cai no match de gatilho.
+      await admin.from("bot_sessions").delete().eq("phone", phone);
+      console.log("[inbound] sessão órfã removida phone=", phone, "flow_id=", sessionRow.flow_id);
     }
   }
 
