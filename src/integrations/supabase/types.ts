@@ -1141,6 +1141,7 @@ export type Database = {
         Row: {
           apresentacoes_semana: number
           created_at: string
+          descricao_venda: string | null
           effective_from: string
           id: string
           ligacoes_dia: number
@@ -1156,6 +1157,7 @@ export type Database = {
         Insert: {
           apresentacoes_semana?: number
           created_at?: string
+          descricao_venda?: string | null
           effective_from?: string
           id?: string
           ligacoes_dia?: number
@@ -1171,6 +1173,7 @@ export type Database = {
         Update: {
           apresentacoes_semana?: number
           created_at?: string
+          descricao_venda?: string | null
           effective_from?: string
           id?: string
           ligacoes_dia?: number
