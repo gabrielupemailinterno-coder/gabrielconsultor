@@ -81,9 +81,10 @@ export default function BotFlowEditor({ flow, onBack }: { flow: Flow; onBack: ()
 
   const sendTest = async () => {
     if (!testPhone) { toast.error("Informe o telefone de teste"); return; }
-    const { error } = await supabase.functions.invoke("bot-flow-test", { body: { flowId: flow.id, phone: testPhone, name: "Teste" } });
+    const { data, error } = await supabase.functions.invoke("bot-flow-test", { body: { flowId: flow.id, phone: testPhone, name: "Teste" } });
     if (error) toast.error(error.message);
-    else toast.success("Teste enviado — confira o WhatsApp");
+    else if ((data as any)?.ok) toast.success("Teste enviado — confira o WhatsApp");
+    else toast.error((data as any)?.error || "Teste não enviado");
   };
 
   const rf = useMemo(() => (
