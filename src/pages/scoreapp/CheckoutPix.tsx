@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Trophy, CheckCircle2 } from "lucide-react";
+import { Loader2, Trophy, CheckCircle2, Download, Copy } from "lucide-react";
+
 
 export default function ScoreCheckoutPix() {
   const navigate = useNavigate();
