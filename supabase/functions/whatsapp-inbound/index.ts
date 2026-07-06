@@ -57,9 +57,50 @@ const SCORE_FIELDS = [
 ];
 
 function pickEmail(body: any): string {
-  return String(body.email || body.user?.email || body.contact?.email || body.chat?.email || body.customer?.email || "")
-    .trim()
-    .toLowerCase();
+  return String(
+    body.email ||
+    body.user?.email ||
+    body.contact?.email ||
+    body.chat?.email ||
+    body.customer?.email ||
+    body.message?.contact?.email ||
+    body.data?.email ||
+    body.data?.contact?.email ||
+    ""
+  ).trim().toLowerCase();
+}
+
+function pickPhone(body: any): string {
+  return String(
+    body.phone ||
+    body.from ||
+    body.contact?.phone ||
+    body.chat?.phone ||
+    body.customer?.phone ||
+    body.message?.from ||
+    body.message?.contact?.phone ||
+    body.message?.chat?.phone ||
+    body.data?.phone ||
+    body.data?.from ||
+    body.data?.contact?.phone ||
+    ""
+  );
+}
+
+function pickMessage(body: any): string {
+  return String(
+    body.message ||
+    body.text ||
+    body.body ||
+    body.content ||
+    body.message?.text ||
+    body.message?.body ||
+    body.message?.content ||
+    body.data?.message ||
+    body.data?.text ||
+    body.data?.body ||
+    ""
+  );
 }
 
 async function getAdminSettings(admin: any) {
@@ -180,10 +221,21 @@ Deno.serve(async (req) => {
   let body: any;
   try { body = await req.json(); } catch { return json({ error: "invalid json" }, 400); }
 
-  const rawPhone: string = body.phone || body.from || body.contact?.phone || body.chat?.phone || "";
+  const rawPhone: string = pickPhone(body);
   const email = pickEmail(body);
-  const message: string = body.message || body.text || body.body || body.content || "";
-  if ((!rawPhone && !email) || !message) return json({ error: "phone/email and message required" }, 400);
+  const message: string = pickMessage(body);
+  if ((!rawPhone && !email) || !message) {
+    // Registra payload não reconhecido para diagnóstico
+    try {
+      await createClient(SUPABASE_URL, SERVICE_KEY).from("score_whatsapp_messages").insert({
+        phone: rawPhone || "unknown",
+        direction: "in",
+        kind: "invalid_payload",
+        payload: { raw: body, reason: "phone/email or message missing" },
+      });
+    } catch {}
+    return json({ error: "phone/email and message required", got: { hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message } }, 400);
+  }
 
   const phone = normalizePhone(rawPhone);
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
@@ -229,7 +281,7 @@ Deno.serve(async (req) => {
   // Se há sessão, continua o fluxo
   if (sessionRow && sessionRow.flow_id) {
     const { data: flowRow } = await admin.from("bot_flows").select("*").eq("id", sessionRow.flow_id).maybeSingle();
-    if (flowRow) {
+    if (flowRow && flowRow.is_active !== false) {
       const session: BotSession = {
         id: sessionRow.id,
         phone,
@@ -251,6 +303,10 @@ Deno.serve(async (req) => {
           matched_trigger: null,
         },
       });
+    } else {
+      // Sessão órfã (fluxo apagado ou desativado) — limpa e cai no match de gatilho.
+      await admin.from("bot_sessions").delete().eq("phone", phone);
+      console.log("[inbound] sessão órfã removida phone=", phone, "flow_id=", sessionRow.flow_id);
     }
   }
 
