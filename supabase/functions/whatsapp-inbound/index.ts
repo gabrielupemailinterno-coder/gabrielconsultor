@@ -221,10 +221,21 @@ Deno.serve(async (req) => {
   let body: any;
   try { body = await req.json(); } catch { return json({ error: "invalid json" }, 400); }
 
-  const rawPhone: string = body.phone || body.from || body.contact?.phone || body.chat?.phone || "";
+  const rawPhone: string = pickPhone(body);
   const email = pickEmail(body);
-  const message: string = body.message || body.text || body.body || body.content || "";
-  if ((!rawPhone && !email) || !message) return json({ error: "phone/email and message required" }, 400);
+  const message: string = pickMessage(body);
+  if ((!rawPhone && !email) || !message) {
+    // Registra payload não reconhecido para diagnóstico
+    try {
+      await createClient(SUPABASE_URL, SERVICE_KEY).from("score_whatsapp_messages").insert({
+        phone: rawPhone || "unknown",
+        direction: "in",
+        kind: "invalid_payload",
+        payload: { raw: body, reason: "phone/email or message missing" },
+      });
+    } catch {}
+    return json({ error: "phone/email and message required", got: { hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message } }, 400);
+  }
 
   const phone = normalizePhone(rawPhone);
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
