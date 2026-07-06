@@ -151,7 +151,11 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "method not allowed" }, 405);
   if (!WEBHOOK_TOKEN) return json({ error: "webhook token not configured" }, 500);
-  const token = req.headers.get("x-webhook-token") ?? req.headers.get("X-Webhook-Token");
+  const url = new URL(req.url);
+  const token =
+    req.headers.get("x-webhook-token") ??
+    req.headers.get("X-Webhook-Token") ??
+    url.searchParams.get("token");
   if (token !== WEBHOOK_TOKEN) return json({ error: "unauthorized" }, 401);
 
   let body: any;
