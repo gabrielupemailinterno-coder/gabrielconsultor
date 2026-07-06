@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
 `📊 Seu diagnóstico da semana (EXEMPLO):
 
 • ${c.atividades} atividades (ligações + WhatsApps)
-• ${c.prospeccoes} prospecções → ${c.contatos} contatos (${c.prospToContato}%)
+• ${c.abordagemBase} abordagens base → ${c.contatos} contatos (${c.prospToContato}%)
 • ${c.reunioes} reuniões · ${c.apresentacoes} apresentações
 • ${c.propostas} propostas → ${c.vendas} vendas (${c.propToVenda}%)
 • Faturamento: ${brl(c.valor)}
