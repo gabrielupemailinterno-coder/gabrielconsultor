@@ -206,10 +206,9 @@ Deno.serve(async (req) => {
   const settings = await getAdminSettings(admin);
   const channelId = settings?.channel_id || null;
 
-  // Modo "somente webhook": mantém o agente desligado a cada inbound (best-effort).
-  if (settings?.webhook_only_mode && settings?.agent_id) {
-    enforceAgentInactive(settings.agent_id).catch(() => {});
-  }
+  // (removido) enforce agent inactive — quebrava o recebimento das mensagens
+  // seguintes da mesma interação na GPT Maker.
+
 
   if (!profile) {
     if (channelId) await sendWhatsApp(channelId, phone,
