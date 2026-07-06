@@ -6,8 +6,8 @@ import { Loader2, Download, Upload, Trash2, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { CurrencyInput, IntegerInput } from "@/components/scoreapp/MaskedInputs";
-import { fmtBRL } from "@/lib/scoreapp/calc";
-import type { DailyLog } from "@/lib/scoreapp/types";
+import { fmtBRL, computeDayScore } from "@/lib/scoreapp/calc";
+import type { DailyLog, ScoreGoals } from "@/lib/scoreapp/types";
 
 const numFields: { k: keyof DailyLog; label: string }[] = [
   { k: "ligacoes", label: "Ligações" },
