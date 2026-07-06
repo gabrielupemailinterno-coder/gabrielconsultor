@@ -97,6 +97,8 @@ export default function ScoreRegistrar() {
     if (!uid) return;
     supabase.from("score_daily_logs").select("*").eq("user_id", uid).order("date", { ascending: false }).limit(180)
       .then(({ data }) => setLogs((data as any) || []));
+    supabase.from("score_goals").select("*").eq("user_id", uid).order("effective_from", { ascending: false }).limit(1).maybeSingle()
+      .then(({ data }) => setGoals((data as any) || null));
   }, [uid, reloadTick]);
 
   const submit = async (e: React.FormEvent) => {
