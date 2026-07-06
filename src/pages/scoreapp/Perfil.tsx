@@ -56,7 +56,25 @@ export default function ScorePerfil() {
           <div><span className="text-muted-foreground text-xs">Segmento:</span> {profile.segment}</div>
           <div><span className="text-muted-foreground text-xs">Plano:</span> {profile.plan}</div>
         </div>
+        <label className="mt-4 flex items-center gap-3 cursor-pointer border-t border-border pt-4">
+          <input
+            type="checkbox"
+            checked={(profile as any).whatsapp_opt_in ?? true}
+            onChange={async (e) => {
+              const val = e.target.checked;
+              const { error } = await supabase.from("score_profiles").update({ whatsapp_opt_in: val }).eq("user_id", uid!);
+              if (error) toast.error(error.message);
+              else { toast.success(val ? "Check-in ativado" : "Check-in desativado"); reload(); }
+            }}
+            className="w-4 h-4"
+          />
+          <div>
+            <div className="text-sm">Receber check-in diário no WhatsApp</div>
+            <div className="text-xs text-muted-foreground">Todo dia às 18h eu puxo seus números do dia. Você responde no WhatsApp e eu atualizo seu Score.</div>
+          </div>
+        </label>
       </div>
+
       <div className="bg-card border border-border rounded-lg p-6 space-y-3">
         <h2 className="font-serif text-xl mb-2">Minhas metas</h2>
 
