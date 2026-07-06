@@ -8,6 +8,7 @@ import InviteMenteeDialog from "@/components/admin/InviteMenteeDialog";
 import MenteeEmailComposer from "@/components/admin/MenteeEmailComposer";
 import ProspectingBulk from "@/components/admin/ProspectingBulk";
 import WhatsAppAdmin from "@/components/admin/whatsapp/WhatsAppAdmin";
+import ScoreAdmin from "@/components/admin/ScoreAdmin";
 import { FORM_LABELS, type FormType } from "@/lib/qualifying-forms";
 
 type Lead = {
