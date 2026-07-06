@@ -77,3 +77,31 @@ export type ContentModule = {
   sort_order: number;
   published: boolean;
 };
+
+export type ScoreContent = {
+  id: string;
+  slug: string;
+  title: string;
+  category: string;
+  short_description: string | null;
+  body: string;
+  video_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type SmartFeedback = {
+  id: string;
+  trigger_key: string;
+  title: string;
+  short_description: string | null;
+  body: string;
+  mission: string;
+  video_url: string | null;
+  priority: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
