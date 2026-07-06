@@ -18,6 +18,16 @@ import PortalResetPassword from "./pages/portal/PortalResetPassword";
 import Parceiros from "./pages/Parceiros";
 import SimuladorUP from "./pages/SimuladorUP";
 import WhatsAppFloatButton from "./components/WhatsAppFloatButton";
+import ScoreLanding from "./pages/scoreapp/Landing";
+import ScoreLogin from "./pages/scoreapp/Login";
+import ScoreSignup from "./pages/scoreapp/Signup";
+import ScoreOnboarding from "./pages/scoreapp/Onboarding";
+import ScoreDashboard from "./pages/scoreapp/Dashboard";
+import ScoreRegistrar from "./pages/scoreapp/Registrar";
+import ScoreConteudos from "./pages/scoreapp/Conteudos";
+import ScoreModulo from "./pages/scoreapp/Modulo";
+import ScorePerfil from "./pages/scoreapp/Perfil";
+import ScorePlanos from "./pages/scoreapp/Planos";
 
 const queryClient = new QueryClient();
 
