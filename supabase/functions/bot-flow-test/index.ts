@@ -13,35 +13,78 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+function json(b: unknown, status = 200) {
+  return new Response(JSON.stringify(b), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+async function getAdminSettings(admin: ReturnType<typeof createClient>) {
+  const { data: settingsRows, error: settingsErr } = await admin
+    .from("settings")
+    .select("channel_id, delay_seconds, updated_at")
+    .not("channel_id", "is", null)
+    .neq("channel_id", "")
+    .order("updated_at", { ascending: false })
+    .limit(1);
+  if (settingsErr) return { settings: null, error: settingsErr.message };
+  if (settingsRows?.[0]) return { settings: settingsRows[0], error: null };
+
+  const { data: fallbackRows, error: fallbackErr } = await admin
+    .from("settings")
+    .select("channel_id, delay_seconds, updated_at")
+    .order("updated_at", { ascending: false })
+    .limit(1);
+  if (fallbackErr) return { settings: null, error: fallbackErr.message };
+  return { settings: fallbackRows?.[0] || null, error: null };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
   const { flowId, phone, name } = await req.json();
   if (!flowId || !phone) {
-    return new Response(JSON.stringify({ error: "flowId and phone required" }), { status: 400, headers: corsHeaders });
+    return json({ ok: false, error: "flowId and phone required" }, 400);
   }
 
-  const { data: flowRow } = await admin.from("bot_flows").select("*").eq("id", flowId).maybeSingle();
-  if (!flowRow) return new Response(JSON.stringify({ error: "flow not found" }), { status: 404, headers: corsHeaders });
+  const { data: flowRow, error: flowErr } = await admin.from("bot_flows").select("*").eq("id", flowId).maybeSingle();
+  if (flowErr) return json({ ok: false, error: `Erro ao buscar fluxo: ${flowErr.message}` }, 200);
+  if (!flowRow) return json({ ok: false, error: "flow not found" }, 200);
 
-  const { data: adminRole } = await admin.from("user_roles").select("user_id").eq("role", "admin").limit(1).maybeSingle();
-  const { data: settings } = await admin.from("settings").select("channel_id, delay_seconds")
-    .eq("user_id", adminRole?.user_id).maybeSingle();
+  const { settings, error: settingsError } = await getAdminSettings(admin);
+  if (settingsError) return json({ ok: false, error: `Erro ao buscar configurações: ${settingsError}` }, 200);
   const channelId = settings?.channel_id;
-  if (!channelId) return new Response(JSON.stringify({ error: "channel_id not configured" }), { status: 400, headers: corsHeaders });
+  if (!channelId) return json({ ok: false, error: "Channel ID não configurado nas configurações do WhatsApp" }, 200);
 
   const normalized = normalizePhone(phone);
   const flow: BotFlow = { id: flowRow.id, name: flowRow.name, triggers: flowRow.triggers, graph: flowRow.graph, priority: 0 };
 
   // Executa só até a primeira pergunta (ou fim) — mesmo comportamento real do bot.
-  const step = await startSession(flow, normalized, adminRole?.user_id || null, { profileName: name || "Teste" });
+  const step = await startSession(flow, normalized, null, { profileName: name || "Teste" });
+  if (step.messages.length === 0) {
+    return json({
+      ok: false,
+      error: "O fluxo não gerou nenhuma mensagem. Verifique se existe caminho do início até uma mensagem/pergunta/fim.",
+      sent: [],
+    });
+  }
 
-  const sent: string[] = [];
+  const sent: { message: string; ok: boolean; error?: string }[] = [];
   for (const msg of step.messages) {
     const preview = `[TESTE ${flow.name}]\n\n${msg}`;
-    await sendWhatsApp(channelId, normalized, preview);
-    sent.push(preview);
-    await new Promise((r) => setTimeout(r, (settings?.delay_seconds ?? 2) * 1000));
+    const result = await sendWhatsApp(channelId, normalized, preview);
+    sent.push({ message: preview, ...result });
+    if (step.messages.length > 1) {
+      await new Promise((r) => setTimeout(r, (settings?.delay_seconds ?? 2) * 1000));
+    }
   }
-  return new Response(JSON.stringify({ ok: true, sent }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  const failed = sent.find((item) => !item.ok);
+  return json({
+    ok: !failed,
+    error: failed?.error || null,
+    phone: normalized,
+    channelId,
+    sent,
+  });
 });
