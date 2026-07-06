@@ -71,17 +71,21 @@ export default function ScoreRegistrar() {
           {numFields.map((f) => (
             <label key={f.k} className="block">
               <span className="text-xs text-muted-foreground">{f.label}</span>
-              <input type="number" inputMode="numeric" min={0} value={values[f.k]}
-                onChange={(e) => setValues((v) => ({ ...v, [f.k]: Number(e.target.value) }))}
-                className="w-full mt-1 bg-input border border-border rounded-md px-3 py-3 text-lg font-mono" />
+              <IntegerInput
+                value={values[f.k] ?? 0}
+                onChange={(v) => setValues((prev) => ({ ...prev, [f.k]: v }))}
+                className="w-full mt-1 bg-input border border-border rounded-md px-3 py-3 text-lg font-mono"
+              />
             </label>
           ))}
         </div>
         <label className="block">
           <span className="text-xs uppercase tracking-wider text-muted-foreground">Valor vendido (R$)</span>
-          <input type="number" inputMode="decimal" min={0} step="0.01" value={valor}
-            onChange={(e) => setValor(Number(e.target.value))}
-            className="w-full mt-1 bg-input border border-border rounded-md px-4 py-3 text-lg font-mono" />
+          <CurrencyInput
+            value={valor}
+            onChange={setValor}
+            className="w-full mt-1 bg-input border border-border rounded-md px-4 py-3 text-lg font-mono"
+          />
         </label>
         <label className="block">
           <span className="text-xs uppercase tracking-wider text-muted-foreground">Observações</span>
