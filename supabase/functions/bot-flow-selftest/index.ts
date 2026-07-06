@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
   const url = `${SUPABASE_URL}/functions/v1/whatsapp-inbound?token=${encodeURIComponent(WEBHOOK_TOKEN)}`;
   const r = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", Authorization: auth },
     body: JSON.stringify({ phone: normalizedPhone || phone, email, message }),
   });
   const t = await r.text();
