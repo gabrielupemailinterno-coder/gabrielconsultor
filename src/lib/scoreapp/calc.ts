@@ -20,15 +20,16 @@ export function computeConversions(logs: DailyLog[]) {
   const vendas = sum(logs, "vendas");
   const valor = sum(logs, "valor_vendido");
   const atividades = sum(logs, "ligacoes") + sum(logs, "whatsapps");
-  const r = (a: number, b: number) => (b > 0 ? (a / b) * 100 : 0);
+  const abordagemBase = prospeccoes >= contatos ? prospeccoes : atividades > 0 ? atividades : Math.max(prospeccoes, contatos);
+  const r = (a: number, b: number) => (b > 0 ? Math.min(100, (a / b) * 100) : 0);
   return {
-    prospeccoes, contatos, reunioes, apresentacoes, propostas, vendas, valor, atividades,
-    prospToContato: r(contatos, prospeccoes),
+    prospeccoes, contatos, reunioes, apresentacoes, propostas, vendas, valor, atividades, abordagemBase,
+    prospToContato: r(contatos, abordagemBase),
     contatoToReuniao: r(reunioes, contatos),
     reuniaoToApresentacao: r(apresentacoes, reunioes),
     apresToProposta: r(propostas, apresentacoes),
     propToVenda: r(vendas, propostas),
-    vendaTotal: r(vendas, prospeccoes),
+    vendaTotal: r(vendas, abordagemBase),
     ticketMedio: vendas > 0 ? valor / vendas : 0,
     valorPorAtividade: atividades > 0 ? valor / atividades : 0,
   };
