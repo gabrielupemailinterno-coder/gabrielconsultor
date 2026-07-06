@@ -4,9 +4,11 @@ import ScoreLayout from "@/components/scoreapp/ScoreLayout";
 import { useScoreData } from "@/hooks/useScoreData";
 import { computeConversions, computeDiagnostics, computeScore, evaluateBadges, monthLogs, fmtBRL, fmtPct, BADGES } from "@/lib/scoreapp/calc";
 import { recommendTrigger } from "@/lib/scoreapp/recommendations";
+import { computeStreakBRT, daysSinceLastLogBRT } from "@/lib/scoreapp/streak";
 import RecommendationCard from "@/components/scoreapp/RecommendationCard";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, TrendingUp, Trophy, Sparkles } from "lucide-react";
+import { Loader2, TrendingUp, Trophy, Sparkles, Flame, AlertTriangle } from "lucide-react";
+
 import { toast } from "sonner";
 
 export default function ScoreDashboard() {
