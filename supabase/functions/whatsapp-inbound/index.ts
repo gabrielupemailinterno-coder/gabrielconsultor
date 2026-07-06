@@ -57,9 +57,50 @@ const SCORE_FIELDS = [
 ];
 
 function pickEmail(body: any): string {
-  return String(body.email || body.user?.email || body.contact?.email || body.chat?.email || body.customer?.email || "")
-    .trim()
-    .toLowerCase();
+  return String(
+    body.email ||
+    body.user?.email ||
+    body.contact?.email ||
+    body.chat?.email ||
+    body.customer?.email ||
+    body.message?.contact?.email ||
+    body.data?.email ||
+    body.data?.contact?.email ||
+    ""
+  ).trim().toLowerCase();
+}
+
+function pickPhone(body: any): string {
+  return String(
+    body.phone ||
+    body.from ||
+    body.contact?.phone ||
+    body.chat?.phone ||
+    body.customer?.phone ||
+    body.message?.from ||
+    body.message?.contact?.phone ||
+    body.message?.chat?.phone ||
+    body.data?.phone ||
+    body.data?.from ||
+    body.data?.contact?.phone ||
+    ""
+  );
+}
+
+function pickMessage(body: any): string {
+  return String(
+    body.message ||
+    body.text ||
+    body.body ||
+    body.content ||
+    body.message?.text ||
+    body.message?.body ||
+    body.message?.content ||
+    body.data?.message ||
+    body.data?.text ||
+    body.data?.body ||
+    ""
+  );
 }
 
 async function getAdminSettings(admin: any) {
