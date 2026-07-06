@@ -110,6 +110,32 @@ function pickMessage(body: any): string {
   );
 }
 
+function pickChatId(body: any): string | null {
+  const id =
+    body?.chatId ||
+    body?.chat?.id ||
+    body?.chat_id ||
+    body?.message?.chatId ||
+    body?.message?.chat?.id ||
+    body?.data?.chatId ||
+    body?.data?.chat?.id ||
+    null;
+  return id ? String(id) : null;
+}
+
+function pickMessageId(body: any): string | null {
+  const id =
+    body?.messageId ||
+    body?.message_id ||
+    body?.id ||
+    body?.message?.id ||
+    body?.data?.messageId ||
+    body?.data?.id ||
+    null;
+  return id ? String(id) : null;
+}
+
+
 function phoneCandidates(raw: string): Set<string> {
   const normalized = normalizePhone(raw);
   const digits = normalized.replace(/\D/g, "");
