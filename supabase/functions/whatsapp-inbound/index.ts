@@ -235,6 +235,9 @@ Deno.serve(async (req) => {
   }));
   const matchedDebug = matchFlowDebug(flows, message);
   const matched = matchedDebug?.flow ?? null;
+  console.log("[inbound] flows_ativos=", flows.length,
+    "flows=", JSON.stringify(flows.map((f) => ({ name: f.name, priority: f.priority, triggers: f.triggers }))),
+    "matched=", matched ? `${matched.name} (trigger=${matchedDebug?.trigger})` : "NONE");
 
   if (matched && matchedDebug) {
     const step = await startSession(matched, phone, profile.user_id, { profileName: profile.full_name });
