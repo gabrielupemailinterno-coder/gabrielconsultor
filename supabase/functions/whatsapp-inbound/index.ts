@@ -103,6 +103,43 @@ function pickMessage(body: any): string {
   );
 }
 
+function phoneCandidates(raw: string): Set<string> {
+  const normalized = normalizePhone(raw);
+  const digits = normalized.replace(/\D/g, "");
+  const candidates = new Set<string>();
+  if (!digits) return candidates;
+
+  const addLocal = (local: string) => {
+    if (!local) return;
+    candidates.add(local);
+    candidates.add(`55${local}`);
+    // WhatsApp Brasil: muitos payloads chegam sem o 9º dígito móvel,
+    // enquanto o perfil pode estar cadastrado com ele (ou o inverso).
+    if (local.length === 11 && local[2] === "9") {
+      const withoutNinth = `${local.slice(0, 2)}${local.slice(3)}`;
+      candidates.add(withoutNinth);
+      candidates.add(`55${withoutNinth}`);
+    }
+    if (local.length === 10) {
+      const withNinth = `${local.slice(0, 2)}9${local.slice(2)}`;
+      candidates.add(withNinth);
+      candidates.add(`55${withNinth}`);
+    }
+  };
+
+  candidates.add(digits);
+  if (digits.startsWith("55")) addLocal(digits.slice(2));
+  else addLocal(digits);
+  return candidates;
+}
+
+function phonesMatch(a: string, b: string): boolean {
+  const aa = phoneCandidates(a);
+  const bb = phoneCandidates(b);
+  for (const item of aa) if (bb.has(item)) return true;
+  return false;
+}
+
 async function getAdminSettings(admin: any) {
   const { data: settingsRows } = await admin
     .from("settings")
@@ -247,12 +284,10 @@ Deno.serve(async (req) => {
     payload: { message, email, raw: body },
   });
 
-  const last10 = phone.slice(-11);
   const { data: profiles } = await admin.from("score_profiles").select("user_id, full_name, email, phone").limit(500);
   const profile = (profiles || []).find((p: any) => {
-    const pp = normalizePhone(p.phone || "");
     const pe = String(p.email || "").trim().toLowerCase();
-    return (phone && pp.endsWith(last10)) || (email && pe === email);
+    return (phone && phonesMatch(phone, p.phone || "")) || (email && pe === email);
   });
 
   const settings = await getAdminSettings(admin);

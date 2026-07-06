@@ -1,6 +1,7 @@
 // Simula uma mensagem chegando no whatsapp-inbound sem depender da GPT Maker.
 // Chamada pelo admin para testar rapidamente se um gatilho inicia o fluxo.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { normalizePhone } from "../_shared/gpt-maker.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,10 +41,11 @@ Deno.serve(async (req) => {
   const message: string = body.message || "registrar";
   const resetSession: boolean = !!body.resetSession;
   if (!phone && !email) return json({ error: "phone ou email obrigatório" }, 400);
+  const normalizedPhone = normalizePhone(phone);
 
   // Limpa sessão para começar do zero no teste, se pedido
-  if (resetSession && phone) {
-    await admin.from("bot_sessions").delete().eq("phone", phone.replace(/\D/g, ""));
+  if (resetSession && normalizedPhone) {
+    await admin.from("bot_sessions").delete().eq("phone", normalizedPhone);
   }
 
   if (!WEBHOOK_TOKEN) return json({ error: "GPT_MAKER_WEBHOOK_TOKEN não configurado" }, 500);
@@ -52,10 +54,16 @@ Deno.serve(async (req) => {
   const r = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone, email, message }),
+    body: JSON.stringify({ phone: normalizedPhone || phone, email, message }),
   });
   const t = await r.text();
   let parsed: any = null;
   try { parsed = JSON.parse(t); } catch { parsed = t; }
-  return json({ ok: r.ok, status: r.status, inbound: parsed }, 200);
+  const inboundOk = typeof parsed === "object" && parsed !== null ? parsed.ok === true : r.ok;
+  return json({
+    ok: r.ok && inboundOk,
+    status: r.status,
+    inbound: parsed,
+    error: inboundOk ? null : (parsed?.error || "selftest failed"),
+  }, 200);
 });
