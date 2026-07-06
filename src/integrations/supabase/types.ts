@@ -1685,6 +1685,7 @@ export type Database = {
           optout_text: string
           updated_at: string
           user_id: string
+          webhook_only_mode: boolean
           whatsapp_ritual_enabled: boolean
           whatsapp_templates: Json
         }
@@ -1699,6 +1700,7 @@ export type Database = {
           optout_text?: string
           updated_at?: string
           user_id: string
+          webhook_only_mode?: boolean
           whatsapp_ritual_enabled?: boolean
           whatsapp_templates?: Json
         }
@@ -1713,6 +1715,7 @@ export type Database = {
           optout_text?: string
           updated_at?: string
           user_id?: string
+          webhook_only_mode?: boolean
           whatsapp_ritual_enabled?: boolean
           whatsapp_templates?: Json
         }

@@ -10,6 +10,7 @@ type Settings = {
   delay_seconds: number;
   batch_limit: number;
   add_to_agent_context: boolean;
+  webhook_only_mode: boolean;
 };
 
 type Discovery = {
@@ -24,6 +25,7 @@ const DEFAULT: Settings = {
   delay_seconds: 3,
   batch_limit: 100,
   add_to_agent_context: false,
+  webhook_only_mode: false,
 };
 
 export default function WhatsAppSettingsTab() {
@@ -288,6 +290,23 @@ export default function WhatsAppSettingsTab() {
             Status: {agentStatus.isActive ? "⚠️ ATIVO (pode responder junto)" : "✅ INATIVO (só nosso fluxo responde)"}
           </div>
         )}
+
+        <div className="border-t border-border pt-4 mt-2 space-y-2">
+          <label className="flex items-start gap-3 text-sm cursor-pointer">
+            <input
+              type="checkbox"
+              checked={settings.webhook_only_mode}
+              onChange={(e) => setSettings({ ...settings, webhook_only_mode: e.target.checked })}
+              className="mt-1"
+            />
+            <div>
+              <div className="font-medium">Modo somente webhook (trava o agente)</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Quando ativado, a cada mensagem recebida o sistema verifica o agente na GPT Maker e o <strong>desliga automaticamente</strong> se estiver ativo. Garante que o agente nunca responda — só o fluxo local. Lembre-se de clicar em <em>Salvar configurações</em>.
+              </div>
+            </div>
+          </label>
+        </div>
       </div>
 
 
