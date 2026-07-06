@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Trophy, Check, Loader2 } from "lucide-react";
@@ -9,10 +9,54 @@ const planos = [
   { key: "semestral", nome: "Semestral", preco: "R$ 49,70", periodo: "por 6 meses", destaque: true },
 ];
 
+const requiredFields: Array<[string, string]> = [
+  ["cpf", "CPF"],
+  ["postal_code", "CEP"],
+  ["address", "Endereço"],
+  ["address_number", "Número"],
+  ["address_complement", "Complemento (opcional)"],
+  ["province", "Bairro"],
+  ["city", "Cidade"],
+  ["state", "UF"],
+];
+
 export default function ScorePlanos() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState<string | null>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [form, setForm] = useState<Record<string, string>>({});
+  const [needsData, setNeedsData] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session) return;
+      const { data } = await supabase.from("score_profiles").select("*").eq("user_id", sess.session.user.id).maybeSingle();
+      if (data) {
+        setProfile(data);
+        const init: Record<string, string> = {};
+        requiredFields.forEach(([k]) => (init[k] = (data as any)[k] ?? ""));
+        setForm(init);
+        const missing = ["cpf","postal_code","address","address_number","province","city","state"].some((k) => !(data as any)[k]);
+        setNeedsData(missing);
+      }
+    })();
+  }, []);
+
+  const saveProfile = async () => {
+    const { data: sess } = await supabase.auth.getSession();
+    if (!sess.session) return false;
+    const payload: any = {};
+    requiredFields.forEach(([k]) => (payload[k] = form[k]?.trim() || null));
+    const { error } = await supabase.from("score_profiles").update(payload).eq("user_id", sess.session.user.id);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+      return false;
+    }
+    setNeedsData(false);
+    return true;
+  };
 
   const subscribe = async (planKey: string) => {
     setLoading(planKey);
@@ -22,6 +66,15 @@ export default function ScorePlanos() {
         toast({ title: "Faça login", description: "Entre na sua conta para assinar." });
         navigate("/scoreapp/login");
         return;
+      }
+      if (needsData) {
+        const missing = ["cpf","postal_code","address","address_number","province","city","state"].filter((k) => !form[k]?.trim());
+        if (missing.length) {
+          toast({ title: "Complete seus dados", description: "Preencha os campos obrigatórios para continuar.", variant: "destructive" });
+          return;
+        }
+        const ok = await saveProfile();
+        if (!ok) return;
       }
       const { data, error } = await supabase.functions.invoke("cora-pix-checkout", {
         body: { plan_key: planKey, terms_accepted: true },
@@ -53,6 +106,26 @@ export default function ScorePlanos() {
       <section className="max-w-4xl mx-auto px-6 py-16 text-center">
         <h1 className="font-serif text-4xl mb-3">Planos</h1>
         <p className="text-muted-foreground mb-10">Ferramenta simples, preço acessível.</p>
+
+        {profile && needsData && (
+          <div className="bg-card border border-primary/40 rounded-lg p-6 mb-8 text-left">
+            <h2 className="font-serif text-xl mb-1">Complete seus dados de cobrança</h2>
+            <p className="text-xs text-muted-foreground mb-4">Necessário para gerar sua cobrança PIX.</p>
+            <div className="grid md:grid-cols-2 gap-3">
+              {requiredFields.map(([k, label]) => (
+                <input
+                  key={k}
+                  value={form[k] ?? ""}
+                  onChange={(e) => setForm((f) => ({ ...f, [k]: e.target.value }))}
+                  placeholder={label}
+                  maxLength={k === "state" ? 2 : undefined}
+                  className="bg-input border border-border rounded-md px-4 py-3 text-sm"
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="grid md:grid-cols-2 gap-4">
           {planos.map((p) => (
             <div key={p.key} className={`bg-card border rounded-lg p-8 text-left ${p.destaque ? "border-primary" : "border-border"}`}>
