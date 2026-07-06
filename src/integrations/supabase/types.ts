@@ -77,6 +77,124 @@ export type Database = {
         }
         Relationships: []
       }
+      bot_flow_versions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          flow_id: string
+          graph: Json
+          id: string
+          triggers: Json
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          flow_id: string
+          graph: Json
+          id?: string
+          triggers?: Json
+          version: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          flow_id?: string
+          graph?: Json
+          id?: string
+          triggers?: Json
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bot_flow_versions_flow_id_fkey"
+            columns: ["flow_id"]
+            isOneToOne: false
+            referencedRelation: "bot_flows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bot_flows: {
+        Row: {
+          created_at: string
+          description: string | null
+          graph: Json
+          id: string
+          is_active: boolean
+          name: string
+          priority: number
+          triggers: Json
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          graph: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          priority?: number
+          triggers?: Json
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          graph?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          priority?: number
+          triggers?: Json
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      bot_sessions: {
+        Row: {
+          current_node_id: string | null
+          flow_id: string | null
+          id: string
+          phone: string
+          started_at: string
+          updated_at: string
+          user_id: string | null
+          variables: Json
+        }
+        Insert: {
+          current_node_id?: string | null
+          flow_id?: string | null
+          id?: string
+          phone: string
+          started_at?: string
+          updated_at?: string
+          user_id?: string | null
+          variables?: Json
+        }
+        Update: {
+          current_node_id?: string | null
+          flow_id?: string | null
+          id?: string
+          phone?: string
+          started_at?: string
+          updated_at?: string
+          user_id?: string | null
+          variables?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bot_sessions_flow_id_fkey"
+            columns: ["flow_id"]
+            isOneToOne: false
+            referencedRelation: "bot_flows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaign_logs: {
         Row: {
           campaign_id: string

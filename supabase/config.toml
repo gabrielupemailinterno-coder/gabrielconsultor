@@ -25,5 +25,7 @@ project_id = "xhzsdnbztsnupbukmdjg"
     verify_jwt = false
   [functions.whatsapp-weekly-report]
     verify_jwt = false
+  [functions.bot-flow-test]
+    verify_jwt = true
 
 
