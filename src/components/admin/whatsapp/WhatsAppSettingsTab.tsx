@@ -210,6 +210,32 @@ export default function WhatsAppSettingsTab() {
         </label>
       </div>
 
+      <div className="bg-card border border-border rounded-lg p-6 space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-serif text-lg">Webhook de entrada (onNewMessage)</h3>
+          <div className="flex gap-2">
+            <button onClick={checkHook} disabled={hookLoading || !settings.agent_id} className="text-sm px-3 py-1.5 border border-border rounded hover:bg-secondary/40 disabled:opacity-50">
+              {hookLoading ? <Loader2 className="animate-spin" size={14} /> : "Verificar"}
+            </button>
+            <button onClick={configureHook} disabled={hookLoading || !settings.agent_id} className="text-sm px-3 py-1.5 bg-primary text-primary-foreground rounded disabled:opacity-50">
+              Configurar automaticamente
+            </button>
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Aponta o evento <span className="font-mono">onNewMessage</span> do agente para o nosso endpoint. Sem isso, mensagens do WhatsApp não disparam o fluxo do bot. Requer <span className="font-mono">agent_id</span> preenchido acima e salvo.
+        </p>
+        {hookStatus && (
+          <div className="text-xs bg-background border border-border rounded p-3 space-y-1 font-mono">
+            <div>Status: {hookStatus.is_configured ? "✅ configurado" : "⚠️ não aponta para whatsapp-inbound"}</div>
+            <div className="break-all">Atual: {hookStatus.current?.onNewMessage || "—"}</div>
+            <div className="break-all text-muted-foreground">Esperado: {hookStatus.expected_url}</div>
+          </div>
+        )}
+      </div>
+
+
+
       <button onClick={save} disabled={saving} className="bg-primary text-primary-foreground px-6 py-3 rounded text-sm uppercase tracking-wide disabled:opacity-50">
         {saving ? "Salvando…" : "Salvar configurações"}
       </button>
