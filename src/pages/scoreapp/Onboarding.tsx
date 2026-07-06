@@ -30,13 +30,16 @@ export default function ScoreOnboarding() {
     navigate("/scoreapp/app", { replace: true });
   };
 
-  const Field = ({ k, label, type = "number" }: any) => (
-    <label className="block">
-      <span className="text-xs text-muted-foreground uppercase tracking-wider">{label}</span>
-      <input type={type} value={(g as any)[k]} onChange={(e) => set(k, type === "number" ? Number(e.target.value) : e.target.value)}
-        className="w-full mt-1 bg-input border border-border rounded-md px-4 py-3 text-sm" />
-    </label>
-  );
+  const fields: Array<[keyof typeof g, string, "number" | "text"]> = [
+    ["meta_mensal_valor", "Meta mensal (R$)", "number"],
+    ["ticket_medio", "Ticket médio (R$)", "number"],
+    ["meta_vendas", "Vendas/mês", "number"],
+    ["ligacoes_dia", "Ligações por dia", "number"],
+    ["whatsapps_dia", "WhatsApps por dia", "number"],
+    ["apresentacoes_semana", "Apresentações por semana", "number"],
+    ["propostas_semana", "Propostas por semana", "number"],
+    ["segmento", "Segmento de atuação", "text"],
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground py-10">
@@ -44,14 +47,13 @@ export default function ScoreOnboarding() {
         <h1 className="font-serif text-3xl mb-2">Suas metas</h1>
         <p className="text-muted-foreground text-sm mb-8">Poucos números para começarmos a calcular seu score.</p>
         <form onSubmit={submit} className="grid md:grid-cols-2 gap-4 bg-card border border-border rounded-lg p-6">
-          <Field k="meta_mensal_valor" label="Meta mensal (R$)" />
-          <Field k="ticket_medio" label="Ticket médio (R$)" />
-          <Field k="meta_vendas" label="Vendas/mês" />
-          <Field k="ligacoes_dia" label="Ligações por dia" />
-          <Field k="whatsapps_dia" label="WhatsApps por dia" />
-          <Field k="apresentacoes_semana" label="Apresentações por semana" />
-          <Field k="propostas_semana" label="Propostas por semana" />
-          <Field k="segmento" label="Segmento de atuação" type="text" />
+          {fields.map(([k, label, type]) => (
+            <label key={k as string} className="block">
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">{label}</span>
+              <input type={type} value={(g as any)[k]} onChange={(e) => set(k as string, type === "number" ? Number(e.target.value) : e.target.value)}
+                className="w-full mt-1 bg-input border border-border rounded-md px-4 py-3 text-sm" />
+            </label>
+          ))}
           <button disabled={loading} className="md:col-span-2 bg-primary text-primary-foreground uppercase tracking-wide text-sm py-3 rounded-md flex items-center justify-center">
             {loading ? <Loader2 className="animate-spin" size={16} /> : "Salvar e continuar"}
           </button>
