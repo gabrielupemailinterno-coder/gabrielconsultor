@@ -1188,6 +1188,20 @@ export type Database = {
       score_profiles: {
         Row: {
           accepted_terms_at: string | null
+          address: string | null
+          address_complement: string | null
+          address_number: string | null
+          city: string | null
+          cora_customer_id: string | null
+          cora_due_date: string | null
+          cora_emv: string | null
+          cora_invoice_id: string | null
+          cora_paid_amount: number | null
+          cora_paid_at: string | null
+          cora_qr_code_url: string | null
+          cora_status: string | null
+          cora_subscription_id: string | null
+          cpf: string | null
           created_at: string
           email: string
           experience_level: string | null
@@ -1195,17 +1209,36 @@ export type Database = {
           id: string
           last_seen_at: string | null
           lead_origin: string | null
+          payment_status: string | null
           phone: string | null
           plan: string
           plan_expires_at: string | null
           plan_started_at: string | null
+          plan_status: string | null
+          postal_code: string | null
           profession: string | null
+          province: string | null
           segment: string | null
+          state: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           accepted_terms_at?: string | null
+          address?: string | null
+          address_complement?: string | null
+          address_number?: string | null
+          city?: string | null
+          cora_customer_id?: string | null
+          cora_due_date?: string | null
+          cora_emv?: string | null
+          cora_invoice_id?: string | null
+          cora_paid_amount?: number | null
+          cora_paid_at?: string | null
+          cora_qr_code_url?: string | null
+          cora_status?: string | null
+          cora_subscription_id?: string | null
+          cpf?: string | null
           created_at?: string
           email?: string
           experience_level?: string | null
@@ -1213,17 +1246,36 @@ export type Database = {
           id?: string
           last_seen_at?: string | null
           lead_origin?: string | null
+          payment_status?: string | null
           phone?: string | null
           plan?: string
           plan_expires_at?: string | null
           plan_started_at?: string | null
+          plan_status?: string | null
+          postal_code?: string | null
           profession?: string | null
+          province?: string | null
           segment?: string | null
+          state?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           accepted_terms_at?: string | null
+          address?: string | null
+          address_complement?: string | null
+          address_number?: string | null
+          city?: string | null
+          cora_customer_id?: string | null
+          cora_due_date?: string | null
+          cora_emv?: string | null
+          cora_invoice_id?: string | null
+          cora_paid_amount?: number | null
+          cora_paid_at?: string | null
+          cora_qr_code_url?: string | null
+          cora_status?: string | null
+          cora_subscription_id?: string | null
+          cpf?: string | null
           created_at?: string
           email?: string
           experience_level?: string | null
@@ -1231,12 +1283,17 @@ export type Database = {
           id?: string
           last_seen_at?: string | null
           lead_origin?: string | null
+          payment_status?: string | null
           phone?: string | null
           plan?: string
           plan_expires_at?: string | null
           plan_started_at?: string | null
+          plan_status?: string | null
+          postal_code?: string | null
           profession?: string | null
+          province?: string | null
           segment?: string | null
+          state?: string | null
           updated_at?: string
           user_id?: string
         }
