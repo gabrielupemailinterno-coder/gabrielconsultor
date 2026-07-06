@@ -153,7 +153,7 @@ async function parseWebhookBody(req: Request, url: URL): Promise<any> {
   }
 
   if (contentType.includes("application/x-www-form-urlencoded") || raw.includes("=")) {
-    const parsed = Object.fromEntries(new URLSearchParams(raw).entries());
+    const parsed: Record<string, unknown> = Object.fromEntries(new URLSearchParams(raw).entries());
     for (const [key, value] of Object.entries(parsed)) {
       if (typeof value === "string" && /^[\[{]/.test(value.trim())) {
         try { parsed[key] = JSON.parse(value); } catch { /* keep text */ }
