@@ -9,6 +9,7 @@ import MenteeEmailComposer from "@/components/admin/MenteeEmailComposer";
 import ProspectingBulk from "@/components/admin/ProspectingBulk";
 import WhatsAppAdmin from "@/components/admin/whatsapp/WhatsAppAdmin";
 import WhatsAppRitualAdmin from "@/components/admin/WhatsAppRitualAdmin";
+import BotFlowsAdmin from "@/components/admin/BotFlowsAdmin";
 
 import ScoreAdmin from "@/components/admin/ScoreAdmin";
 import ContentsAdmin from "@/components/admin/ContentsAdmin";
@@ -52,7 +53,7 @@ const Admin = () => {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [clicks, setClicks] = useState<Click[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [tab, setTab] = useState<"mentees" | "score" | "conteudos" | "emails" | "prospect" | "whatsapp" | "ritual" | "leads" | "visits" | "clicks" | "sessions" | "blog">("mentees");
+  const [tab, setTab] = useState<"mentees" | "score" | "conteudos" | "emails" | "prospect" | "whatsapp" | "ritual" | "botflow" | "leads" | "visits" | "clicks" | "sessions" | "blog">("mentees");
   const [leadFilter, setLeadFilter] = useState<FormType | "all">("all");
 
   useEffect(() => {
@@ -148,6 +149,8 @@ const Admin = () => {
             { id: "prospect", label: "Prospecção" },
             { id: "whatsapp", label: "WhatsApp" },
             { id: "ritual", label: "Ritual WhatsApp" },
+            { id: "botflow", label: "Fluxo do Bot" },
+
 
             { id: "leads", label: `Cadastros (${leads.length})` },
             { id: "visits", label: `Visitas (${visits.length})` },
@@ -172,6 +175,7 @@ const Admin = () => {
         {tab === "prospect" && <ProspectingBulk />}
         {tab === "whatsapp" && <WhatsAppAdmin />}
         {tab === "ritual" && <WhatsAppRitualAdmin />}
+        {tab === "botflow" && <BotFlowsAdmin />}
 
 
         {tab === "leads" && (() => {
