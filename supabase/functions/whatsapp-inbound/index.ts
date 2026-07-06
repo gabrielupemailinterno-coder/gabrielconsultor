@@ -217,6 +217,7 @@ async function persistAndReply(
   phone: string,
   profile: any,
   step: StepResult,
+  chatIdHint: string | null,
 ) {
   // 1) Se há log a salvar, salva com merge
   let scoreInfo: { score: number; label: string; streak: number } | null = null;
@@ -238,7 +239,16 @@ async function persistAndReply(
     scoreInfo = { score, label, streak };
   }
 
-  // 2) Persistir sessão (upsert ou delete se encerrou)
+  // 2) Resolve chatId uma vez para todo o step; se sessão continua, silencia o agente.
+  let chatId = chatIdHint;
+  if (channelId && !chatId) {
+    try { chatId = await resolveChatId(channelId, phone); } catch { chatId = null; }
+  }
+  if (chatId && step.session) {
+    try { await startHuman(chatId); } catch { /* best effort */ }
+  }
+
+  // 3) Persistir sessão (upsert ou delete se encerrou)
   if (step.session) {
     await admin.from("bot_sessions").upsert(
       {
@@ -254,7 +264,7 @@ async function persistAndReply(
     await admin.from("bot_sessions").delete().eq("phone", phone);
   }
 
-  // 3) Enviar mensagens (última pode ter placeholders de score)
+  // 4) Enviar mensagens (última pode ter placeholders de score)
   const streakLine = scoreInfo && scoreInfo.streak >= 2 ? `\n🔥 Streak: ${scoreInfo.streak} dias consecutivos!` : "";
   const finalMessages = step.messages.map((m) =>
     m
@@ -263,19 +273,28 @@ async function persistAndReply(
       .replace(/\{\{\s*streak_line\s*\}\}/g, streakLine),
   );
 
-  for (const msg of finalMessages) {
+  for (let i = 0; i < finalMessages.length; i++) {
     if (!channelId) break;
-    const r = await sendWhatsApp(channelId, phone, msg);
+    const msg = finalMessages[i];
+    if (i > 0) await new Promise((r) => setTimeout(r, 300));
+    const r = await sendWhatsApp(channelId, phone, msg, { chatId });
+    if (!chatId && r.chatId) chatId = r.chatId;
     await admin.from("score_whatsapp_messages").insert({
       user_id: profile.user_id,
       phone,
       direction: "out",
       kind: "bot_step",
-      payload: { message: msg, ...(scoreInfo || {}) },
+      payload: { message: msg, chatId: chatId || null, endpoint: r.endpoint, status: r.status, attempts: r.attempts, ...(scoreInfo || {}) },
       error: r.ok ? null : r.error,
     });
   }
+
+  // 5) Se o fluxo terminou, devolve controle ao agente.
+  if (!step.session && chatId) {
+    try { await stopHuman(chatId); } catch { /* best effort */ }
+  }
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
