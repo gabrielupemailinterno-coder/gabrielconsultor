@@ -19,6 +19,7 @@ import Parceiros from "./pages/Parceiros";
 import SimuladorUP from "./pages/SimuladorUP";
 import WhatsAppFloatButton from "./components/WhatsAppFloatButton";
 import ScoreLanding from "./pages/scoreapp/Landing";
+import ConhecaScoreApp from "./pages/scoreapp/ConhecaScoreApp";
 import ScoreLogin from "./pages/scoreapp/Login";
 import ScoreSignup from "./pages/scoreapp/Signup";
 import ScoreOnboarding from "./pages/scoreapp/Onboarding";
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/mentorados" element={<PortalDashboard />} />
             <Route path="/simulador-up" element={<SimuladorUP />} />
             <Route path="/scoreapp" element={<ScoreLanding />} />
+            <Route path="/conhecascoreapp" element={<ConhecaScoreApp />} />
             <Route path="/scoreapp/login" element={<ScoreLogin />} />
             <Route path="/scoreapp/cadastro" element={<ScoreSignup />} />
             <Route path="/scoreapp/onboarding" element={<ScoreOnboarding />} />
