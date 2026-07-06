@@ -1,22 +1,28 @@
-Plano de diagnóstico:
+Plano de correção:
 
-1. Confirmar o ponto de falha
-- A conversa chegou na GPT Maker, mas os logs do backend não mostram nenhuma chamada real nova no webhook.
-- Isso indica que o WhatsApp está conectado, mas a automação/webhook da GPT Maker não está disparando.
+1. Instrumentar a entrada real da GPT Maker
+- Adicionar log seguro logo após o recebimento da chamada, mostrando apenas chaves do payload e quais campos foram detectados.
+- Registrar claramente quando a chamada entra autenticada mas não contém telefone/mensagem no formato esperado.
+- Isso elimina o problema atual: a chamada apareceu, mas morreu antes do log principal.
 
-2. Validar a configuração dentro da GPT Maker
-- Conferir se o webhook está salvo exatamente nos gatilhos/eventos corretos.
-- Verificar se há dois campos de webhook e se ambos usam a mesma URL completa com token.
-- Confirmar se o webhook está ativo para o canal/agente certo, não apenas salvo em uma área global.
+2. Tornar o parser compatível com formatos mais amplos
+- Aceitar mensagem em campos como `message.text`, `messages[0].text`, `event.message`, `payload.text`, `lastMessage`, `content.text`, `conversation.message` e equivalentes.
+- Aceitar telefone/contato em campos como `contact.phone`, `contact.whatsapp`, `sender.phone`, `from.phone`, `customer.phone`, `chat.contactIdentifier`, `visitor.phone`, `payload.contact` e campos aninhados.
+- Tratar arrays de mensagens/contatos, não só objetos simples.
 
-3. Fazer teste isolado do webhook pela GPT Maker
-- Usar o botão de teste da própria GPT Maker, se existir, para enviar um payload ao webhook.
-- Ler os logs imediatamente após o teste para confirmar se a plataforma chamou o backend.
+3. Não bloquear a chamada quando faltar telefone, mas houver `chatId`
+- Se o payload vier com `chatId` e mensagem, tentar responder pelo chat diretamente.
+- Se ainda não houver telefone nem perfil, retornar um erro detalhado nos logs e salvar o payload como diagnóstico, em vez de parecer que “não funcionou”.
 
-4. Se ainda não houver chamada
-- Tratar como problema de configuração/disparo na GPT Maker.
-- Pedir um print da tela onde a conversa apareceu e da tela de webhooks salva, para identificar se o webhook está no agente, canal ou evento errado.
+4. Corrigir o retorno para a GPT Maker
+- Garantir resposta rápida `200` quando a chamada for recebida e registrada, mesmo se o payload vier incompleto.
+- Evitar que a GPT Maker desative/retenha o webhook por receber `400/401` em payloads parcialmente diferentes.
 
-Resultado esperado:
-- Se aparecer log novo: eu sigo analisando payload, gatilho e resposta.
-- Se não aparecer log novo: o problema está antes do webhook, dentro da GPT Maker, porque o backend continua sem receber nenhuma requisição real.
+5. Validar
+- Re-publicar a função.
+- Testar com payload JSON parecido com o real.
+- Ler os logs novamente e confirmar que a próxima mensagem real mostra: chamada recebida, campos detectados, fluxo disparado ou motivo exato do bloqueio.
+
+<presentation-actions>
+<presentation-link url="https://docs.lovable.dev/tips-tricks/troubleshooting">Troubleshooting docs</presentation-link>
+</presentation-actions>
