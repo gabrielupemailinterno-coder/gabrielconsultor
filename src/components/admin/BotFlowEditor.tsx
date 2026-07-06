@@ -66,14 +66,13 @@ export default function BotFlowEditor({ flow, onBack }: { flow: Flow; onBack: ()
 
   const save = async () => {
     setSaving(true);
-    const graph = { nodes, edges };
+    const graph = { nodes, edges } as any;
     const triggersArr = triggers.split(",").map((s) => s.trim()).filter(Boolean);
-    // snapshot
     await supabase.from("bot_flow_versions").insert({
-      flow_id: flow.id, version: flow.version, graph, triggers: triggersArr,
+      flow_id: flow.id, version: flow.version, graph, triggers: triggersArr as any,
     });
     const { error } = await supabase.from("bot_flows").update({
-      name, triggers: triggersArr, graph, is_active: isActive, version: flow.version + 1,
+      name, triggers: triggersArr as any, graph, is_active: isActive, version: flow.version + 1,
     }).eq("id", flow.id);
     setSaving(false);
     if (error) toast.error(error.message);
