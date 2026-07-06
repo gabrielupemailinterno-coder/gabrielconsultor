@@ -92,11 +92,25 @@ export default function ScoreCheckoutPix() {
           <span className="font-serif text-lg">Score Comercial</span>
         </div>
 
-        {paid ? (
-          <div className="bg-card border border-border rounded-lg p-8 text-center">
+        {status === "paid" ? (
+          <div className="bg-card border border-primary/50 rounded-lg p-8 text-center">
             <CheckCircle2 className="mx-auto text-primary mb-4" size={48} />
-            <h1 className="font-serif text-2xl mb-2">Pagamento confirmado</h1>
-            <p className="text-muted-foreground text-sm">Redirecionando para o app...</p>
+            <h1 className="font-serif text-2xl mb-2">{STATUS_META.paid.label}</h1>
+            <p className="text-muted-foreground text-sm">{STATUS_META.paid.hint}</p>
+          </div>
+        ) : status === "not_found" ? (
+          <div className="bg-card border border-destructive/50 rounded-lg p-8 text-center space-y-4">
+            <AlertCircle className="mx-auto text-destructive" size={48} />
+            <div>
+              <h1 className="font-serif text-2xl mb-2">{STATUS_META.not_found.label}</h1>
+              <p className="text-muted-foreground text-sm">{STATUS_META.not_found.hint}</p>
+            </div>
+            <button
+              onClick={() => navigate("/scoreapp/planos", { replace: true })}
+              className="w-full bg-primary text-primary-foreground text-sm py-2 rounded-md"
+            >
+              Voltar aos planos
+            </button>
           </div>
         ) : (
           <div className="bg-card border border-border rounded-lg p-6 space-y-4">
@@ -142,10 +156,25 @@ export default function ScoreCheckoutPix() {
               </a>
             )}
 
-
-            <p className="text-center text-xs text-muted-foreground">
-              Aguardando confirmação do pagamento...
-            </p>
+            <div className={`flex items-start gap-2 rounded-md border p-3 text-xs ${status === "error" ? "border-destructive/40 bg-destructive/5" : "border-border bg-muted/40"}`}>
+              {status === "error" ? (
+                <AlertCircle size={14} className="text-destructive mt-0.5 shrink-0" />
+              ) : status === "checking" ? (
+                <Loader2 size={14} className="text-primary animate-spin mt-0.5 shrink-0" />
+              ) : (
+                <Clock size={14} className="text-muted-foreground mt-0.5 shrink-0" />
+              )}
+              <div className="flex-1">
+                <div className={`font-medium ${STATUS_META[status].tone}`}>{STATUS_META[status].label}</div>
+                <div className="text-muted-foreground">{STATUS_META[status].hint}</div>
+                {lastCheckedAt && (
+                  <div className="text-[10px] text-muted-foreground mt-1">
+                    Última verificação: {lastCheckedAt.toLocaleTimeString("pt-BR")}
+                    {profile?.cora_status ? ` · status Cora: ${profile.cora_status}` : ""}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
