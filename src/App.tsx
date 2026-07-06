@@ -18,6 +18,16 @@ import PortalResetPassword from "./pages/portal/PortalResetPassword";
 import Parceiros from "./pages/Parceiros";
 import SimuladorUP from "./pages/SimuladorUP";
 import WhatsAppFloatButton from "./components/WhatsAppFloatButton";
+import ScoreLanding from "./pages/scoreapp/Landing";
+import ScoreLogin from "./pages/scoreapp/Login";
+import ScoreSignup from "./pages/scoreapp/Signup";
+import ScoreOnboarding from "./pages/scoreapp/Onboarding";
+import ScoreDashboard from "./pages/scoreapp/Dashboard";
+import ScoreRegistrar from "./pages/scoreapp/Registrar";
+import ScoreConteudos from "./pages/scoreapp/Conteudos";
+import ScoreModulo from "./pages/scoreapp/Modulo";
+import ScorePerfil from "./pages/scoreapp/Perfil";
+import ScorePlanos from "./pages/scoreapp/Planos";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +52,16 @@ const App = () => (
             <Route path="/mentorados/redefinir-senha" element={<PortalResetPassword />} />
             <Route path="/mentorados" element={<PortalDashboard />} />
             <Route path="/simulador-up" element={<SimuladorUP />} />
+            <Route path="/scoreapp" element={<ScoreLanding />} />
+            <Route path="/scoreapp/login" element={<ScoreLogin />} />
+            <Route path="/scoreapp/cadastro" element={<ScoreSignup />} />
+            <Route path="/scoreapp/onboarding" element={<ScoreOnboarding />} />
+            <Route path="/scoreapp/app" element={<ScoreDashboard />} />
+            <Route path="/scoreapp/app/registrar" element={<ScoreRegistrar />} />
+            <Route path="/scoreapp/app/conteudos" element={<ScoreConteudos />} />
+            <Route path="/scoreapp/app/conteudos/:slug" element={<ScoreModulo />} />
+            <Route path="/scoreapp/app/perfil" element={<ScorePerfil />} />
+            <Route path="/scoreapp/planos" element={<ScorePlanos />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -991,6 +991,278 @@ export type Database = {
         }
         Relationships: []
       }
+      score_badges: {
+        Row: {
+          badge_key: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_key: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_key?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      score_content_modules: {
+        Row: {
+          categoria: string
+          created_at: string
+          descricao: string | null
+          id: string
+          material_url: string | null
+          published: boolean
+          slug: string
+          sort_order: number
+          titulo: string
+          updated_at: string
+          video_url: string | null
+        }
+        Insert: {
+          categoria: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          material_url?: string | null
+          published?: boolean
+          slug: string
+          sort_order?: number
+          titulo: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          material_url?: string | null
+          published?: boolean
+          slug?: string
+          sort_order?: number
+          titulo?: string
+          updated_at?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
+      score_content_progress: {
+        Row: {
+          completed_at: string
+          id: string
+          module_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          module_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          module_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "score_content_progress_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "score_content_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      score_daily_logs: {
+        Row: {
+          apresentacoes: number
+          contatos_efetivos: number
+          created_at: string
+          date: string
+          id: string
+          ligacoes: number
+          observacoes: string | null
+          propostas: number
+          prospeccoes: number
+          reunioes_agendadas: number
+          updated_at: string
+          user_id: string
+          valor_vendido: number
+          vendas: number
+          whatsapps: number
+        }
+        Insert: {
+          apresentacoes?: number
+          contatos_efetivos?: number
+          created_at?: string
+          date?: string
+          id?: string
+          ligacoes?: number
+          observacoes?: string | null
+          propostas?: number
+          prospeccoes?: number
+          reunioes_agendadas?: number
+          updated_at?: string
+          user_id: string
+          valor_vendido?: number
+          vendas?: number
+          whatsapps?: number
+        }
+        Update: {
+          apresentacoes?: number
+          contatos_efetivos?: number
+          created_at?: string
+          date?: string
+          id?: string
+          ligacoes?: number
+          observacoes?: string | null
+          propostas?: number
+          prospeccoes?: number
+          reunioes_agendadas?: number
+          updated_at?: string
+          user_id?: string
+          valor_vendido?: number
+          vendas?: number
+          whatsapps?: number
+        }
+        Relationships: []
+      }
+      score_goals: {
+        Row: {
+          apresentacoes_semana: number
+          created_at: string
+          effective_from: string
+          id: string
+          ligacoes_dia: number
+          meta_mensal_valor: number
+          meta_vendas: number
+          propostas_semana: number
+          segmento: string | null
+          ticket_medio: number
+          updated_at: string
+          user_id: string
+          whatsapps_dia: number
+        }
+        Insert: {
+          apresentacoes_semana?: number
+          created_at?: string
+          effective_from?: string
+          id?: string
+          ligacoes_dia?: number
+          meta_mensal_valor?: number
+          meta_vendas?: number
+          propostas_semana?: number
+          segmento?: string | null
+          ticket_medio?: number
+          updated_at?: string
+          user_id: string
+          whatsapps_dia?: number
+        }
+        Update: {
+          apresentacoes_semana?: number
+          created_at?: string
+          effective_from?: string
+          id?: string
+          ligacoes_dia?: number
+          meta_mensal_valor?: number
+          meta_vendas?: number
+          propostas_semana?: number
+          segmento?: string | null
+          ticket_medio?: number
+          updated_at?: string
+          user_id?: string
+          whatsapps_dia?: number
+        }
+        Relationships: []
+      }
+      score_profiles: {
+        Row: {
+          accepted_terms_at: string | null
+          created_at: string
+          email: string
+          experience_level: string | null
+          full_name: string
+          id: string
+          last_seen_at: string | null
+          lead_origin: string | null
+          phone: string | null
+          plan: string
+          plan_expires_at: string | null
+          plan_started_at: string | null
+          profession: string | null
+          segment: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accepted_terms_at?: string | null
+          created_at?: string
+          email?: string
+          experience_level?: string | null
+          full_name?: string
+          id?: string
+          last_seen_at?: string | null
+          lead_origin?: string | null
+          phone?: string | null
+          plan?: string
+          plan_expires_at?: string | null
+          plan_started_at?: string | null
+          profession?: string | null
+          segment?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accepted_terms_at?: string | null
+          created_at?: string
+          email?: string
+          experience_level?: string | null
+          full_name?: string
+          id?: string
+          last_seen_at?: string | null
+          lead_origin?: string | null
+          phone?: string | null
+          plan?: string
+          plan_expires_at?: string | null
+          plan_started_at?: string | null
+          profession?: string | null
+          segment?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      score_upsell_interests: {
+        Row: {
+          context: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          context?: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          context?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       settings: {
         Row: {
           add_to_agent_context: boolean
@@ -1127,7 +1399,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user" | "mentee"
+      app_role: "admin" | "user" | "mentee" | "scoreapp_user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1255,7 +1527,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user", "mentee"],
+      app_role: ["admin", "user", "mentee", "scoreapp_user"],
     },
   },
 } as const

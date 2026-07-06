@@ -8,6 +8,7 @@ import InviteMenteeDialog from "@/components/admin/InviteMenteeDialog";
 import MenteeEmailComposer from "@/components/admin/MenteeEmailComposer";
 import ProspectingBulk from "@/components/admin/ProspectingBulk";
 import WhatsAppAdmin from "@/components/admin/whatsapp/WhatsAppAdmin";
+import ScoreAdmin from "@/components/admin/ScoreAdmin";
 import { FORM_LABELS, type FormType } from "@/lib/qualifying-forms";
 
 type Lead = {
@@ -48,7 +49,7 @@ const Admin = () => {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [clicks, setClicks] = useState<Click[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [tab, setTab] = useState<"mentees" | "emails" | "prospect" | "whatsapp" | "leads" | "visits" | "clicks" | "sessions" | "blog">("mentees");
+  const [tab, setTab] = useState<"mentees" | "score" | "emails" | "prospect" | "whatsapp" | "leads" | "visits" | "clicks" | "sessions" | "blog">("mentees");
   const [leadFilter, setLeadFilter] = useState<FormType | "all">("all");
 
   useEffect(() => {
@@ -138,6 +139,7 @@ const Admin = () => {
         <div className="flex gap-2 border-b border-border">
           {[
             { id: "mentees", label: "Mentorados" },
+            { id: "score", label: "Score Comercial" },
             { id: "emails", label: "E-mails" },
             { id: "prospect", label: "Prospecção" },
             { id: "whatsapp", label: "WhatsApp" },
@@ -158,6 +160,7 @@ const Admin = () => {
         </div>
 
         {tab === "mentees" && <MenteesAdmin />}
+        {tab === "score" && <ScoreAdmin />}
         {tab === "emails" && <MenteeEmailComposer />}
         {tab === "prospect" && <ProspectingBulk />}
         {tab === "whatsapp" && <WhatsAppAdmin />}
