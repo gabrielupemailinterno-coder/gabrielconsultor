@@ -1,5 +1,8 @@
-import { Link } from "react-router-dom";
-import { Trophy, Check } from "lucide-react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Trophy, Check, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const planos = [
   { key: "mensal", nome: "Mensal", preco: "R$ 9,70", periodo: "/mês", destaque: false },
@@ -7,6 +10,38 @@ const planos = [
 ];
 
 export default function ScorePlanos() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState<string | null>(null);
+
+  const subscribe = async (planKey: string) => {
+    setLoading(planKey);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session) {
+        toast({ title: "Faça login", description: "Entre na sua conta para assinar." });
+        navigate("/scoreapp/login");
+        return;
+      }
+      const { data, error } = await supabase.functions.invoke("cora-pix-checkout", {
+        body: { plan_key: planKey, terms_accepted: true },
+      });
+      if (error || data?.error) {
+        toast({
+          title: "Erro no checkout",
+          description: data?.error || error?.message || "Tente novamente.",
+          variant: "destructive",
+        });
+        return;
+      }
+      navigate(`/scoreapp/checkout-pix?invoice=${data.invoiceId}`);
+    } catch (err: any) {
+      toast({ title: "Erro no checkout", description: err?.message || "Tente novamente.", variant: "destructive" });
+    } finally {
+      setLoading(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border">
@@ -29,7 +64,13 @@ export default function ScorePlanos() {
                   <li key={f} className="flex items-center gap-2"><Check size={14} className="text-primary" /> {f}</li>
                 ))}
               </ul>
-              <button className="w-full mt-8 bg-primary text-primary-foreground uppercase tracking-wide text-sm py-3 rounded-md">Assinar {p.nome}</button>
+              <button
+                disabled={loading !== null}
+                onClick={() => subscribe(p.key)}
+                className="w-full mt-8 bg-primary text-primary-foreground uppercase tracking-wide text-sm py-3 rounded-md flex items-center justify-center gap-2"
+              >
+                {loading === p.key ? <Loader2 className="animate-spin" size={16} /> : `Assinar ${p.nome}`}
+              </button>
             </div>
           ))}
         </div>

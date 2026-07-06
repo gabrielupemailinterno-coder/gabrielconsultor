@@ -28,6 +28,7 @@ import ScoreConteudos from "./pages/scoreapp/Conteudos";
 import ScoreModulo from "./pages/scoreapp/Modulo";
 import ScorePerfil from "./pages/scoreapp/Perfil";
 import ScorePlanos from "./pages/scoreapp/Planos";
+import ScoreCheckoutPix from "./pages/scoreapp/CheckoutPix";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ const App = () => (
             <Route path="/scoreapp/app/conteudos/:slug" element={<ScoreModulo />} />
             <Route path="/scoreapp/app/perfil" element={<ScorePerfil />} />
             <Route path="/scoreapp/planos" element={<ScorePlanos />} />
+            <Route path="/scoreapp/checkout-pix" element={<ScoreCheckoutPix />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
