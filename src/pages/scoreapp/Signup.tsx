@@ -7,6 +7,8 @@ export default function ScoreSignup() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     full_name: "", email: "", password: "", phone: "",
+    cpf: "", postal_code: "", address: "", address_number: "", address_complement: "",
+    province: "", city: "", state: "",
     profession: "", experience_level: "iniciante", lead_origin: "instagram", segment: "",
     accepted_terms: false,
   });
@@ -25,6 +27,10 @@ export default function ScoreSignup() {
         data: {
           source: "scoreapp",
           full_name: form.full_name, phone: form.phone,
+          cpf: form.cpf, postal_code: form.postal_code,
+          address: form.address, address_number: form.address_number,
+          address_complement: form.address_complement,
+          province: form.province, city: form.city, state: form.state,
           profession: form.profession, experience_level: form.experience_level,
           lead_origin: form.lead_origin, segment: form.segment,
           accepted_terms: true,
@@ -45,6 +51,18 @@ export default function ScoreSignup() {
           <input required type="email" value={form.email} onChange={(e) => set("email", e.target.value)} placeholder="E-mail" className="w-full bg-input border border-border rounded-md px-4 py-3 text-sm" />
           <input required type="password" minLength={6} value={form.password} onChange={(e) => set("password", e.target.value)} placeholder="Senha (mín. 6)" className="w-full bg-input border border-border rounded-md px-4 py-3 text-sm" />
           <input required value={form.phone} onChange={(e) => set("phone", e.target.value)} placeholder="Telefone / WhatsApp" className="w-full bg-input border border-border rounded-md px-4 py-3 text-sm" />
+          <input required value={form.cpf} onChange={(e) => set("cpf", e.target.value)} placeholder="CPF" className="w-full bg-input border border-border rounded-md px-4 py-3 text-sm" />
+          <div className="grid grid-cols-2 gap-3">
+            <input required value={form.postal_code} onChange={(e) => set("postal_code", e.target.value)} placeholder="CEP" className="bg-input border border-border rounded-md px-4 py-3 text-sm" />
+            <input required value={form.address_number} onChange={(e) => set("address_number", e.target.value)} placeholder="Número" className="bg-input border border-border rounded-md px-4 py-3 text-sm" />
+          </div>
+          <input required value={form.address} onChange={(e) => set("address", e.target.value)} placeholder="Endereço" className="w-full bg-input border border-border rounded-md px-4 py-3 text-sm" />
+          <input value={form.address_complement} onChange={(e) => set("address_complement", e.target.value)} placeholder="Complemento (opcional)" className="w-full bg-input border border-border rounded-md px-4 py-3 text-sm" />
+          <div className="grid grid-cols-2 gap-3">
+            <input required value={form.province} onChange={(e) => set("province", e.target.value)} placeholder="Bairro" className="bg-input border border-border rounded-md px-4 py-3 text-sm" />
+            <input required value={form.city} onChange={(e) => set("city", e.target.value)} placeholder="Cidade" className="bg-input border border-border rounded-md px-4 py-3 text-sm" />
+          </div>
+          <input required value={form.state} onChange={(e) => set("state", e.target.value)} maxLength={2} placeholder="UF" className="w-full bg-input border border-border rounded-md px-4 py-3 text-sm" />
           <div className="grid grid-cols-2 gap-3">
             <input required value={form.profession} onChange={(e) => set("profession", e.target.value)} placeholder="Profissão / segmento" className="bg-input border border-border rounded-md px-4 py-3 text-sm" />
             <select value={form.experience_level} onChange={(e) => set("experience_level", e.target.value)} className="bg-input border border-border rounded-md px-4 py-3 text-sm">
