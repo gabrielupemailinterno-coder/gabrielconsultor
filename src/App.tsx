@@ -55,6 +55,7 @@ const App = () => (
             <Route path="/mentorados" element={<PortalDashboard />} />
             <Route path="/simulador-up" element={<SimuladorUP />} />
             <Route path="/scoreapp" element={<ScoreLanding />} />
+            <Route path="/conhecascoreapp" element={<ConhecaScoreApp />} />
             <Route path="/scoreapp/login" element={<ScoreLogin />} />
             <Route path="/scoreapp/cadastro" element={<ScoreSignup />} />
             <Route path="/scoreapp/onboarding" element={<ScoreOnboarding />} />
