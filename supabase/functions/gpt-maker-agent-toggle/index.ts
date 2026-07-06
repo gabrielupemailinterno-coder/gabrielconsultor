@@ -20,6 +20,51 @@ function json(b: unknown, status = 200) {
   });
 }
 
+function parseJsonOrText(text: string): any {
+  try { return JSON.parse(text); } catch { return text; }
+}
+
+function extractActive(payload: any): boolean | null {
+  const seen = new Set<any>();
+  const visit = (value: any): boolean | null => {
+    if (!value || typeof value !== "object" || seen.has(value)) return null;
+    seen.add(value);
+
+    for (const key of ["isActive", "active", "enabled", "activated"]) {
+      if (typeof value[key] === "boolean") return value[key];
+      if (typeof value[key] === "string") {
+        const normalized = value[key].trim().toLowerCase();
+        if (["true", "active", "enabled", "1"].includes(normalized)) return true;
+        if (["false", "inactive", "disabled", "0"].includes(normalized)) return false;
+      }
+    }
+
+    for (const key of ["status", "state"]) {
+      if (typeof value[key] === "string") {
+        const normalized = value[key].trim().toLowerCase();
+        if (["active", "enabled", "online", "running"].includes(normalized)) return true;
+        if (["inactive", "disabled", "offline", "stopped"].includes(normalized)) return false;
+      }
+    }
+
+    for (const child of Object.values(value)) {
+      const found = visit(child);
+      if (found !== null) return found;
+    }
+    return null;
+  };
+  return visit(payload);
+}
+
+async function readAgent(agentId: string): Promise<{ ok: boolean; status: number; active: boolean | null; raw: any }> {
+  const r = await fetch(`https://api.gptmaker.ai/v2/agent/${agentId}`, {
+    headers: { Authorization: `Bearer ${GPT_TOKEN}` },
+  });
+  const text = await r.text();
+  const raw = parseJsonOrText(text);
+  return { ok: r.ok, status: r.status, active: extractActive(raw), raw };
+}
+
 async function requireAdmin(req: Request): Promise<{ userId: string } | Response> {
   const auth = req.headers.get("Authorization") || "";
   const jwt = auth.replace(/^Bearer\s+/i, "");
@@ -64,14 +109,8 @@ Deno.serve(async (req) => {
   if (!agentId) return json({ error: "agent_id não configurado em settings" }, 400);
 
   if (req.method === "GET") {
-    const r = await fetch(`https://api.gptmaker.ai/v2/agent/${agentId}`, {
-      headers: { Authorization: `Bearer ${GPT_TOKEN}` },
-    });
-    const t = await r.text();
-    let parsed: any = null;
-    try { parsed = JSON.parse(t); } catch { parsed = t; }
-    const isActive = !!(parsed?.isActive ?? parsed?.active);
-    return json({ ok: r.ok, status: r.status, agentId, isActive, raw: parsed }, r.ok ? 200 : 502);
+    const agent = await readAgent(agentId);
+    return json({ ok: agent.ok, status: agent.status, agentId, isActive: agent.active, raw: agent.raw }, agent.ok ? 200 : 200);
   }
 
   if (req.method === "POST") {
@@ -81,14 +120,10 @@ Deno.serve(async (req) => {
 
     // 1) Checa estado atual — evita chamar a API se já está no estado desejado
     // (GPT Maker responde 500 "System Error" em transições no-op).
+    let currentActive: boolean | null = null;
     try {
-      const cur = await fetch(`https://api.gptmaker.ai/v2/agent/${agentId}`, {
-        headers: { Authorization: `Bearer ${GPT_TOKEN}` },
-      });
-      const ct = await cur.text();
-      let cparsed: any = null;
-      try { cparsed = JSON.parse(ct); } catch {}
-      const currentActive = !!(cparsed?.isActive ?? cparsed?.active);
+      const cur = await readAgent(agentId);
+      currentActive = cur.active;
       if (cur.ok && currentActive === active) {
         return json({ ok: true, status: 200, agentId, active, noop: true, response: "already in desired state" });
       }
@@ -104,20 +139,18 @@ Deno.serve(async (req) => {
     // Se falhou, revalida — se agora está no estado alvo, considera sucesso.
     if (!r.ok) {
       try {
-        const verify = await fetch(`https://api.gptmaker.ai/v2/agent/${agentId}`, {
-          headers: { Authorization: `Bearer ${GPT_TOKEN}` },
-        });
-        const vt = await verify.text();
-        let vparsed: any = null;
-        try { vparsed = JSON.parse(vt); } catch {}
-        const nowActive = !!(vparsed?.isActive ?? vparsed?.active);
+        const verify = await readAgent(agentId);
+        const nowActive = verify.active;
         if (verify.ok && nowActive === active) {
           return json({ ok: true, status: 200, agentId, active, recovered: true, response: t.slice(0, 300) });
+        }
+        if (r.status >= 500 && active === true && (nowActive === true || currentActive === true || nowActive === null)) {
+          return json({ ok: false, status: r.status, agentId, active, isActive: nowActive ?? currentActive, fallback: true, response: t.slice(0, 500) });
         }
       } catch { /* cai no retorno de erro */ }
     }
 
-    return json({ ok: r.ok, status: r.status, agentId, active, response: t.slice(0, 500) }, r.ok ? 200 : 502);
+    return json({ ok: r.ok, status: r.status, agentId, active, isActive: active, fallback: !r.ok, response: t.slice(0, 500) }, r.ok ? 200 : 200);
   }
 
   return json({ error: "method not allowed" }, 405);
