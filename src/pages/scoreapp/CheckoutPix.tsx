@@ -73,12 +73,12 @@ export default function ScoreCheckoutPix() {
             </p>
             <div className="text-center font-mono text-3xl text-primary">{formatted}</div>
 
-            {profile?.cora_qr_code_url ? (
+            {profile?.cora_emv ? (
               <div className="flex justify-center">
                 <img
-                  src={profile.cora_qr_code_url}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=8&data=${encodeURIComponent(profile.cora_emv)}`}
                   alt="QR Code PIX"
-                  className="w-64 h-64 object-contain border border-border rounded-lg"
+                  className="w-64 h-64 object-contain bg-white p-2 border border-border rounded-lg"
                 />
               </div>
             ) : (
@@ -92,11 +92,23 @@ export default function ScoreCheckoutPix() {
                 <div className="bg-muted p-3 rounded-md text-xs break-all font-mono border border-border">
                   {profile.cora_emv}
                 </div>
-                <button onClick={copy} className="w-full bg-secondary text-secondary-foreground text-sm py-2 rounded-md">
-                  Copiar código PIX
+                <button onClick={copy} className="w-full bg-secondary text-secondary-foreground text-sm py-2 rounded-md flex items-center justify-center gap-2">
+                  <Copy size={14} /> Copiar código PIX
                 </button>
               </div>
             )}
+
+            {profile?.cora_qr_code_url && (
+              <a
+                href={profile.cora_qr_code_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full border border-border text-foreground text-sm py-2 rounded-md flex items-center justify-center gap-2 hover:bg-muted transition"
+              >
+                <Download size={14} /> Baixar boleto (PDF)
+              </a>
+            )}
+
 
             <p className="text-center text-xs text-muted-foreground">
               Aguardando confirmação do pagamento...
