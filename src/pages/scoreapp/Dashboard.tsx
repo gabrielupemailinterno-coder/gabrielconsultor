@@ -22,7 +22,7 @@ export default function ScoreDashboard() {
 
   const mLogs = useMemo(() => monthLogs(logs), [logs]);
   const conv = useMemo(() => computeConversions(mLogs), [mLogs]);
-  const { score, faixa } = useMemo(() => computeScore(logs, goals), [logs, goals]);
+  const { score, faixa } = useMemo(() => computeScore(logs, goals, (profile as any)?.inactivity_penalty_days ?? 0), [logs, goals, profile]);
   const diag = useMemo(() => computeDiagnostics(mLogs, goals), [mLogs, goals]);
   const badges = useMemo(() => evaluateBadges(logs, goals), [logs, goals]);
   const recTrigger = useMemo(() => recommendTrigger(logs, goals), [logs, goals]);
