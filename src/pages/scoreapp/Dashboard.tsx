@@ -34,7 +34,8 @@ export default function ScoreDashboard() {
 
   const requestAnalise = async () => {
     if (!uid) return;
-    await supabase.from("score_upsell_interests").insert({ user_id: uid, context: "analise_funil" });
+    const { error } = await supabase.from("score_upsell_requests").insert({ user_id: uid, source: "dashboard:analise_funil" });
+    if (error) { toast.error(error.message); return; }
     toast.success("Recebemos seu pedido. Vamos entrar em contato em breve.");
   };
 
