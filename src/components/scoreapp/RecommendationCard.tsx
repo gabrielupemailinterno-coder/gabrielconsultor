@@ -5,10 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import type { SmartFeedback } from "@/lib/scoreapp/types";
 import type { TriggerKey } from "@/lib/scoreapp/recommendations";
 
-export default function RecommendationCard({ triggerKey }: { triggerKey: TriggerKey }) {
+export default function RecommendationCard({ triggerKey }: { triggerKey: TriggerKey | null }) {
   const [f, setF] = useState<SmartFeedback | null>(null);
 
   useEffect(() => {
+    if (!triggerKey) { setF(null); return; }
     (async () => {
       const { data } = await supabase
         .from("score_smart_feedbacks")
