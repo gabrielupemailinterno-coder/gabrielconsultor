@@ -34,7 +34,8 @@ export default function ScoreDashboard() {
 
   const requestAnalise = async () => {
     if (!uid) return;
-    await supabase.from("score_upsell_interests").insert({ user_id: uid, context: "analise_funil" });
+    const { error } = await supabase.from("score_upsell_requests").insert({ user_id: uid, source: "dashboard:analise_funil" });
+    if (error) { toast.error(error.message); return; }
     toast.success("Recebemos seu pedido. Vamos entrar em contato em breve.");
   };
 
@@ -134,12 +135,12 @@ export default function ScoreDashboard() {
           <h3 className="font-serif text-lg mb-4">Funil de conversão</h3>
           <div className="space-y-2 text-sm">
             {[
-              ["Prospecção → contato", conv.prospToContato],
+              ["Abordagem → contato", conv.prospToContato],
               ["Contato → reunião", conv.contatoToReuniao],
               ["Reunião → apresentação", conv.reuniaoToApresentacao],
               ["Apresentação → proposta", conv.apresToProposta],
               ["Proposta → venda", conv.propToVenda],
-              ["Vendas / prospecções", conv.vendaTotal],
+              ["Vendas / abordagens", conv.vendaTotal],
             ].map(([l, v]: any, i) => (
               <div key={i} className="flex items-center justify-between gap-3">
                 <span className="text-muted-foreground">{l}</span>

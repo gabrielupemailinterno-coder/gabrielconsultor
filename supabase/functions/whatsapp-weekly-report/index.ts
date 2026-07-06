@@ -14,7 +14,7 @@ function json(b: unknown, s = 200) {
   return new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 }
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const pct = (a: number, b: number) => (b > 0 ? Math.round((a / b) * 100) : 0);
+const pct = (a: number, b: number) => (b > 0 ? Math.min(100, Math.round((a / b) * 100)) : 0);
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 function summarize(logs: any[]) {
@@ -23,8 +23,9 @@ function summarize(logs: any[]) {
   const reunioes = s("reunioes_agendadas"), apresentacoes = s("apresentacoes");
   const propostas = s("propostas"), vendas = s("vendas");
   const valor = s("valor_vendido"), atividades = s("ligacoes") + s("whatsapps");
-  return { prospeccoes, contatos, reunioes, apresentacoes, propostas, vendas, valor, atividades,
-    prospToContato: pct(contatos, prospeccoes),
+  const abordagemBase = prospeccoes >= contatos ? prospeccoes : atividades > 0 ? atividades : Math.max(prospeccoes, contatos);
+  return { prospeccoes, contatos, reunioes, apresentacoes, propostas, vendas, valor, atividades, abordagemBase,
+    prospToContato: pct(contatos, abordagemBase),
     contatoToReuniao: pct(reunioes, contatos),
     apresToProposta: pct(propostas, apresentacoes),
     propToVenda: pct(vendas, propostas) };
@@ -32,8 +33,8 @@ function summarize(logs: any[]) {
 
 function identifyGargalo(c: ReturnType<typeof summarize>): string {
   if (c.atividades === 0) return "Volume zerado — nem começou a semana.";
-  if (c.prospeccoes < 20) return "Volume baixo de prospecção.";
-  if (c.prospeccoes >= 20 && c.prospToContato < 20) return "Abordagem inicial fraca — muita prospecção, pouco contato.";
+  if (c.atividades < 20) return "Volume baixo de atividades de abordagem.";
+  if (c.abordagemBase >= 20 && c.prospToContato < 20) return "Abordagem inicial fraca — muitas abordagens, poucos contatos.";
   if (c.contatos >= 10 && c.contatoToReuniao < 25) return "Conversão de contato para reunião.";
   if (c.apresentacoes >= 3 && c.apresToProposta < 40) return "Qualificação ou condução da apresentação.";
   if (c.propostas >= 2 && c.propToVenda < 25) return "Negociação e fechamento.";
@@ -65,7 +66,7 @@ Deno.serve(async (req) => {
 `📊 Seu diagnóstico da semana (EXEMPLO):
 
 • ${c.atividades} atividades (ligações + WhatsApps)
-• ${c.prospeccoes} prospecções → ${c.contatos} contatos (${c.prospToContato}%)
+• ${c.abordagemBase} abordagens base → ${c.contatos} contatos (${c.prospToContato}%)
 • ${c.reunioes} reuniões · ${c.apresentacoes} apresentações
 • ${c.propostas} propostas → ${c.vendas} vendas (${c.propToVenda}%)
 • Faturamento: ${brl(c.valor)}
@@ -108,7 +109,7 @@ Quer que eu analise seu funil por 60 min? Responde "quero análise".`;
 `📊 Seu diagnóstico da semana ${first ? `, ${first}` : ""}:
 
 • ${c.atividades} atividades (ligações + WhatsApps)
-• ${c.prospeccoes} prospecções → ${c.contatos} contatos (${c.prospToContato}%)
+• ${c.abordagemBase} abordagens base → ${c.contatos} contatos (${c.prospToContato}%)
 • ${c.reunioes} reuniões · ${c.apresentacoes} apresentações
 • ${c.propostas} propostas → ${c.vendas} vendas (${c.propToVenda}%)
 • Faturamento: ${brl(c.valor)}

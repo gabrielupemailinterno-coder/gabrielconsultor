@@ -48,7 +48,7 @@ export function evaluateTriggers(logs: DailyLog[], goals: ScoreGoals | null): Tr
 
   // Usuário novo demais: só volume conta
   if (logs.length === 0) {
-    hits.push({ key: "volume_prospeccao", severity: 95, reason: "Você ainda não registrou nenhuma atividade." });
+    hits.push({ key: "volume_prospeccao", severity: 95, reason: "Você ainda não registrou nenhuma atividade de abordagem." });
     return hits;
   }
 
@@ -67,33 +67,33 @@ export function evaluateTriggers(logs: DailyLog[], goals: ScoreGoals | null): Tr
     });
   }
 
-  // 2. Volume de prospecção abaixo da meta acumulada
+  // 2. Volume de atividades de abordagem abaixo da meta acumulada
   if (goals) {
-    const metaProspDia = Math.max(goals.ligacoes_dia, 0) + Math.max(goals.whatsapps_dia, 0);
-    if (metaProspDia > 0) {
-      const esperado = metaProspDia * daysElapsed * 0.6;
-      if (c.prospeccoes < esperado) {
+    const metaAtivDia = Math.max(goals.ligacoes_dia, 0) + Math.max(goals.whatsapps_dia, 0);
+    if (metaAtivDia > 0) {
+      const esperado = metaAtivDia * daysElapsed * 0.6;
+      if (c.atividades < esperado) {
         hits.push({
           key: "volume_prospeccao",
           severity: 90,
-          reason: `Você fez ${c.prospeccoes} prospecções no mês (esperado ~${Math.round(esperado)}).`,
+          reason: `Você fez ${c.atividades} atividades de abordagem no mês (esperado ~${Math.round(esperado)}).`,
         });
       }
     }
-  } else if (c.prospeccoes < 20 && logs.length >= 3) {
+  } else if (c.atividades < 20 && logs.length >= 3) {
     hits.push({
       key: "volume_prospeccao",
       severity: 85,
-      reason: `Apenas ${c.prospeccoes} prospecções registradas no mês.`,
+      reason: `Apenas ${c.atividades} atividades de abordagem registradas no mês.`,
     });
   }
 
-  // 3. Abordagem fraca — muita prospecção, poucos contatos efetivos
-  if (c.prospeccoes >= 20 && c.prospToContato < 20) {
+  // 3. Abordagem fraca — muitas abordagens, poucos contatos efetivos
+  if (c.abordagemBase >= 20 && c.prospToContato < 20) {
     hits.push({
       key: "abordagem_baixa",
       severity: 80,
-      reason: `Apenas ${c.prospToContato.toFixed(0)}% das suas prospecções viram contato efetivo.`,
+      reason: `Apenas ${c.prospToContato.toFixed(0)}% das suas abordagens viraram contato efetivo.`,
     });
   }
 

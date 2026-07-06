@@ -20,15 +20,16 @@ export function computeConversions(logs: DailyLog[]) {
   const vendas = sum(logs, "vendas");
   const valor = sum(logs, "valor_vendido");
   const atividades = sum(logs, "ligacoes") + sum(logs, "whatsapps");
-  const r = (a: number, b: number) => (b > 0 ? (a / b) * 100 : 0);
+  const abordagemBase = prospeccoes >= contatos ? prospeccoes : atividades > 0 ? atividades : Math.max(prospeccoes, contatos);
+  const r = (a: number, b: number) => (b > 0 ? Math.min(100, (a / b) * 100) : 0);
   return {
-    prospeccoes, contatos, reunioes, apresentacoes, propostas, vendas, valor, atividades,
-    prospToContato: r(contatos, prospeccoes),
+    prospeccoes, contatos, reunioes, apresentacoes, propostas, vendas, valor, atividades, abordagemBase,
+    prospToContato: r(contatos, abordagemBase),
     contatoToReuniao: r(reunioes, contatos),
     reuniaoToApresentacao: r(apresentacoes, reunioes),
     apresToProposta: r(propostas, apresentacoes),
     propToVenda: r(vendas, propostas),
-    vendaTotal: r(vendas, prospeccoes),
+    vendaTotal: r(vendas, abordagemBase),
     ticketMedio: vendas > 0 ? valor / vendas : 0,
     valorPorAtividade: atividades > 0 ? valor / atividades : 0,
   };
@@ -38,7 +39,7 @@ export function computeDiagnostics(logs: DailyLog[], _goals: ScoreGoals | null):
   if (logs.length < 3) return ["Você tem poucos registros. Antes de ajustar técnica, aumente volume e constância."];
   const c = computeConversions(logs);
   const out: string[] = [];
-  if (c.prospeccoes > 20 && c.prospToContato < 20) out.push("Seu gargalo está na abordagem inicial — muitas prospecções e poucos contatos efetivos.");
+  if (c.abordagemBase > 20 && c.prospToContato < 20) out.push("Seu gargalo está na abordagem inicial — muitas abordagens e poucos contatos efetivos.");
   if (c.contatos > 10 && c.contatoToReuniao < 25) out.push("Seu gargalo está na conversão de contato para reunião.");
   if (c.apresentacoes > 4 && c.apresToProposta < 40) out.push("Seu gargalo pode estar na qualificação ou condução da apresentação.");
   if (c.propostas > 3 && c.propToVenda < 25) out.push("Seu gargalo está na negociação e fechamento.");
