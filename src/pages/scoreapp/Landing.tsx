@@ -14,6 +14,8 @@ export default function ScoreLanding() {
         navigate("/conhecascoreapp", { replace: true });
         return;
       }
+      // Sync payment status with Cora before deciding where to send the user
+      try { await supabase.functions.invoke("cora-check-invoice", { body: {} }); } catch {}
       const { data } = await supabase
         .from("score_profiles")
         .select("payment_status, plan_status, plan_expires_at")
