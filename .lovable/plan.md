@@ -1,110 +1,157 @@
 
-# Ritual diário no WhatsApp (Score Comercial)
+# Bot conversacional no WhatsApp com editor de fluxograma
 
-Transforma a plataforma de "dashboard passivo" em rotina: o bot puxa o registro todo dia às 18h, entende a resposta do usuário, atualiza o Score, cobra quem sumiu e manda diagnóstico semanal na segunda.
+Transforma o `whatsapp-inbound` de "parser único" em **motor de fluxo com estado**. A pessoa pode dizer "quero registrar do dia 12/03" (ou "ontem", "anteontem", "hoje") e o bot conduz uma conversa sequencial, pergunta a pergunta, salvando no `score_daily_logs` da data escolhida. Você edita todo o fluxo num canvas visual (React Flow) na aba admin.
 
-## Fluxo do usuário
+## O que muda para o usuário final
 
 ```
-18:00 seg-sáb  → "Bora fechar seu score de hoje?" (com botões e formato)
-Usuário responde texto livre OU "Ligações: 20, Reuniões: 3..."
-                ↓
-      Parser entende → grava em score_daily_logs → responde com o score do dia
-                ↓
-10:00 diariamente → varre inatividade:
-    2 dias sem registro → cutucada leve
-    5 dias sem registro → mensagem forte + CTA
-   10 dias sem registro → aviso de queda de Score + penalidade aplicada
-                ↓
-Seg 08:00 → diagnóstico semanal (atividades, conversão, gargalo, aula, CTA mentoria)
+Usuário: quero registrar de ontem
+Bot:     Beleza! Vou registrar seu dia 05/07. Quantas ligações você fez?
+Usuário: 25
+Bot:     E WhatsApps enviados?
+Usuário: 40
+Bot:     Reuniões realizadas?
+...
+Bot:     Registrado ✅ Score do dia 05/07: 72/100 (Bom). Streak: 4 dias 🔥
 ```
 
-## Novas edge functions
+Ou, no meio do fluxo, se colar o formato rotulado completo (`Ligações: 25\nWhatsApps: 40...`), o bot detecta, salva tudo de uma vez e vai direto pro resumo final.
 
-1. **`whatsapp-daily-checkin`** (cron 18:00 BRT, seg–sáb)
-   - Para cada `score_profiles` com `phone` e `whatsapp_opt_in=true` e sem log hoje: envia mensagem de check-in via GPT Maker (mesmo `channel_id` do admin).
-   - Grava em nova tabela `score_whatsapp_messages` (direction=out, kind=checkin).
+Comandos globais: `cancelar` / `sair` aborta a sessão. Sem timeout — retoma na próxima mensagem enquanto não completar/cancelar.
 
-2. **`whatsapp-inbound`** (webhook público que o usuário cola no GPT Maker)
-   - Recebe `{ phone, message, chatId }`.
-   - Identifica `score_profiles` pelo telefone normalizado.
-   - Parser tenta 3 caminhos em ordem:
-     1. Regex de linhas rotuladas (`Ligações: 20`, `Reuniões: 3`, aceita variações/acento/case).
-     2. Fallback: sequência de números na ordem canônica (Ligações, WhatsApps, Reuniões, Apresentações, Propostas, Vendas, Valor).
-     3. Se falhar: responde pedindo o formato + link mágico para `/scoreapp/registrar`.
-   - Sucesso: `upsert` em `score_daily_logs` da data de hoje (BRT), calcula `computeDayScore` e responde: *"Score de hoje: 78/100 (Bom). Streak: 5 dias 🔥"*.
+## Datas aceitas
 
-3. **`whatsapp-inactivity-alerts`** (cron 10:00 BRT, diário)
-   - Calcula `dias_sem_registro` por perfil. Dispara nos limites 2, 5, 10.
-   - Aos 10 dias, marca `score_profiles.inactivity_penalty_days` e o cálculo do Score global aplica -X pts (visível na home).
-   - Deduplica por dia via `score_whatsapp_messages` (não manda o mesmo alerta 2x no mesmo ciclo).
+- **Relativas:** `hoje`, `ontem`, `anteontem`
+- **Numéricas:** `12/03`, `12/03/2026`, `12-03` (ano default = atual, se resultar em futuro assume ano anterior)
+- **Validação:** máximo 7 dias atrás. Fora disso, bot responde "Só consigo registrar até 7 dias atrás. Qual outra data?"
 
-4. **`whatsapp-weekly-report`** (cron seg 08:00 BRT)
-   - Roda por perfil ativo: agrega últimos 7 dias, calcula conversões, identifica maior gargalo (reusa `evaluateTriggers` de `src/lib/scoreapp/recommendations.ts`), monta texto e envia.
+## Editor visual no admin (nova aba "Fluxo do Bot")
 
-## Mudanças no schema
+Canvas React Flow com drag-and-drop. Tipos de nó:
 
-Migration cria:
+| Tipo | O que faz | Config |
+|---|---|---|
+| **Gatilho** | Frase(s) que iniciam o fluxo. Ex: "registrar", "quero registrar" | Lista de regex |
+| **Mensagem** | Envia texto puro (aceita `{{nome}}`, `{{data}}`, `{{campo.X}}`) | Texto |
+| **Pergunta** | Envia texto, aguarda resposta, salva em variável de sessão + valida (número, data, texto livre) | Texto, nome da variável, validação, mensagem de erro |
+| **Condição** | Ramifica: `if variavel.vendas > 0 → A, else → B` | Expressão simples |
+| **Ação** | Efeitos colaterais: `salvar_log`, `zerar_penalidade`, `enviar_score_do_dia` | Tipo + params |
+| **Fim** | Encerra sessão, opcionalmente envia mensagem final | Texto opcional |
 
-- `score_whatsapp_messages` (id, user_id, phone, direction in|out, kind checkin|alert|weekly|inbound|reply, payload jsonb, sent_at, error). Serve de log + deduplicação.
-- `score_profiles.whatsapp_opt_in boolean default true`
-- `score_profiles.whatsapp_last_checkin_at timestamptz`
-- `score_profiles.inactivity_penalty_days int default 0`
+Recursos do canvas:
+- Zoom, pan, minimap.
+- Duplo clique no nó abre painel lateral com config.
+- Arestas com label (para condições: "sim"/"não").
+- Botão "Testar no meu WhatsApp" que simula o fluxo enviando pro seu número.
+- Versionamento simples: cada save cria snapshot, "Reverter para versão anterior".
+- Toggle **Ativo/Rascunho** por fluxo (só o ativo responde no WhatsApp).
 
-Grants + RLS: usuário lê só as suas mensagens; service_role escreve tudo.
-
-## Agendamentos (pg_cron + pg_net)
-
-Três jobs em BRT (America/Sao_Paulo, cron em UTC):
-- `whatsapp-daily-checkin` → `0 21 * * 1-6` (18h BRT seg–sáb)
-- `whatsapp-inactivity-alerts` → `0 13 * * *` (10h BRT)
-- `whatsapp-weekly-report` → `0 11 * * 1` (8h BRT segunda)
-
-Inseridos via `supabase--insert` (não migration) porque incluem o service-role bearer.
-
-## Streak e penalidade
-
-- Novo helper `computeStreak(userId)` em `src/lib/scoreapp/streak.ts`: conta dias consecutivos com log até hoje.
-- Home (`Dashboard.tsx`) ganha bloco compacto: "🔥 Streak: N dias" + aviso quando `inactivity_penalty_days > 0`.
-- `computeOverallScore` passa a subtrair `min(20, penalty_days * 2)` pts quando houver penalidade.
-
-## Admin / configuração
-
-- Em `src/pages/Admin.tsx` → nova aba **"WhatsApp Ritual"** com:
-  - URL do webhook para colar no GPT Maker: `https://<project>.functions.supabase.co/whatsapp-inbound`
-  - Toggle master (liga/desliga todos os disparos).
-  - Editor dos 4 templates de mensagem (check-in, alerta 2d, alerta 5d, alerta 10d, semanal). Guardados em `settings` (jsonb `whatsapp_templates`).
-  - Botão "Enviar teste para o meu número".
-
-- Em `src/pages/scoreapp/Configuracoes.tsx` (ou perfil): toggle **"Receber check-in diário no WhatsApp"** que grava `whatsapp_opt_in`.
-
-## Parser — regras de robustez
-
-- Normaliza telefone com `phone_e164` (mesma função já usada em contacts).
-- Aceita apelidos: `ligações|calls|call`, `whats|whatsapps|zap`, `reunião|reuniao|meeting`, `apresentação|apresentacao|pitch|demo`, `proposta|propostas|orçamento`, `venda|vendas|fechei`, `valor|faturamento|R$`.
-- `Valor` aceita `R$ 12.500,00`, `12500`, `12k`.
-- Se só vier número solto (ex.: "vendi 2 hoje"), pergunta 1x pelo formato completo antes de gravar.
-- Idempotente: dois envios no mesmo dia fazem `upsert` (sobrescreve).
+Fluxos vêm com 2 templates pré-populados (você pode editar/desativar):
+1. **Registro de hoje** — gatilhos `["registrar", "score de hoje"]`, pergunta os 9 campos em sequência.
+2. **Registro de data específica** — gatilho `"registrar do dia"`, pergunta a data primeiro, valida, depois os campos.
 
 ## Detalhes técnicos
 
-- Reaproveita helper `sendToPhone` extraído para `supabase/functions/_shared/gpt-maker.ts` (usado por `send-message`, `dispatch-scheduled` e as 4 novas funções).
-- `whatsapp-inbound` é público (`verify_jwt = false` em `config.toml`), mas exige header `X-Webhook-Token` = secret novo `GPT_MAKER_WEBHOOK_TOKEN` (gerado com `generate_secret`).
-- Timezone: todo cálculo de "hoje" usa `America/Sao_Paulo` (helper `todayBRT()` em `src/lib/scoreapp/tz.ts` + versão Deno na função).
-- Rate limit natural: crons processam em lote de 50 por execução, com delay de `settings.delay_seconds` entre envios.
-- Logs de erro do GPT Maker vão para `score_whatsapp_messages.error` + `console.error` (visível em `edge_function_logs`).
+### Banco de dados (migration)
+
+```sql
+-- Fluxos editáveis no admin
+CREATE TABLE public.bot_flows (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  triggers jsonb NOT NULL DEFAULT '[]',        -- ["registrar", "quero registrar"]
+  graph jsonb NOT NULL,                        -- { nodes: [...], edges: [...] } no formato React Flow
+  is_active boolean NOT NULL DEFAULT false,
+  priority int NOT NULL DEFAULT 0,             -- ordem de match quando > 1 fluxo bate
+  version int NOT NULL DEFAULT 1,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- Histórico de versões
+CREATE TABLE public.bot_flow_versions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  flow_id uuid NOT NULL REFERENCES public.bot_flows(id) ON DELETE CASCADE,
+  version int NOT NULL,
+  graph jsonb NOT NULL,
+  created_at timestamptz DEFAULT now(),
+  created_by uuid
+);
+
+-- Estado da conversa por telefone
+CREATE TABLE public.bot_sessions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  phone text NOT NULL UNIQUE,
+  user_id uuid,
+  flow_id uuid REFERENCES public.bot_flows(id) ON DELETE SET NULL,
+  current_node_id text,
+  variables jsonb NOT NULL DEFAULT '{}',       -- { data: "2026-07-05", ligacoes: 25, ... }
+  started_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+```
+
+Grants + RLS: só admin lê/edita `bot_flows` e versões; `bot_sessions` acessível só via service_role (edge functions).
+
+### Motor de fluxo (`supabase/functions/_shared/bot-engine.ts`)
+
+Função `runFlow({ session, userMessage, context })` que:
+1. Lê `current_node_id` da sessão.
+2. Se resposta = comando global (`cancelar`), encerra.
+3. Se nó atual é "Pergunta", tenta o fallback rotulado (parser existente) antes de aceitar single-field.
+4. Valida input conforme tipo (numero, data, texto).
+5. Executa ação do nó atual → pega próximo nó pela aresta correspondente.
+6. Se próximo é "Mensagem" ou "Pergunta", envia texto (com interpolação).
+7. Se "Ação", executa (ex: `upsert score_daily_logs` na data de `variables.data`).
+8. Retorna próximas mensagens a enviar.
+
+### Refactor `whatsapp-inbound/index.ts`
+
+- Log inbound (como hoje).
+- Localiza perfil.
+- Busca `bot_sessions` pelo telefone. Se existir → continua fluxo.
+- Se não existir → tenta casar `triggers` de fluxos ativos (por prioridade). Match → cria sessão + roda primeiro nó.
+- Se nenhum trigger casar → mantém comportamento atual (parser one-shot) como fallback pra retrocompatibilidade.
+- Envia respostas via `sendWhatsApp` + loga em `score_whatsapp_messages` com `kind: "bot_step"`.
+
+### Parser de data (novo helper `_shared/date-parser.ts`)
+
+Função `parseUserDate(text): { date: string, ok: boolean, reason?: string }`:
+- Regex para relativas (`hoje|ontem|anteontem`) + `dd/mm(/aaaa)?` + `dd-mm(-aaaa)?`.
+- Assume BRT.
+- Rejeita datas > 7 dias no passado ou no futuro.
+
+### Frontend — nova aba admin
+
+Arquivos:
+- `src/components/admin/BotFlowsAdmin.tsx` — lista de fluxos, botões "Novo", "Editar", "Ativar", "Duplicar", "Excluir", "Testar".
+- `src/components/admin/BotFlowEditor.tsx` — canvas React Flow, painel lateral de config do nó selecionado, barra superior com Salvar / Publicar / Reverter versão.
+- `src/components/admin/BotFlowNode.tsx` — componentes visuais por tipo de nó (cores + ícones distintos).
+- `src/components/admin/BotFlowSidebar.tsx` — form dinâmico conforme tipo do nó.
+
+Instala `reactflow` (`bun add reactflow`).
+
+Integração em `src/pages/Admin.tsx`: adiciona aba "Fluxo do Bot" ao lado da "Ritual WhatsApp".
+
+### Seed dos 2 fluxos padrão
+
+Migration insere via `INSERT` os dois templates prontos (registro de hoje + registro de data específica), com `is_active = true` para o primeiro.
 
 ## Ordem de implementação
 
-1. Migration (`score_whatsapp_messages`, colunas em `score_profiles`, coluna `whatsapp_templates` em `settings`) + grants + RLS.
-2. Helper `_shared/gpt-maker.ts` + `src/lib/scoreapp/streak.ts` + `tz.ts`.
-3. Edge functions: `whatsapp-inbound` → `whatsapp-daily-checkin` → `whatsapp-inactivity-alerts` → `whatsapp-weekly-report`.
-4. Cron jobs via `supabase--insert`.
-5. UI: aba Admin "WhatsApp Ritual" + toggle no perfil + streak no Dashboard.
-6. Teste ponta-a-ponta: botão "Enviar teste" + simulação de webhook inbound via `curl_edge_functions`.
+1. Migration (`bot_flows`, `bot_flow_versions`, `bot_sessions`) + grants + RLS + seed dos 2 fluxos.
+2. `bun add reactflow`.
+3. Helpers `_shared/bot-engine.ts` + `_shared/date-parser.ts`.
+4. Refactor `whatsapp-inbound/index.ts` para usar o motor (mantém fallback do parser atual).
+5. UI admin: `BotFlowsAdmin` + `BotFlowEditor` + nós customizados + botão de teste.
+6. Endpoint `bot-flow-test` (nova edge function): dispara execução simulada pro número do admin.
+7. Testes ponta-a-ponta via `curl_edge_functions`: "quero registrar de ontem" → fluxo completo → linha em `score_daily_logs` com data D-1.
 
-## O que fica de fora deste plano (posso incluir se quiser)
+## O que fica de fora (posso adicionar se pedir)
 
-- Botões interativos nativos do WhatsApp (GPT Maker envia texto; botões dependem de template HSM aprovado — sugiro fase 2).
-- Comunidade / desafio semanal em grupo (item 8 da sua lista) — precisa decidir se é grupo único ou por turma.
-- "Missão do dia" na home ao logar — fácil de acoplar depois de o streak estar rodando.
+- Botões interativos nativos do WhatsApp (depende de template HSM aprovado).
+- Fluxos com envio agendado a partir de nó (hoje só os crons já existentes disparam).
+- A/B testing entre versões de fluxo.
+- Analytics por nó (taxa de abandono em cada pergunta).
+
