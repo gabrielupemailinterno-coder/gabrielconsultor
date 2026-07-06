@@ -125,10 +125,22 @@ export default function BotFlowEditor({ flow, onBack }: { flow: Flow; onBack: ()
         </div>
       </div>
 
-      <div className="px-4 py-2 border-b border-border bg-card/50">
-        <label className="text-xs uppercase tracking-wider text-muted-foreground">Gatilhos (separados por vírgula)</label>
+      <div className="px-4 py-3 border-b border-border bg-amber-500/5">
+        <div className="flex items-baseline justify-between mb-1">
+          <label className="text-xs uppercase tracking-wider font-semibold text-amber-700 dark:text-amber-300">
+            🎯 Gatilhos (frases que iniciam este fluxo no WhatsApp)
+          </label>
+          <span className="text-[11px] text-muted-foreground">separe por vírgula · não diferencia maiúscula/minúscula · casa se a frase do usuário CONTÉM o gatilho</span>
+        </div>
         <input value={triggers} onChange={(e) => setTriggers(e.target.value)}
-          className="w-full bg-transparent text-sm mt-1 outline-none" placeholder="registrar, quero registrar, score de hoje" />
+          className="w-full bg-background border border-border rounded px-3 py-2 text-sm font-mono"
+          placeholder="ex: registrar, quero registrar, score de hoje" />
+        <div className="mt-2 flex flex-wrap gap-1">
+          {triggers.split(",").map((t) => t.trim()).filter(Boolean).map((t) => (
+            <span key={t} className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-800 dark:text-amber-200">{t}</span>
+          ))}
+          {!triggers.trim() && <span className="text-xs text-muted-foreground italic">nenhum gatilho — o fluxo não vai iniciar sozinho</span>}
+        </div>
       </div>
 
       <div className="flex" style={{ height: "70vh" }}>
