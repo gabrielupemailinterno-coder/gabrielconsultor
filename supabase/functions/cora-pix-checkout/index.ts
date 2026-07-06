@@ -2,7 +2,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@3";
 
-const CORA_BASE = "https://api.cora.com.br";
+const CORA_BASE = "https://matls-clients.api.cora.com.br";
 const TOKEN_URL = "https://matls-clients.api.cora.com.br/token";
 
 const prices: Record<string, { amount: number; description: string; recurring: boolean }> = {
