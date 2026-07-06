@@ -20,7 +20,7 @@ function json(b: unknown, status = 200) {
   });
 }
 
-async function getAdminSettings(admin: any) {
+async function getAdminSettings(admin: ReturnType<typeof createClient>) {
   const { data: settingsRows, error: settingsErr } = await admin
     .from("settings")
     .select("channel_id, delay_seconds, updated_at")
