@@ -397,7 +397,7 @@ Deno.serve(async (req) => {
         variables: sessionRow.variables || {},
       };
       const step = await continueSession(flowRow.graph, session, message, { profileName: profile.full_name });
-      await persistAndReply(admin, channelId, phone, profile, step);
+      await persistAndReply(admin, channelId, phone, profile, step, chatIdIn);
       return json({
         ok: true,
         mode: "continue",
@@ -430,7 +430,7 @@ Deno.serve(async (req) => {
 
   if (matched && matchedDebug) {
     const step = await startSession(matched, phone, profile.user_id, { profileName: profile.full_name });
-    await persistAndReply(admin, channelId, phone, profile, step);
+    await persistAndReply(admin, channelId, phone, profile, step, chatIdIn);
     return json({
       ok: true,
       mode: "start",
