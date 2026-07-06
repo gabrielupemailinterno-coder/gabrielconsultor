@@ -78,12 +78,45 @@ Deno.serve(async (req) => {
     let body: any = {};
     try { body = await req.json(); } catch {}
     const active = !!body?.active;
+
+    // 1) Checa estado atual — evita chamar a API se já está no estado desejado
+    // (GPT Maker responde 500 "System Error" em transições no-op).
+    try {
+      const cur = await fetch(`https://api.gptmaker.ai/v2/agent/${agentId}`, {
+        headers: { Authorization: `Bearer ${GPT_TOKEN}` },
+      });
+      const ct = await cur.text();
+      let cparsed: any = null;
+      try { cparsed = JSON.parse(ct); } catch {}
+      const currentActive = !!(cparsed?.isActive ?? cparsed?.active);
+      if (cur.ok && currentActive === active) {
+        return json({ ok: true, status: 200, agentId, active, noop: true, response: "already in desired state" });
+      }
+    } catch { /* segue para o PUT */ }
+
     const path = active ? "active" : "inactive";
     const r = await fetch(`https://api.gptmaker.ai/v2/agent/${agentId}/${path}`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${GPT_TOKEN}` },
     });
     const t = await r.text();
+
+    // Se falhou, revalida — se agora está no estado alvo, considera sucesso.
+    if (!r.ok) {
+      try {
+        const verify = await fetch(`https://api.gptmaker.ai/v2/agent/${agentId}`, {
+          headers: { Authorization: `Bearer ${GPT_TOKEN}` },
+        });
+        const vt = await verify.text();
+        let vparsed: any = null;
+        try { vparsed = JSON.parse(vt); } catch {}
+        const nowActive = !!(vparsed?.isActive ?? vparsed?.active);
+        if (verify.ok && nowActive === active) {
+          return json({ ok: true, status: 200, agentId, active, recovered: true, response: t.slice(0, 300) });
+        }
+      } catch { /* cai no retorno de erro */ }
+    }
+
     return json({ ok: r.ok, status: r.status, agentId, active, response: t.slice(0, 500) }, r.ok ? 200 : 502);
   }
 
