@@ -34,6 +34,8 @@ export default function WhatsAppSettingsTab() {
   const [discovery, setDiscovery] = useState<Discovery | null>(null);
   const [hookStatus, setHookStatus] = useState<any>(null);
   const [hookLoading, setHookLoading] = useState(false);
+  const [agentStatus, setAgentStatus] = useState<{ isActive: boolean } | null>(null);
+  const [agentLoading, setAgentLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -65,6 +67,32 @@ export default function WhatsAppSettingsTab() {
       toast.error("Falhou: " + JSON.stringify((data as any)?.response || data));
     }
   };
+
+  const checkAgent = async () => {
+    setAgentLoading(true);
+    const { data, error } = await supabase.functions.invoke("gpt-maker-agent-toggle", { method: "GET" });
+    setAgentLoading(false);
+    if (error) return toast.error("Erro: " + error.message);
+    if ((data as any)?.error) return toast.error((data as any).error);
+    setAgentStatus({ isActive: !!(data as any)?.isActive });
+  };
+
+  const toggleAgent = async (active: boolean) => {
+    setAgentLoading(true);
+    const { data, error } = await supabase.functions.invoke("gpt-maker-agent-toggle", {
+      method: "POST", body: { active },
+    });
+    setAgentLoading(false);
+    if (error) return toast.error("Erro: " + error.message);
+    if ((data as any)?.ok) {
+      toast.success(active ? "Agente reativado" : "Agente desligado ✅");
+      await checkAgent();
+    } else {
+      toast.error("Falhou: " + JSON.stringify((data as any)?.response || data));
+    }
+  };
+
+
 
 
   const save = async () => {
@@ -233,6 +261,36 @@ export default function WhatsAppSettingsTab() {
           </div>
         )}
       </div>
+
+      <div className="bg-card border border-border rounded-lg p-6 space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-serif text-lg">Estado do agente na GPT Maker</h3>
+          <div className="flex gap-2">
+            <button onClick={checkAgent} disabled={agentLoading || !settings.agent_id} className="text-sm px-3 py-1.5 border border-border rounded hover:bg-secondary/40 disabled:opacity-50">
+              {agentLoading ? <Loader2 className="animate-spin" size={14} /> : "Verificar"}
+            </button>
+            {agentStatus?.isActive !== false ? (
+              <button onClick={() => toggleAgent(false)} disabled={agentLoading || !settings.agent_id} className="text-sm px-3 py-1.5 bg-destructive text-destructive-foreground rounded disabled:opacity-50">
+                Desligar agente
+              </button>
+            ) : (
+              <button onClick={() => toggleAgent(true)} disabled={agentLoading || !settings.agent_id} className="text-sm px-3 py-1.5 bg-primary text-primary-foreground rounded disabled:opacity-50">
+                Reativar agente
+              </button>
+            )}
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Com o agente <strong>desligado</strong>, apenas o fluxo do bot desta plataforma responde às mensagens — sem risco de resposta dupla nem consumo de créditos de IA da GPT Maker. Recomendado. <strong>Não precisa treinar o agente</strong>: o fluxo (perguntas, validação, cálculo de score) roda inteiro aqui.
+        </p>
+        {agentStatus && (
+          <div className="text-xs bg-background border border-border rounded p-3 font-mono">
+            Status: {agentStatus.isActive ? "⚠️ ATIVO (pode responder junto)" : "✅ INATIVO (só nosso fluxo responde)"}
+          </div>
+        )}
+      </div>
+
+
 
 
 
