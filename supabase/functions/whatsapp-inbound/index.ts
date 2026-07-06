@@ -165,6 +165,8 @@ Deno.serve(async (req) => {
   const phone = normalizePhone(rawPhone);
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
+  console.log("[inbound] phone=", phone, "email=", email, "message=", JSON.stringify(message));
+
   await admin.from("score_whatsapp_messages").insert({
     phone: phone || "unknown", direction: "in", kind: "inbound",
     payload: { message, email, raw: body },
@@ -233,6 +235,9 @@ Deno.serve(async (req) => {
   }));
   const matchedDebug = matchFlowDebug(flows, message);
   const matched = matchedDebug?.flow ?? null;
+  console.log("[inbound] flows_ativos=", flows.length,
+    "flows=", JSON.stringify(flows.map((f) => ({ name: f.name, priority: f.priority, triggers: f.triggers }))),
+    "matched=", matched ? `${matched.name} (trigger=${matchedDebug?.trigger})` : "NONE");
 
   if (matched && matchedDebug) {
     const step = await startSession(matched, phone, profile.user_id, { profileName: profile.full_name });
