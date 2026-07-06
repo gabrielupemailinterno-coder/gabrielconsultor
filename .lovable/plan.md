@@ -1,64 +1,81 @@
-# Simulador de Receita | Vendedores UP
+## Score Comercial — plataforma dentro do sistema atual
 
-Observação: não consigo criar um projeto Lovable novo a partir daqui. Vou criar a página como uma **rota isolada** neste projeto (`/simulador-up`), sem link no menu nem dependência do site do Gabriel Consultor. Fica 100% autônoma — você acessa direto pela URL e pode compartilhar no WhatsApp. Se preferir um projeto separado de verdade, me avise que te passo o passo pra duplicar.
+Nova área em `/scoreapp` para vendedores registrarem rotina, verem métricas, score e conteúdos. Reaproveita autenticação, layout, tokens de design e admin já existentes. Não é CRM.
 
-Sem formulário de lead com persistência — o form final é só visual (mostra "Recebemos seu interesse" ao enviar), conforme você indicou.
+### 1. Rotas (React Router em `src/App.tsx`)
 
-## O que vou construir
+Público:
+- `/scoreapp` — landing curta + CTA (cadastro/login)
+- `/scoreapp/login` — login
+- `/scoreapp/cadastro` — signup (nome, email, telefone, profissão/segmento, nível de experiência, origem do lead, aceite de termos)
 
-Arquivo único: `src/pages/SimuladorUP.tsx`, registrado em `src/App.tsx` como `/simulador-up`. Sem tocar em nada do site atual.
+Autenticado (vendedor):
+- `/scoreapp/onboarding` — meta mensal, ticket médio, nº vendas, ligações/dia, whatsapps/dia, apresentações/semana, propostas/semana, segmento
+- `/scoreapp/app` — dashboard pessoal (KPIs, % da meta, conversões, evolução semanal, score, diagnóstico, badges)
+- `/scoreapp/app/registrar` — formulário rápido do dia (<2 min, mobile first)
+- `/scoreapp/app/historico` — lista de registros diários
+- `/scoreapp/app/conteudos` — biblioteca de módulos
+- `/scoreapp/app/conteudos/:slug` — módulo (vídeo embed + material + marcar concluído)
+- `/scoreapp/app/planos` — Mensal R$ 9,70 / Semestral R$ 49,70 (checkout externo — botão placeholder para Asaas depois)
 
-### Seções (single page, scroll)
+Admin (dentro do `/admin` atual, nova aba "Score Comercial"):
+- Lista de usuários Score, filtros, tags de temperatura, detalhes, exportação.
 
-1. **Hero** — Título "Simule sua receita como vendedor UP", subtítulo, CTA "Começar simulação" (scroll suave até o simulador).
-2. **Explicativo** — Texto curto + 2 cards lado a lado: "Lead Marketing 2%–3%" e "Captação Própria 3%–4%".
-3. **Simulador** — Form reativo:
-   - Select de Produto (Veneza R$350k, Montrezor R$850k, Park Europa R$210k, Park Alterosas R$210k com badge "Lançamento")
-   - Radio de Origem (Lead Marketing / Captação Própria)
-   - Input numérico de Quantidade (mín. 1, validado)
-   - Cálculo atualiza em tempo real (`useMemo`)
-4. **Resultado** — Card grande com produto, valor médio, origem, qtd, comissão min/max por venda, receita total min/max, e o texto de impacto.
-5. **Comparativo** — Tabela responsiva com os 4 produtos × faixas Marketing/Captação (vira lista de cards no mobile).
-6. **CTA final** — "Quero fazer parte do time UP" abre Dialog com campos Nome, WhatsApp (máscara BR), Cidade, 2 radios Sim/Não, textarea de experiência. Submit mostra toast de confirmação (sem backend).
-7. **Aviso legal** — Texto pequeno, muted, rodapé da página.
+### 2. Banco de dados (Lovable Cloud)
 
-### Regras de cálculo
+Novas tabelas no schema `public` (todas com RLS + GRANTs; usuário só vê o próprio, admin vê tudo via `has_role`):
 
-```text
-valor = preço médio do produto
-qtd   = max(1, input)
-se origem = Marketing:  min = valor * 0.02, max = valor * 0.03
-se origem = Captação:   min = valor * 0.03, max = valor * 0.04
-receita_min = min * qtd
-receita_max = max * qtd
-```
+- `score_profiles` — 1:1 com `auth.users`. Campos: full_name, email, phone, profession, experience_level, lead_origin, accepted_terms_at, segment, plan (`free|mensal|semestral`), plan_started_at, plan_expires_at, last_seen_at.
+- `score_goals` — meta_mensal_valor, ticket_medio, meta_vendas, ligacoes_dia, whatsapps_dia, apresentacoes_semana, propostas_semana, segmento, effective_from.
+- `score_daily_logs` — user_id, date (unique por user+date), ligacoes, whatsapps, prospeccoes, contatos_efetivos, reunioes_agendadas, apresentacoes, propostas, vendas, valor_vendido, observacoes.
+- `score_content_modules` — categoria, slug, título, descrição, video_url, material_url, sort_order, published. Gerenciado pelo admin.
+- `score_content_progress` — user_id, module_id, completed_at.
+- `score_badges` — user_id, badge_key, earned_at (único).
+- `score_upsell_interests` — user_id, context (ex.: "análise individual do funil"), created_at.
 
-Formatação: `Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })`.
+Trigger simples para popular `score_profiles` no signup via `handle_new_user` existente (adaptar/estender).
 
-### Design
+### 3. Cálculos (client-side em `src/lib/scoreapp/`)
 
-- Visual moderno comercial premium, dark-friendly mas otimizado pra mobile (WhatsApp).
-- Paleta independente do site Gabriel (não usa os tokens grafite/laranja) — proponho:
-  - Base: branco off (#FAFAF7) com seções escuras (#0B1220) alternadas
-  - Acento: verde-dinheiro premium (#0E9F6E) + dourado sutil (#C9A227) pros números grandes
-  - Tipografia: **Sora** (títulos, peso 700) + **Inter** (texto) via `@fontsource`
-- Números de comissão grandes (text-5xl/6xl), animação sutil de count-up ao recalcular.
-- Cards com borda fina, sombra suave, hover discreto.
-- Layout mobile-first: tudo em coluna, simulador sticky-friendly, tabela vira cards empilhados <768px.
+- `computeConversions(logs)` — prospecções→contatos, contatos→reuniões, reuniões→apresentações, apresentações→propostas, propostas→vendas, vendas/prospecções, ticket médio, valor/atividade.
+- `computeDiagnostics(logs, goals)` — retorna array de insights por gargalo (regras do briefing).
+- `computeScore(logs, goals)` — 0–100 ponderando consistência (dias preenchidos/dias corridos), cumprimento de metas diárias, evolução semanal, conversão, volume, resultado. Retorna faixa: Iniciante / Em construção / Em evolução / Alta performance / Elite.
+- `computeBadges(logs)` — verifica e concede badges (primeiro registro, 7/30 dias consistência, primeira venda, 100/500/1000 ligações, meta semanal, meta mensal).
+- `computeTemperature(profile, logs, goals)` — frio / ativação / engajado / quente-mentoria (regras do briefing).
 
-### Detalhes técnicos
+Recalcado no load do dashboard e após cada registro; badges gravados no banco quando conquistados.
 
-- Componentes shadcn já presentes: `Card`, `Button`, `Input`, `Label`, `Select`, `RadioGroup`, `Dialog`, `Textarea`, `Badge`, `Table`, `toast`.
-- Tokens novos isolados via classes utility na própria página (sem poluir `index.css` global) — uso `style={{}}` ou Tailwind arbitrary values pros 2-3 acentos específicos da UP, mantendo o resto do app intacto.
-- Fontes: `bun add @fontsource/sora @fontsource/inter`, import só dentro da página via `main.tsx`.
-- SEO: `<title>` e `meta description` setados via efeito na rota, H1 único, viewport responsivo (já global).
-- Sem chamadas a Supabase, sem secrets, sem edge functions.
+### 4. UI (mobile first, mesma linguagem visual)
 
-### Arquivos
+- Reuso de tokens `index.css` (grafite, laranja acento, off-white), tipografia Libre Baskerville + Inter + IBM Plex Mono para KPIs.
+- Componentes shadcn já existentes (Card, Button, Input, Tabs, Dialog, Progress, Badge).
+- Novo `src/components/scoreapp/ScoreLayout.tsx` com header próprio + bottom nav mobile (Dashboard, Registrar, Conteúdos, Perfil).
+- Dashboard em cards: Meta (progress ring), KPIs do mês, Funil de conversão, Score (número grande + faixa + barra), Diagnóstico (lista), Badges, Evolução semanal (gráfico simples com Recharts já disponível).
+- Formulário do dia: campos numéricos grandes, teclado numérico, submit único.
 
-- **Novo:** `src/pages/SimuladorUP.tsx`
-- **Editar:** `src/App.tsx` (1 rota nova)
-- **Editar:** `src/main.tsx` (2 imports de fonte)
-- **Editar:** `package.json` via `bun add`
+### 5. Painel admin
 
-Confirma que posso seguir?
+Nova aba "Score" em `src/pages/Admin.tsx`:
+- KPIs topo: total usuários, ativos (log nos últimos 7d), inativos, top preenchedores, top score, baixo score.
+- Tabela: nome, contato, segmento, origem, plano, cadastro, último acesso, score, temperatura (badge colorido), botão "Ver detalhes".
+- Detalhe do usuário: perfil, metas, últimos logs, score, diagnóstico atual, botão "Virar mentorado" (reusa `InviteMenteeDialog`).
+- Gerenciamento dos módulos de conteúdo (CRUD simples).
+
+### 6. Pagamento
+
+Botões nos planos disparam a mesma edge function `asaas-create-checkout` (novo parâmetro `product: "scoreapp_mensal" | "scoreapp_semestral"` com valores 9,70 e 49,70). Sem cobrança implementada agora além do checkout — resto fica placeholder para ativar depois.
+
+### 7. Entrega em fases
+
+1. Migração DB (tabelas + RLS + GRANTs + trigger de profile).
+2. Auth/rotas + cadastro + onboarding.
+3. Registro diário + dashboard + cálculos + score + diagnóstico + badges.
+4. Área de conteúdos + progresso.
+5. Aba admin Score + tags de temperatura + CRUD de módulos.
+6. Planos + botão "Quero análise individual" (grava em `score_upsell_interests`).
+
+### Pontos que preciso confirmar antes de codar
+
+1. **Login separado ou compartilhado?** O login do Score usa a mesma conta Supabase do portal de mentorados (um usuário pode ser as duas coisas), ou é um cadastro totalmente isolado? Recomendo compartilhado: mesmo `auth.users`, papel novo `scoreapp_user` em `user_roles`, e a pessoa cai no `/scoreapp/app` quando entra por lá.
+2. **Conteúdos iniciais**: começo com os 13 módulos listados só com título/descrição (sem vídeo) para você preencher depois no admin, ok?
+3. **Checkout**: ativo o botão pagando via Asaas agora (usando a função existente) ou deixo só o CTA gravando interesse e a gente liga depois?
