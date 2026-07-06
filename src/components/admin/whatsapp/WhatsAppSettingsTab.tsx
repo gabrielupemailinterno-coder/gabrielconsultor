@@ -34,6 +34,8 @@ export default function WhatsAppSettingsTab() {
   const [discovery, setDiscovery] = useState<Discovery | null>(null);
   const [hookStatus, setHookStatus] = useState<any>(null);
   const [hookLoading, setHookLoading] = useState(false);
+  const [agentStatus, setAgentStatus] = useState<{ isActive: boolean } | null>(null);
+  const [agentLoading, setAgentLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
