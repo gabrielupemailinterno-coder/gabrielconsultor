@@ -24,28 +24,13 @@ const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const WEBHOOK_TOKEN = Deno.env.get("GPT_MAKER_WEBHOOK_TOKEN");
 const GPT_TOKEN = Deno.env.get("GPT_MAKER_API_TOKEN");
 
-// Best-effort: garante que o agente da GPT Maker esteja INATIVO.
-// Usado quando settings.webhook_only_mode = true, para bloquear qualquer
-// resposta automática do agente (só o nosso fluxo responde).
-async function enforceAgentInactive(agentId: string) {
-  if (!GPT_TOKEN || !agentId) return;
-  try {
-    const r = await fetch(`https://api.gptmaker.ai/v2/agent/${agentId}`, {
-      headers: { Authorization: `Bearer ${GPT_TOKEN}` },
-    });
-    if (!r.ok) return;
-    const data = await r.json().catch(() => ({}));
-    const isActive = !!(data?.isActive ?? data?.active);
-    if (!isActive) return;
-    await fetch(`https://api.gptmaker.ai/v2/agent/${agentId}/inactive`, {
-      method: "PUT",
-      headers: { Authorization: `Bearer ${GPT_TOKEN}` },
-    });
-    console.log("[inbound] webhook_only_mode: agente estava ativo, foi desligado");
-  } catch (e) {
-    console.warn("[inbound] enforceAgentInactive falhou:", (e as Error).message);
-  }
-}
+// NOTA: NÃO forçamos mais o agente da GPT Maker para inativo aqui.
+// Descoberta em produção: quando o agente está inativo, a GPT Maker
+// deixa de disparar `onNewMessage` para as mensagens seguintes da mesma
+// interação — só a primeira mensagem chega ao webhook, e o fluxo trava
+// depois da primeira pergunta. Mantemos o agente ativo; o "modo somente
+// webhook" agora é garantido pelo prompt/treinamento do agente na GPT
+// Maker (ex.: "não responda nada"), e nós já respondemos primeiro.
 
 function json(b: unknown, status = 200) {
   return new Response(JSON.stringify(b), {
@@ -221,10 +206,9 @@ Deno.serve(async (req) => {
   const settings = await getAdminSettings(admin);
   const channelId = settings?.channel_id || null;
 
-  // Modo "somente webhook": mantém o agente desligado a cada inbound (best-effort).
-  if (settings?.webhook_only_mode && settings?.agent_id) {
-    enforceAgentInactive(settings.agent_id).catch(() => {});
-  }
+  // (removido) enforce agent inactive — quebrava o recebimento das mensagens
+  // seguintes da mesma interação na GPT Maker.
+
 
   if (!profile) {
     if (channelId) await sendWhatsApp(channelId, phone,
