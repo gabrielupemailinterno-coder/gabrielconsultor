@@ -65,56 +65,85 @@ const SCORE_FIELDS = [
 
 function pickEmail(body: any): string {
   return firstString(
-    body.email,
-    body.user?.email,
-    body.contact?.email,
-    body.chat?.email,
-    body.customer?.email,
-    body.message?.contact?.email,
-    body.data?.email,
-    body.data?.contact?.email,
-    deepPick(body, ["email"]),
+    valueAtPath(body, "email"),
+    valueAtPath(body, "user.email"),
+    valueAtPath(body, "contact.email"),
+    valueAtPath(body, "sender.email"),
+    valueAtPath(body, "from.email"),
+    valueAtPath(body, "chat.email"),
+    valueAtPath(body, "customer.email"),
+    valueAtPath(body, "payload.email"),
+    valueAtPath(body, "data.email"),
+    findByKey(body, ["email"]),
   ).trim().toLowerCase();
 }
 
 function pickPhone(body: any): string {
-  return firstString(
-    body.phone,
-    body.from,
-    body.contactIdentifier,
-    body.contact?.phone,
-    body.contact?.identifier,
-    body.chat?.phone,
-    body.customer?.phone,
-    body.message?.from,
-    body.message?.contact?.phone,
-    body.message?.chat?.phone,
-    body.data?.phone,
-    body.data?.from,
-    body.data?.contact?.phone,
-    body.data?.contactIdentifier,
-    deepPick(body, ["phone", "from", "contactIdentifier", "whatsapp"]),
+  const explicit = firstString(
+    valueAtPath(body, "phone"),
+    valueAtPath(body, "whatsapp"),
+    valueAtPath(body, "contactIdentifier"),
+    valueAtPath(body, "contact.phone"),
+    valueAtPath(body, "contact.whatsapp"),
+    valueAtPath(body, "contact.identifier"),
+    valueAtPath(body, "sender.phone"),
+    valueAtPath(body, "sender.whatsapp"),
+    valueAtPath(body, "sender.contactIdentifier"),
+    valueAtPath(body, "from.phone"),
+    valueAtPath(body, "from.whatsapp"),
+    valueAtPath(body, "from.contactIdentifier"),
+    valueAtPath(body, "chat.phone"),
+    valueAtPath(body, "chat.contactIdentifier"),
+    valueAtPath(body, "customer.phone"),
+    valueAtPath(body, "visitor.phone"),
+    valueAtPath(body, "payload.phone"),
+    valueAtPath(body, "payload.contact.phone"),
+    valueAtPath(body, "data.phone"),
+    valueAtPath(body, "data.from"),
+    valueAtPath(body, "data.contact.phone"),
+    valueAtPath(body, "data.contactIdentifier"),
+    valueAtPath(body, "message.from"),
+    valueAtPath(body, "message.contact.phone"),
+    valueAtPath(body, "message.chat.phone"),
+    findByKey(body, ["phone", "whatsapp", "contactIdentifier"]),
   );
+  return phoneLike(explicit) || phoneLikeFromPayload(body);
 }
 
 function pickMessage(body: any): string {
   return firstString(
-    body.text,
-    body.body,
-    body.content,
-    body.message?.text,
-    body.message?.body,
-    body.message?.content,
-    body.message?.message,
-    body.data?.text,
-    body.data?.body,
-    body.data?.content,
-    body.data?.message?.text,
-    body.data?.message?.body,
-    body.data?.message?.content,
-    typeof body.message === "string" ? body.message : undefined,
-    typeof body.data?.message === "string" ? body.data.message : undefined,
-    deepPick(body, ["text", "body", "content", "message", "mensagem"]),
+    valueAtPath(body, "text"),
+    valueAtPath(body, "body"),
+    valueAtPath(body, "content"),
+    valueAtPath(body, "lastMessage"),
+    valueAtPath(body, "mensagem"),
+    valueAtPath(body, "message"),
+    valueAtPath(body, "message.text"),
+    valueAtPath(body, "message.body"),
+    valueAtPath(body, "message.content"),
+    valueAtPath(body, "message.message"),
+    valueAtPath(body, "message.text.body"),
+    valueAtPath(body, "messages.0.text"),
+    valueAtPath(body, "messages.0.body"),
+    valueAtPath(body, "messages.0.content"),
+    valueAtPath(body, "event.message"),
+    valueAtPath(body, "event.message.text"),
+    valueAtPath(body, "event.message.body"),
+    valueAtPath(body, "payload.text"),
+    valueAtPath(body, "payload.body"),
+    valueAtPath(body, "payload.content"),
+    valueAtPath(body, "payload.message"),
+    valueAtPath(body, "payload.message.text"),
+    valueAtPath(body, "data.text"),
+    valueAtPath(body, "data.body"),
+    valueAtPath(body, "data.content"),
+    valueAtPath(body, "data.message"),
+    valueAtPath(body, "data.message.text"),
+    valueAtPath(body, "data.message.body"),
+    valueAtPath(body, "data.message.content"),
+    valueAtPath(body, "conversation.message"),
+    valueAtPath(body, "conversation.lastMessage"),
+    findMessageByKey(body),
   );
 }
 
@@ -126,19 +155,105 @@ function firstString(...values: unknown[]): string {
   return "";
 }
 
-function deepPick(input: unknown, keys: string[], depth = 0): string {
-  if (!input || typeof input !== "object" || depth > 5) return "";
+function valueAtPath(input: unknown, path: string): unknown {
+  return path.split(".").reduce((current: unknown, part) => {
+    if (current == null) return undefined;
+    if (Array.isArray(current)) return current[Number(part)];
+    if (typeof current === "object") return (current as Record<string, unknown>)[part];
+    return undefined;
+  }, input);
+}
+
+function findByKey(input: unknown, keys: string[], depth = 0): string {
+  if (!input || typeof input !== "object" || depth > 6) return "";
+  if (Array.isArray(input)) {
+    for (const item of input) {
+      const found = findByKey(item, keys, depth + 1);
+      if (found) return found;
+    }
+    return "";
+  }
   const record = input as Record<string, unknown>;
-  for (const key of keys) {
-    const value = record[key];
-    if (typeof value === "string" && value.trim()) return value.trim();
-    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  const wanted = new Set(keys.map((k) => k.toLowerCase()));
+  for (const [key, value] of Object.entries(record)) {
+    if (wanted.has(key.toLowerCase())) {
+      const text = firstString(value);
+      if (text) return text;
+    }
   }
   for (const value of Object.values(record)) {
-    const found = deepPick(value, keys, depth + 1);
+    const found = findByKey(value, keys, depth + 1);
     if (found) return found;
   }
   return "";
+}
+
+function findMessageByKey(input: unknown, depth = 0): string {
+  if (!input || typeof input !== "object" || depth > 6) return "";
+  if (Array.isArray(input)) {
+    for (const item of input) {
+      const found = findMessageByKey(item, depth + 1);
+      if (found) return found;
+    }
+    return "";
+  }
+  const record = input as Record<string, unknown>;
+  for (const [key, value] of Object.entries(record)) {
+    const normalized = key.toLowerCase();
+    const text = firstString(value);
+    if (
+      text &&
+      ["text", "body", "content", "message", "mensagem", "lastmessage"].includes(normalized) &&
+      !looksLikeTechnicalValue(text)
+    ) {
+      return text;
+    }
+  }
+  for (const value of Object.values(record)) {
+    const found = findMessageByKey(value, depth + 1);
+    if (found) return found;
+  }
+  return "";
+}
+
+function looksLikeTechnicalValue(value: string): boolean {
+  const text = value.trim();
+  if (!text) return true;
+  if (/^https?:\/\//i.test(text)) return true;
+  if (/^[a-f0-9-]{20,}$/i.test(text)) return true;
+  if (/^[\w.-]+@[\w.-]+\.[a-z]{2,}$/i.test(text)) return true;
+  if (text.replace(/\D/g, "").length >= 10 && text.replace(/\D/g, "").length >= text.length - 4) return true;
+  return false;
+}
+
+function phoneLike(value: string): string {
+  const digits = String(value || "").replace(/\D+/g, "");
+  if (digits.length >= 10 && digits.length <= 15) return digits;
+  return "";
+}
+
+function phoneLikeFromPayload(input: unknown, depth = 0): string {
+  if (input == null || depth > 6) return "";
+  if (typeof input === "string" || typeof input === "number") return phoneLike(String(input));
+  if (Array.isArray(input)) {
+    for (const item of input) {
+      const found = phoneLikeFromPayload(item, depth + 1);
+      if (found) return found;
+    }
+    return "";
+  }
+  if (typeof input === "object") {
+    for (const value of Object.values(input as Record<string, unknown>)) {
+      const found = phoneLikeFromPayload(value, depth + 1);
+      if (found) return found;
+    }
+  }
+  return "";
+}
+
+function topLevelKeys(input: unknown): string[] {
+  if (!input || typeof input !== "object") return [];
+  return Object.keys(input as Record<string, unknown>).slice(0, 30);
 }
 
 async function parseWebhookBody(req: Request, url: URL): Promise<any> {
@@ -169,11 +284,20 @@ function pickChatId(body: any): string | null {
   const id =
     body?.chatId ||
     body?.chat?.id ||
+    body?.chat?.chatId ||
     body?.chat_id ||
+    body?.conversationId ||
+    body?.conversation?.id ||
+    body?.conversation?.chatId ||
     body?.message?.chatId ||
     body?.message?.chat?.id ||
+    body?.payload?.chatId ||
+    body?.payload?.chat?.id ||
     body?.data?.chatId ||
     body?.data?.chat?.id ||
+    body?.data?.conversationId ||
+    body?.data?.conversation?.id ||
+    findByKey(body, ["chatId", "chat_id", "conversationId"]) ||
     null;
   return id ? String(id) : null;
 }
@@ -384,17 +508,34 @@ Deno.serve(async (req) => {
   const message: string = pickMessage(body);
   const chatIdIn = pickChatId(body);
   const messageId = pickMessageId(body);
-  if ((!rawPhone && !email) || !message) {
+  console.log(
+    "[inbound:parsed] keys=", JSON.stringify(topLevelKeys(body)),
+    "hasPhone=", !!rawPhone,
+    "hasEmail=", !!email,
+    "hasMessage=", !!message,
+    "hasChatId=", !!chatIdIn,
+  );
+  if ((!rawPhone && !email && !chatIdIn) || !message) {
     // Registra payload não reconhecido para diagnóstico
     try {
       await createClient(SUPABASE_URL, SERVICE_KEY).from("score_whatsapp_messages").insert({
         phone: rawPhone || "unknown",
         direction: "in",
         kind: "invalid_payload",
-        payload: { raw: body, reason: "phone/email or message missing" },
+        payload: {
+          raw: body,
+          reason: "phone/email/chatId or message missing",
+          detected: { hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message, hasChatId: !!chatIdIn, keys: topLevelKeys(body) },
+        },
       });
     } catch {}
-    return json({ error: "phone/email and message required", got: { hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message } }, 400);
+    console.warn("[inbound:invalid_payload]", JSON.stringify({ hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message, hasChatId: !!chatIdIn, keys: topLevelKeys(body) }));
+    return json({
+      ok: true,
+      accepted: true,
+      ignored: "invalid_payload",
+      got: { hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message, hasChatId: !!chatIdIn, keys: topLevelKeys(body) },
+    });
   }
 
   const phone = normalizePhone(rawPhone);
