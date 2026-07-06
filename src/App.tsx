@@ -52,6 +52,16 @@ const App = () => (
             <Route path="/mentorados/redefinir-senha" element={<PortalResetPassword />} />
             <Route path="/mentorados" element={<PortalDashboard />} />
             <Route path="/simulador-up" element={<SimuladorUP />} />
+            <Route path="/scoreapp" element={<ScoreLanding />} />
+            <Route path="/scoreapp/login" element={<ScoreLogin />} />
+            <Route path="/scoreapp/cadastro" element={<ScoreSignup />} />
+            <Route path="/scoreapp/onboarding" element={<ScoreOnboarding />} />
+            <Route path="/scoreapp/app" element={<ScoreDashboard />} />
+            <Route path="/scoreapp/app/registrar" element={<ScoreRegistrar />} />
+            <Route path="/scoreapp/app/conteudos" element={<ScoreConteudos />} />
+            <Route path="/scoreapp/app/conteudos/:slug" element={<ScoreModulo />} />
+            <Route path="/scoreapp/app/perfil" element={<ScorePerfil />} />
+            <Route path="/scoreapp/planos" element={<ScorePlanos />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
