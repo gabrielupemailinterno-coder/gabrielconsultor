@@ -39,7 +39,7 @@ export function computeDiagnostics(logs: DailyLog[], _goals: ScoreGoals | null):
   if (logs.length < 3) return ["Você tem poucos registros. Antes de ajustar técnica, aumente volume e constância."];
   const c = computeConversions(logs);
   const out: string[] = [];
-  if (c.prospeccoes > 20 && c.prospToContato < 20) out.push("Seu gargalo está na abordagem inicial — muitas prospecções e poucos contatos efetivos.");
+  if (c.abordagemBase > 20 && c.prospToContato < 20) out.push("Seu gargalo está na abordagem inicial — muitas abordagens e poucos contatos efetivos.");
   if (c.contatos > 10 && c.contatoToReuniao < 25) out.push("Seu gargalo está na conversão de contato para reunião.");
   if (c.apresentacoes > 4 && c.apresToProposta < 40) out.push("Seu gargalo pode estar na qualificação ou condução da apresentação.");
   if (c.propostas > 3 && c.propToVenda < 25) out.push("Seu gargalo está na negociação e fechamento.");
