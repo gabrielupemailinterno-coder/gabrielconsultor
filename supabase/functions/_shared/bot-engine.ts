@@ -159,13 +159,20 @@ async function advance(
 }
 
 export function matchFlow(flows: BotFlow[], message: string): BotFlow | null {
+  return matchFlowDebug(flows, message)?.flow ?? null;
+}
+
+export function matchFlowDebug(
+  flows: BotFlow[],
+  message: string,
+): { flow: BotFlow; trigger: string } | null {
   const lower = message.trim().toLowerCase();
   const sorted = [...flows].sort((a, b) => b.priority - a.priority);
   for (const f of sorted) {
     for (const trg of f.triggers || []) {
       if (!trg) continue;
       const t = String(trg).toLowerCase();
-      if (lower.includes(t)) return f;
+      if (lower.includes(t)) return { flow: f, trigger: String(trg) };
     }
   }
   return null;

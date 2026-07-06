@@ -8,7 +8,7 @@ import {
   BotSession,
   continueSession,
   isCancelCommand,
-  matchFlow,
+  matchFlowDebug,
   startSession,
   StepResult,
 } from "../_shared/bot-engine.ts";
@@ -211,7 +211,17 @@ Deno.serve(async (req) => {
       };
       const step = await continueSession(flowRow.graph, session, message, { profileName: profile.full_name });
       await persistAndReply(admin, channelId, phone, profile, step);
-      return json({ ok: true, mode: "continue" });
+      return json({
+        ok: true,
+        mode: "continue",
+        debug: {
+          flow_id: flowRow.id,
+          flow_name: flowRow.name,
+          flow_priority: flowRow.priority ?? 0,
+          current_node_id: sessionRow.current_node_id,
+          matched_trigger: null,
+        },
+      });
     }
   }
 
@@ -221,12 +231,24 @@ Deno.serve(async (req) => {
   const flows: BotFlow[] = (flowsRows || []).map((r: any) => ({
     id: r.id, name: r.name, triggers: r.triggers || [], graph: r.graph, priority: r.priority || 0,
   }));
-  const matched = matchFlow(flows, message);
+  const matchedDebug = matchFlowDebug(flows, message);
+  const matched = matchedDebug?.flow ?? null;
 
-  if (matched) {
+  if (matched && matchedDebug) {
     const step = await startSession(matched, phone, profile.user_id, { profileName: profile.full_name });
     await persistAndReply(admin, channelId, phone, profile, step);
-    return json({ ok: true, mode: "start", flow: matched.name });
+    return json({
+      ok: true,
+      mode: "start",
+      flow: matched.name,
+      debug: {
+        flow_id: matched.id,
+        flow_name: matched.name,
+        flow_priority: matched.priority ?? 0,
+        matched_trigger: matchedDebug.trigger,
+        checked_flows: flows.map((f) => ({ id: f.id, name: f.name, priority: f.priority, triggers: f.triggers })),
+      },
+    });
   }
 
   // Fallback: parser one-shot rotulado (comportamento antigo)
@@ -262,5 +284,15 @@ Deno.serve(async (req) => {
       user_id: profile.user_id, phone, direction: "out", kind: "reply_help", payload: { message: help },
     });
   }
-  return json({ ok: false, error: "no match" });
+  return json({
+    ok: false,
+    error: "no match",
+    debug: {
+      matched_trigger: null,
+      flow_id: null,
+      flow_name: null,
+      flow_priority: null,
+      checked_flows: flows.map((f) => ({ id: f.id, name: f.name, priority: f.priority, triggers: f.triggers })),
+    },
+  });
 });
