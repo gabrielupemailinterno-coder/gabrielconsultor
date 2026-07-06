@@ -23,6 +23,7 @@ export default function ScoreDashboard() {
   const { score, faixa } = useMemo(() => computeScore(logs, goals), [logs, goals]);
   const diag = useMemo(() => computeDiagnostics(mLogs, goals), [mLogs, goals]);
   const badges = useMemo(() => evaluateBadges(logs, goals), [logs, goals]);
+  const recTrigger = useMemo(() => recommendTrigger(logs, goals), [logs, goals]);
 
   useEffect(() => {
     if (!uid || badges.length === 0) return;
@@ -45,6 +46,9 @@ export default function ScoreDashboard() {
         <p className="text-xs uppercase tracking-wider text-muted-foreground">Olá {profile?.full_name?.split(" ")[0] || ""}</p>
         <h1 className="font-serif text-3xl">Seu painel do mês</h1>
       </div>
+
+      <RecommendationCard triggerKey={recTrigger} />
+
 
       <div className="grid md:grid-cols-3 gap-4 mb-6">
         <div className="md:col-span-2 bg-card border border-border rounded-lg p-6">
