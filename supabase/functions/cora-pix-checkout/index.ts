@@ -178,34 +178,27 @@ Deno.serve(async (req) => {
     const emv = (invoice.pix as any)?.emv as string;
     const qrUrl = ((invoice.payment_options as any)?.bank_slip as any)?.url as string;
 
-    let subscriptionId: string | null = null;
-    if (plan.recurring) {
-      const subBody = {
-        invoice_id: invoiceId,
-        frequency: "MONTHLY",
-        occurrences: 12,
-      };
-      const sub = await coraApi<Record<string, any>>(client, coraToken, "POST", "/v2/subscriptions/", subBody);
-      subscriptionId = (sub.id as string) ?? null;
-    }
+    const now = new Date().toISOString();
+    const planExpiresAt = plan_key === "semestral"
+      ? new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString()
+      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
     await supabase.from("score_profiles").update({
       plan: plan_key,
       payment_status: "pending",
       plan_status: "pending",
-      cora_customer_id: null,
       cora_invoice_id: invoiceId,
-      cora_subscription_id: subscriptionId,
       cora_status: invoice.status as string,
       cora_due_date: dueDateStr,
       cora_emv: emv,
       cora_qr_code_url: qrUrl,
+      plan_started_at: now,
+      plan_expires_at: planExpiresAt,
     }).eq("user_id", userId);
 
     return new Response(
       JSON.stringify({
         invoiceId,
-        subscriptionId,
         emv,
         qrCodeUrl: qrUrl,
         amount: plan.amount,
