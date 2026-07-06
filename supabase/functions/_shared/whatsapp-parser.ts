@@ -141,11 +141,16 @@ export function parseWhatsAppLog(text: string): {
 
   // 1.5) Frases naturais: "fiz 200 ligações", "200 ligações", "vendi 12500", "valor vendido 12k"
   if (labeledCount === 0) {
+    const segments = clean
+      .split(/[\n;,]+|\s+e\s+/i)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const haystacks = segments.length > 1 ? segments : [clean];
     for (const key of ORDER) {
       for (const alias of NATURAL_ALIASES[key]) {
         const after = new RegExp(`${alias.source}\\D{0,24}([\\d.,]+\\s*k?)`, "i");
         const before = new RegExp(`([\\d.,]+\\s*k?)\\D{0,24}${alias.source}`, "i");
-        const match = clean.match(before) || clean.match(after);
+        const match = haystacks.map((segment) => segment.match(before) || segment.match(after)).find(Boolean);
         if (match?.[1]) {
           setFound(found, key, match[1]);
           break;
