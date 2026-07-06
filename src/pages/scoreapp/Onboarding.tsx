@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { CurrencyInput, IntegerInput } from "@/components/scoreapp/MaskedInputs";
+
+const CURRENCY_KEYS = new Set(["meta_mensal_valor", "ticket_medio"]);
+const INTEGER_KEYS = new Set([
+  "meta_vendas", "ligacoes_dia", "whatsapps_dia", "apresentacoes_semana", "propostas_semana",
+]);
 
 export default function ScoreOnboarding() {
   const navigate = useNavigate();
@@ -9,7 +15,8 @@ export default function ScoreOnboarding() {
   const [loading, setLoading] = useState(false);
   const [g, setG] = useState({
     meta_mensal_valor: 0, ticket_medio: 0, meta_vendas: 0,
-    ligacoes_dia: 0, whatsapps_dia: 0, apresentacoes_semana: 0, propostas_semana: 0, segmento: "",
+    ligacoes_dia: 0, whatsapps_dia: 0, apresentacoes_semana: 0, propostas_semana: 0,
+    segmento: "", descricao_venda: "",
   });
 
   useEffect(() => {
@@ -24,22 +31,25 @@ export default function ScoreOnboarding() {
   const set = (k: string, v: any) => setG((s) => ({ ...s, [k]: v }));
 
   const submit = async (e: React.FormEvent) => {
-    e.preventDefault(); if (!uid) return;
+    e.preventDefault();
+    if (!uid) return;
+    if (!g.descricao_venda.trim()) return;
     setLoading(true);
     await supabase.from("score_goals").insert({ ...g, user_id: uid });
     navigate("/scoreapp/app", { replace: true });
   };
 
-  const fields: Array<[keyof typeof g, string, "number" | "text"]> = [
-    ["meta_mensal_valor", "Meta mensal (R$)", "number"],
-    ["ticket_medio", "Ticket médio (R$)", "number"],
-    ["meta_vendas", "Vendas/mês", "number"],
-    ["ligacoes_dia", "Ligações por dia", "number"],
-    ["whatsapps_dia", "WhatsApps por dia", "number"],
-    ["apresentacoes_semana", "Apresentações por semana", "number"],
-    ["propostas_semana", "Propostas por semana", "number"],
-    ["segmento", "Segmento de atuação", "text"],
+  const fields: Array<[keyof typeof g, string]> = [
+    ["meta_mensal_valor", "Meta mensal (R$)"],
+    ["ticket_medio", "Ticket médio (R$)"],
+    ["meta_vendas", "Vendas/mês"],
+    ["ligacoes_dia", "Ligações por dia"],
+    ["whatsapps_dia", "WhatsApps por dia"],
+    ["apresentacoes_semana", "Apresentações por semana"],
+    ["propostas_semana", "Propostas por semana"],
   ];
+
+  const inputCls = "w-full mt-1 bg-input border border-border rounded-md px-4 py-3 text-sm font-mono";
 
   return (
     <div className="min-h-screen bg-background text-foreground py-10">
@@ -47,13 +57,41 @@ export default function ScoreOnboarding() {
         <h1 className="font-serif text-3xl mb-2">Suas metas</h1>
         <p className="text-muted-foreground text-sm mb-8">Poucos números para começarmos a calcular seu score.</p>
         <form onSubmit={submit} className="grid md:grid-cols-2 gap-4 bg-card border border-border rounded-lg p-6">
-          {fields.map(([k, label, type]) => (
+          <label className="block md:col-span-2">
+            <span className="text-xs text-muted-foreground uppercase tracking-wider">O que você vende? (máx. 100)</span>
+            <input
+              type="text"
+              maxLength={100}
+              required
+              value={g.descricao_venda}
+              onChange={(e) => set("descricao_venda", e.target.value.slice(0, 100))}
+              placeholder="Ex.: software de gestão para clínicas odontológicas"
+              className="w-full mt-1 bg-input border border-border rounded-md px-4 py-3 text-sm"
+            />
+            <span className="text-[10px] text-muted-foreground">{g.descricao_venda.length}/100</span>
+          </label>
+
+          {fields.map(([k, label]) => (
             <label key={k as string} className="block">
               <span className="text-xs text-muted-foreground uppercase tracking-wider">{label}</span>
-              <input type={type} value={(g as any)[k]} onChange={(e) => set(k as string, type === "number" ? Number(e.target.value) : e.target.value)}
-                className="w-full mt-1 bg-input border border-border rounded-md px-4 py-3 text-sm" />
+              {CURRENCY_KEYS.has(k as string) ? (
+                <CurrencyInput value={(g as any)[k]} onChange={(v) => set(k as string, v)} className={inputCls} />
+              ) : INTEGER_KEYS.has(k as string) ? (
+                <IntegerInput value={(g as any)[k]} onChange={(v) => set(k as string, v)} className={inputCls} />
+              ) : null}
             </label>
           ))}
+
+          <label className="block md:col-span-2">
+            <span className="text-xs text-muted-foreground uppercase tracking-wider">Segmento de atuação</span>
+            <input
+              type="text"
+              value={g.segmento}
+              onChange={(e) => set("segmento", e.target.value)}
+              className="w-full mt-1 bg-input border border-border rounded-md px-4 py-3 text-sm"
+            />
+          </label>
+
           <button disabled={loading} className="md:col-span-2 bg-primary text-primary-foreground uppercase tracking-wide text-sm py-3 rounded-md flex items-center justify-center">
             {loading ? <Loader2 className="animate-spin" size={16} /> : "Salvar e continuar"}
           </button>

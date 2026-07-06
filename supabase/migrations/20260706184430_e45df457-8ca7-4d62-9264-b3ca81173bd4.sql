@@ -1,0 +1,1 @@
+ALTER TABLE public.score_goals ADD COLUMN IF NOT EXISTS descricao_venda TEXT CHECK (char_length(descricao_venda) <= 100);
