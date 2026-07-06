@@ -359,8 +359,8 @@ Deno.serve(async (req) => {
   const token =
     req.headers.get("x-webhook-token") ??
     req.headers.get("X-Webhook-Token") ??
-    req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
     url.searchParams.get("token") ??
+    req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
     url.pathname.split("/").filter(Boolean).at(-1);
   console.log("[inbound:req] method=", req.method, "contentType=", req.headers.get("content-type") || "", "auth=", token ? "present" : "missing");
   if (token !== WEBHOOK_TOKEN) {
