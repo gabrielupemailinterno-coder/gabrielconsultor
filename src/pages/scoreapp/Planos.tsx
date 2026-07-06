@@ -95,6 +95,29 @@ export default function ScorePlanos() {
     }
   };
 
+  const [verifying, setVerifying] = useState(false);
+  const verifyPayment = async () => {
+    setVerifying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("cora-check-invoice", { body: {} });
+      if (error) {
+        toast({ title: "Erro ao verificar", description: error.message, variant: "destructive" });
+        return;
+      }
+      if (data?.paid) {
+        toast({ title: "Pagamento confirmado!", description: "Liberando acesso..." });
+        setTimeout(() => navigate("/scoreapp/app", { replace: true }), 800);
+      } else {
+        toast({
+          title: "Ainda não confirmado",
+          description: `Status atual: ${data?.status ?? "aguardando"}. Tente novamente em alguns segundos.`,
+        });
+      }
+    } finally {
+      setVerifying(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border">
