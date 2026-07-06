@@ -22,16 +22,22 @@ export default function ScoreLayout({ children }: { children: ReactNode }) {
         navigate("/scoreapp/login", { replace: true });
         return;
       }
-      const { data } = await supabase
+      const readProfile = async () => (await supabase
         .from("score_profiles")
         .select("payment_status, plan_status, plan_expires_at")
-        .eq("user_id", sess.session.user.id)
-        .maybeSingle();
-      const active =
-        data?.plan_status === "active" &&
-        data?.payment_status === "paid" &&
-        (!data?.plan_expires_at || new Date(data.plan_expires_at) > new Date());
-      if (!active) {
+        .eq("user_id", sess.session!.user.id)
+        .maybeSingle()).data;
+      let data = await readProfile();
+      const isActive = (d: any) =>
+        d?.plan_status === "active" &&
+        d?.payment_status === "paid" &&
+        (!d?.plan_expires_at || new Date(d.plan_expires_at) > new Date());
+      if (!isActive(data)) {
+        // Ask Cora directly in case the webhook hasn't updated us yet
+        try { await supabase.functions.invoke("cora-check-invoice", { body: {} }); } catch {}
+        data = await readProfile();
+      }
+      if (!isActive(data)) {
         navigate("/scoreapp/planos", { replace: true });
         return;
       }
