@@ -48,7 +48,7 @@ export function evaluateTriggers(logs: DailyLog[], goals: ScoreGoals | null): Tr
 
   // Usuário novo demais: só volume conta
   if (logs.length === 0) {
-    hits.push({ key: "volume_prospeccao", severity: 95, reason: "Você ainda não registrou nenhuma atividade." });
+    hits.push({ key: "volume_prospeccao", severity: 95, reason: "Você ainda não registrou nenhuma atividade de abordagem." });
     return hits;
   }
 
