@@ -284,11 +284,20 @@ function pickChatId(body: any): string | null {
   const id =
     body?.chatId ||
     body?.chat?.id ||
+    body?.chat?.chatId ||
     body?.chat_id ||
+    body?.conversationId ||
+    body?.conversation?.id ||
+    body?.conversation?.chatId ||
     body?.message?.chatId ||
     body?.message?.chat?.id ||
+    body?.payload?.chatId ||
+    body?.payload?.chat?.id ||
     body?.data?.chatId ||
     body?.data?.chat?.id ||
+    body?.data?.conversationId ||
+    body?.data?.conversation?.id ||
+    findByKey(body, ["chatId", "chat_id", "conversationId"]) ||
     null;
   return id ? String(id) : null;
 }
@@ -499,17 +508,34 @@ Deno.serve(async (req) => {
   const message: string = pickMessage(body);
   const chatIdIn = pickChatId(body);
   const messageId = pickMessageId(body);
-  if ((!rawPhone && !email) || !message) {
+  console.log(
+    "[inbound:parsed] keys=", JSON.stringify(topLevelKeys(body)),
+    "hasPhone=", !!rawPhone,
+    "hasEmail=", !!email,
+    "hasMessage=", !!message,
+    "hasChatId=", !!chatIdIn,
+  );
+  if ((!rawPhone && !email && !chatIdIn) || !message) {
     // Registra payload não reconhecido para diagnóstico
     try {
       await createClient(SUPABASE_URL, SERVICE_KEY).from("score_whatsapp_messages").insert({
         phone: rawPhone || "unknown",
         direction: "in",
         kind: "invalid_payload",
-        payload: { raw: body, reason: "phone/email or message missing" },
+        payload: {
+          raw: body,
+          reason: "phone/email/chatId or message missing",
+          detected: { hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message, hasChatId: !!chatIdIn, keys: topLevelKeys(body) },
+        },
       });
     } catch {}
-    return json({ error: "phone/email and message required", got: { hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message } }, 400);
+    console.warn("[inbound:invalid_payload]", JSON.stringify({ hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message, hasChatId: !!chatIdIn, keys: topLevelKeys(body) }));
+    return json({
+      ok: true,
+      accepted: true,
+      ignored: "invalid_payload",
+      got: { hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message, hasChatId: !!chatIdIn, keys: topLevelKeys(body) },
+    });
   }
 
   const phone = normalizePhone(rawPhone);
