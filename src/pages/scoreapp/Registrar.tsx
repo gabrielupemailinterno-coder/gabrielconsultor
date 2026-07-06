@@ -4,6 +4,7 @@ import ScoreLayout from "@/components/scoreapp/ScoreLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { CurrencyInput, IntegerInput } from "@/components/scoreapp/MaskedInputs";
 
 const numFields: { k: string; label: string }[] = [
   { k: "ligacoes", label: "Ligações" },
