@@ -1444,6 +1444,7 @@ export type Database = {
           full_name: string
           id: string
           inactivity_penalty_days: number
+          is_active: boolean
           last_seen_at: string | null
           lead_origin: string | null
           payment_status: string | null
@@ -1484,6 +1485,7 @@ export type Database = {
           full_name?: string
           id?: string
           inactivity_penalty_days?: number
+          is_active?: boolean
           last_seen_at?: string | null
           lead_origin?: string | null
           payment_status?: string | null
@@ -1524,6 +1526,7 @@ export type Database = {
           full_name?: string
           id?: string
           inactivity_penalty_days?: number
+          is_active?: boolean
           last_seen_at?: string | null
           lead_origin?: string | null
           payment_status?: string | null
