@@ -536,7 +536,53 @@ export default function PartnersAdmin() {
                     <tr className="bg-muted/10 border-t border-border">
                       <td></td>
                       <td colSpan={6} className="px-4 py-4 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pb-3 border-b border-border">
+                          <div>
+                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Comissão (%)</p>
+                            <input
+                              type="number"
+                              min={0}
+                              max={100}
+                              step={1}
+                              defaultValue={p.commission_rate ?? 70}
+                              onBlur={(e) => {
+                                const v = Number(e.target.value);
+                                if (!Number.isNaN(v) && v !== Number(p.commission_rate)) {
+                                  updatePartner(p.id, { commission_rate: v } as any);
+                                }
+                              }}
+                              className="bg-background border border-border rounded px-2 py-1 text-xs font-mono w-24"
+                            />
+                          </div>
+                          <div>
+                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+                              {p.user_id ? "Conta vinculada" : "Vincular usuário do portal"}
+                            </p>
+                            {p.user_id ? (
+                              <p className="text-xs font-mono text-muted-foreground truncate">{p.user_id}</p>
+                            ) : (
+                              <div className="flex gap-2">
+                                <input
+                                  type="email"
+                                  placeholder="email@exemplo.com"
+                                  value={linkEmail[p.id] || ""}
+                                  onChange={(e) => setLinkEmail((m) => ({ ...m, [p.id]: e.target.value }))}
+                                  className="flex-1 bg-background border border-border rounded px-2 py-1 text-xs"
+                                />
+                                <button
+                                  disabled={linkingPid === p.id}
+                                  onClick={() => linkUserToPartner(p.id)}
+                                  className="inline-flex items-center gap-1 bg-primary text-primary-foreground text-xs px-3 py-1.5 rounded disabled:opacity-50"
+                                >
+                                  <UserPlus size={12} /> Vincular
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
                         <div>
+
                           <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
                             Testes concedidos
                           </p>
