@@ -216,6 +216,18 @@ function Stat({ label, value }: { label: string; value: number }) {
 }
 
 function FlowConfigSection() {
+  const [copied, setCopied] = useState<string | null>(null);
+
+  async function copy(text: string, key: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(key);
+      setTimeout(() => setCopied(null), 1500);
+    } catch {
+      toast.error("Não foi possível copiar");
+    }
+  }
+
   return (
     <section>
       <h2 className="font-serif text-lg mb-3">Configuração por evento</h2>
@@ -224,6 +236,15 @@ function FlowConfigSection() {
           <div key={f.key} className="border border-border rounded-lg p-4">
             <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">{f.key}</div>
             <div className="font-serif text-base mt-1">{f.label}</div>
+            <div className="mt-2 flex items-center justify-between gap-2 border border-border rounded px-2 py-1.5 bg-muted/20">
+              <span className="font-mono text-xs truncate">{f.functionName}</span>
+              <button
+                onClick={() => copy(f.functionName, f.key)}
+                className="text-xs px-2 py-1 border border-border rounded hover:bg-muted whitespace-nowrap"
+              >
+                {copied === f.key ? "Copiado" : "Copiar"}
+              </button>
+            </div>
             <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{f.description}</p>
           </div>
         ))}
