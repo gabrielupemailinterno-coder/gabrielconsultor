@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Copy, Check, Pencil, X, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import { Loader2, Plus, Copy, Check, Pencil, X, ChevronDown, ChevronRight, Trash2, UserPlus, ExternalLink } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 type Partner = {
@@ -14,6 +14,46 @@ type Partner = {
   notes: string | null;
   created_at: string;
   updated_at: string;
+  user_id: string | null;
+  commission_rate: number;
+};
+
+type PartnerLink = {
+  id: string;
+  partner_id: string;
+  slug: string;
+  label: string | null;
+  destination: string;
+  active: boolean;
+  created_at: string;
+};
+
+type Conversion = {
+  id: string;
+  partner_id: string;
+  kind: "lead" | "purchase";
+  source_table: string;
+  amount_cents: number | null;
+  commission_cents: number;
+  commission_status: "pending" | "approved" | "paid" | "canceled";
+  created_at: string;
+};
+
+const brl = (cents: number | null | undefined) =>
+  ((cents || 0) / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+const CONV_STATUS = ["pending", "approved", "paid", "canceled"] as const;
+const convStatusLabel: Record<string, string> = {
+  pending: "Pendente",
+  approved: "Aprovada",
+  paid: "Paga",
+  canceled: "Cancelada",
+};
+const convStatusClass: Record<string, string> = {
+  pending: "bg-yellow-500/15 text-yellow-600",
+  approved: "bg-primary/15 text-primary",
+  paid: "bg-emerald-500/15 text-emerald-600",
+  canceled: "bg-muted text-muted-foreground",
 };
 
 type Trial = {
