@@ -675,7 +675,116 @@ export default function PartnersAdmin() {
           </tbody>
         </table>
       </div>
+
+      {/* Links de divulgação */}
+      <section className="space-y-3">
+        <h3 className="font-serif text-lg">Links de divulgação</h3>
+        <div className="bg-card border border-border rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/30 text-[10px] uppercase tracking-widest text-muted-foreground">
+              <tr>
+                <th className="text-left px-4 py-2">Parceiro</th>
+                <th className="text-left px-4 py-2">Rótulo</th>
+                <th className="text-left px-4 py-2">Destino</th>
+                <th className="text-left px-4 py-2">URL</th>
+                <th className="text-left px-4 py-2">Ativo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {links.length === 0 && (
+                <tr><td colSpan={5} className="text-center text-muted-foreground py-6 text-sm">Nenhum link criado.</td></tr>
+              )}
+              {links.map((l) => {
+                const url = `${window.location.origin}/r/${l.slug}`;
+                return (
+                  <tr key={l.id} className="border-t border-border">
+                    <td className="px-4 py-3 text-xs">{partnerName(l.partner_id)}</td>
+                    <td className="px-4 py-3 text-xs">{l.label || "—"}</td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground">{l.destination}</td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={async () => {
+                          await navigator.clipboard.writeText(url);
+                          toast({ title: "Link copiado" });
+                        }}
+                        className="font-mono text-xs bg-muted px-2 py-1 rounded hover:bg-muted/70 inline-flex items-center gap-1"
+                      >
+                        <Copy size={10} /> {url}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`text-[10px] px-2 py-0.5 rounded ${l.active ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+                        {l.active ? "Ativo" : "Inativo"}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Conversões e comissão */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <h3 className="font-serif text-lg">Conversões e comissão</h3>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Pendente: <strong className="font-mono text-yellow-600">{brl(totalPending)}</strong></span>
+            <span className="text-muted-foreground">Aprovada: <strong className="font-mono text-primary">{brl(totalApproved)}</strong></span>
+            <span className="text-muted-foreground">Paga: <strong className="font-mono text-emerald-600">{brl(totalPaid)}</strong></span>
+            <select
+              value={convFilter}
+              onChange={(e) => setConvFilter(e.target.value)}
+              className="bg-background border border-border rounded px-2 py-1 text-xs"
+            >
+              <option value="all">Todas</option>
+              {CONV_STATUS.map((s) => <option key={s} value={s}>{convStatusLabel[s]}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/30 text-[10px] uppercase tracking-widest text-muted-foreground">
+              <tr>
+                <th className="text-left px-4 py-2">Data</th>
+                <th className="text-left px-4 py-2">Parceiro</th>
+                <th className="text-left px-4 py-2">Tipo</th>
+                <th className="text-left px-4 py-2">Origem</th>
+                <th className="text-right px-4 py-2">Valor</th>
+                <th className="text-right px-4 py-2">Comissão</th>
+                <th className="text-left px-4 py-2">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredConversions.length === 0 && (
+                <tr><td colSpan={7} className="text-center text-muted-foreground py-6 text-sm">Nenhuma conversão.</td></tr>
+              )}
+              {filteredConversions.map((c) => (
+                <tr key={c.id} className="border-t border-border">
+                  <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(c.created_at).toLocaleString("pt-BR")}</td>
+                  <td className="px-4 py-3 text-xs">{partnerName(c.partner_id)}</td>
+                  <td className="px-4 py-3 text-xs">{c.kind === "lead" ? "Lead" : "Compra"}</td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">{c.source_table}</td>
+                  <td className="px-4 py-3 text-right font-mono text-xs">{brl(c.amount_cents)}</td>
+                  <td className="px-4 py-3 text-right font-mono text-xs">{brl(c.commission_cents)}</td>
+                  <td className="px-4 py-3">
+                    <select
+                      value={c.commission_status}
+                      onChange={(e) => updateConversionStatus(c.id, e.target.value)}
+                      className={`text-[10px] px-2 py-1 rounded border-0 outline-none ${convStatusClass[c.commission_status]}`}
+                    >
+                      {CONV_STATUS.map((s) => <option key={s} value={s}>{convStatusLabel[s]}</option>)}
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   );
 }
+
 
