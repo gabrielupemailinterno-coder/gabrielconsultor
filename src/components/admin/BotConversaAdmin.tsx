@@ -106,6 +106,9 @@ export default function BotConversaAdmin() {
       </div>
 
       <section>
+      <TestTriggers />
+
+      <section>
         <h2 className="font-serif text-xl mb-3">Usuários</h2>
         <div className="overflow-x-auto border border-border rounded-lg">
           <table className="w-full text-sm">
