@@ -103,7 +103,7 @@ Deno.serve(async (req) => {
     const first = (p.full_name || "").split(" ")[0] || "";
     const template = templates[kind] || DEFAULTS[kind];
     const msg = template.replaceAll("{{nome}}", first);
-    const r = await sendTextByPhone(phone, msg);
+    const r = await sendTextByUser(p.user_id, msg);
     await admin.from("score_whatsapp_messages").insert({
       user_id: p.user_id, phone, direction: "out", kind,
       payload: { message: msg, days }, error: r.ok ? null : r.error,

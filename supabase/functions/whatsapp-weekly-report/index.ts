@@ -121,7 +121,7 @@ Quer que eu analise seu funil por 60 min? Responde "quero análise".`;
 
 Quer que eu analise seu funil por 60 min numa sessão individual? Responde "quero análise" que te mando os detalhes.`;
 
-    const r = await sendTextByPhone(phone, msg);
+    const r = await sendTextByUser(p.user_id, msg);
     await admin.from("score_whatsapp_messages").insert({
       user_id: p.user_id, phone, direction: "out", kind: "weekly",
       payload: { message: msg, summary: c, gargalo }, error: r.ok ? null : r.error,
