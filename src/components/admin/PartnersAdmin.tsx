@@ -292,17 +292,8 @@ export default function PartnersAdmin() {
     load();
   };
 
-  const linksByPartner = useMemo(() => {
-    const m: Record<string, PartnerLink[]> = {};
-    links.forEach((l) => ((m[l.partner_id] ||= []).push(l)));
-    return m;
-  }, [links]);
 
-  const convByPartner = useMemo(() => {
-    const m: Record<string, Conversion[]> = {};
-    conversions.forEach((c) => ((m[c.partner_id] ||= []).push(c)));
-    return m;
-  }, [conversions]);
+
 
   const totalPending = conversions.filter((c) => c.commission_status === "pending").reduce((a, b) => a + b.commission_cents, 0);
   const totalApproved = conversions.filter((c) => c.commission_status === "approved").reduce((a, b) => a + b.commission_cents, 0);
