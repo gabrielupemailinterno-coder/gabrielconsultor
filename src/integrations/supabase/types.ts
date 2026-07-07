@@ -1315,6 +1315,45 @@ export type Database = {
         }
         Relationships: []
       }
+      partners: {
+        Row: {
+          company_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          partner_code: string
+          phone: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          partner_code: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          partner_code?: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       score_badges: {
         Row: {
           badge_key: string
