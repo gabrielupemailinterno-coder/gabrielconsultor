@@ -15,6 +15,7 @@ import {
   MousePointerClick,
   Clock,
   FileText,
+  Handshake,
 } from "lucide-react";
 import {
   Sidebar,
