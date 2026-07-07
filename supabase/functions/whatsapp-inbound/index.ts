@@ -595,8 +595,22 @@ Deno.serve(async (req) => {
   const settings = await getAdminSettings(admin);
   const channelId = settings?.channel_id || null;
 
-  // (removido) enforce agent inactive — quebrava o recebimento das mensagens
-  // seguintes da mesma interação na GPT Maker.
+  // 🔇 Silencia o agente da GPT Maker IMEDIATAMENTE em toda mensagem de entrada
+  // do usuário, ANTES de qualquer processamento. Sem isso, o agente responde em
+  // paralelo com o nosso fluxo (dois bots falando ao mesmo tempo).
+  let earlyChatId: string | null = chatIdIn;
+  if (channelId && phone) {
+    if (!earlyChatId) {
+      try { earlyChatId = await resolveChatId(channelId, phone); } catch { earlyChatId = null; }
+    }
+    if (earlyChatId) {
+      try { await startHuman(earlyChatId); } catch { /* best effort */ }
+    } else {
+      console.warn("[inbound] não consegui resolver chatId para silenciar agente phone=", phone);
+    }
+  }
+
+
 
 
   if (!profile) {
