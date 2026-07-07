@@ -239,7 +239,7 @@ function TestTriggers() {
   async function fire(flow: typeof TEST_FLOWS[number]) {
     setBusy(flow.key);
     try {
-      await sendBotConversaLead(flow.nome, flow.telefone);
+      await sendBotConversaLead(flow.nome, flow.telefone, flow.key);
       setResults((r) => ({ ...r, [flow.key]: "ok" }));
       toast.success(`Gatilho "${flow.label}" disparado`);
     } catch (e: any) {
