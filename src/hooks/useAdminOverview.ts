@@ -59,6 +59,7 @@ export function useAdminOverview(): AdminOverview {
       const results = await Promise.allSettled([
         supabase.from("leads").select("id", { count: "exact", head: true }),
         supabase.from("leads").select("id", { count: "exact", head: true }).gte("created_at", since7),
+        supabase.from("page_visits").select("id", { count: "exact", head: true }).gte("created_at", since7),
         supabase.from("page_visits").select("session_id").gte("created_at", since7).limit(5000),
         supabase.from("page_clicks").select("id", { count: "exact", head: true }).gte("created_at", since7),
         supabase.from("page_sessions").select("duration_seconds").gte("started_at", since7).limit(2000),
