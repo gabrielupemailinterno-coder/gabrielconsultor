@@ -12,6 +12,15 @@ const TEST_FLOWS: { key: string; label: string; nome: string; telefone: string }
   { key: "inativo", label: "Recuperação de inativo", nome: "TESTE Recuperacao Inativo", telefone: "5511999990006" },
 ];
 
+const FLOW_CONFIG: { key: string; label: string; description: string }[] = [
+  { key: "onboarding", label: "Onboarding", description: "Fluxo de boas-vindas ativado no primeiro cadastro ou início de jornada." },
+  { key: "checkin", label: "Check-in diário", description: "Coleta rotineira de progresso, humor ou produtividade do usuário." },
+  { key: "gabriel", label: "Falar com Gabriel", description: "Roteia o usuário para contato direto ou notificação ao consultor." },
+  { key: "assistente", label: "Assistente", description: "Atendimento automático e respostas a dúvidas frequentes via WhatsApp." },
+  { key: "diagnostico", label: "Diagnóstico semanal", description: "Pesquisa semanal para avaliar evolução e identificar bloqueios." },
+  { key: "inativo", label: "Recuperação de inativo", description: "Reengajamento de usuários que pararam de interagir nos últimos dias." },
+];
+
 type LogRow = {
   id: string;
   user_id: string | null;
@@ -104,6 +113,8 @@ export default function BotConversaAdmin() {
         <Stat label="Sincronizados no BotConversa" value={synced} />
         <Stat label="Webhooks pendentes" value={pending.length} />
       </div>
+
+      <FlowConfigSection />
 
       <TestTriggers />
 
@@ -201,6 +212,23 @@ function Stat({ label, value }: { label: string; value: number }) {
       <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="text-2xl font-serif mt-1">{value}</div>
     </div>
+  );
+}
+
+function FlowConfigSection() {
+  return (
+    <section>
+      <h2 className="font-serif text-lg mb-3">Configuração por evento</h2>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {FLOW_CONFIG.map((f) => (
+          <div key={f.key} className="border border-border rounded-lg p-4">
+            <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">{f.key}</div>
+            <div className="font-serif text-base mt-1">{f.label}</div>
+            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{f.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
