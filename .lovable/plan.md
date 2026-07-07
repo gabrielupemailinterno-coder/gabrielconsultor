@@ -1,137 +1,134 @@
-## Objetivo
 
-Criar uma aba **"Integrações"** completa no painel admin (`/admin`) para gerenciar de forma robusta:
+# Redesign do /admin — Cockpit de Gestão
 
-1. **Webhooks de saída (outbound)** — dispara eventos do app pra sistemas externos (BotConversa, Make, n8n, Zapier, CRMs, etc).
-2. **Endpoints de entrada (inbound)** — URLs únicas do próprio app pra receber POSTs de sistemas externos.
-3. **Chaves de API** — tokens gerados pra terceiros consumirem uma API REST do app.
-4. **Logs de entregas** — histórico de disparos, retentativas, resposta HTTP.
+Transformar o painel atual (header + faixa horizontal de 15 abas) em um cockpit executivo com sidebar navegável, dashboard inicial com KPIs e ações rápidas, e agrupamento lógico dos módulos existentes. **Nenhum módulo é removido ou alterado internamente — apenas a moldura de navegação e a home mudam.**
 
-Nada de webhook ativo hoje é alterado — a aba passa a ser a fonte de configuração, com fallback nos valores atuais.
+## Estado atual (diagnóstico)
 
----
+- `src/pages/Admin.tsx` concentra: guarda de auth, carga de dados, 4 StatCards fixos no topo, faixa horizontal com 15 abas e o conteúdo inline de cada aba (leads, visits, clicks, sessions).
+- Componentes de módulo (Mentorados, Score, Conteúdos, E-mails, Prospecção, WhatsApp, Ritual, BotFlow, BotConversa, Integrações, Blog) já estão isolados em `src/components/admin/*` — só são renderizados condicionalmente.
+- A tira de 15 abas quebra visualmente e não escala. Não há home, não há hierarquia, não há atalhos.
 
-## Arquitetura
+## Direção visual
 
-### Tabelas novas (Lovable Cloud)
+- Layout shell com **sidebar shadcn** (`collapsible="icon"`) à esquerda + header fino com breadcrumb e ações globais + área de conteúdo.
+- Paleta oficial da marca (Grafite/Petróleo/Laranja/Areia — memory: Visual Identity). Acento laranja `#C4632D` apenas em CTAs e estado ativo. Fundo Grafite, cards Petróleo, texto Off-white.
+- Tipografia: Libre Baskerville nos títulos de seção e KPIs numéricos em IBM Plex Mono.
+- Sem alterar tokens globais do projeto — só usar os tokens semânticos já existentes; se faltar variante, adicionar em `index.css` sem quebrar o resto.
 
-**`integration_events`** — catálogo de todos os eventos do sistema (seed fixo, admin-read).
-- `key` (único, ex: `lead.contato`, `score.daily_checkin`, `mentee.meeting_completed`)
-- `label`, `category` (`lead` | `score` | `mentee` | `botconversa` | `custom`)
-- `sample_payload` jsonb, `description`
+## Estrutura de navegação (sidebar)
 
-**`integration_webhooks`** — webhooks de saída configurados pelo admin.
-- `id`, `name`, `url`, `enabled`, `secret` (opcional, p/ assinatura HMAC)
-- `event_keys` text[] (quais eventos assinam esse webhook — N pra N)
-- `headers` jsonb (headers customizados)
-- `retry_policy` jsonb (`max_attempts`, `backoff_seconds`)
-- `timeout_ms`, `created_at`, `updated_at`
+Sidebar com grupos colapsáveis, cada item leva a uma view (mantendo os componentes atuais como conteúdo):
 
-**`integration_deliveries`** — log de cada disparo.
-- `id`, `webhook_id`, `event_key`, `payload` jsonb
-- `attempt`, `status` (`pending`|`success`|`failed`|`retrying`)
-- `response_status`, `response_body`, `error`, `duration_ms`
-- `created_at`, `next_retry_at`
+```
+COCKPIT
+  └ Visão Geral              (nova home /admin)
 
-**`integration_inbound_endpoints`** — URLs de entrada.
-- `id`, `slug` (único, compõe a URL pública), `name`, `enabled`
-- `secret` (verificação de header `X-Webhook-Secret` ou HMAC)
-- `target` (`lead` | `score_event` | `raw_log`) — o que fazer com o payload
-- `last_received_at`, `total_received`
+OPERAÇÃO
+  ├ Mentorados               (MenteesAdmin)
+  ├ Score Comercial          (ScoreAdmin)
+  └ Conteúdos                (ContentsAdmin)
 
-**`integration_api_keys`** — chaves p/ terceiros consumirem a API.
-- `id`, `name`, `key_prefix` (visível), `key_hash` (bcrypt/sha256, valor cheio só mostrado 1x)
-- `scopes` text[] (`leads:read`, `leads:write`, `score:read`, etc)
-- `enabled`, `last_used_at`, `expires_at`, `created_at`
+RELACIONAMENTO
+  ├ E-mails                  (MenteeEmailComposer)
+  ├ Prospecção               (ProspectingBulk)
+  ├ WhatsApp                 (WhatsAppAdmin)
+  └ Ritual WhatsApp          (WhatsAppRitualAdmin)
 
-Todas: RLS admin-only via `has_role`, GRANTs pra `authenticated` + `service_role`.
+AUTOMAÇÕES
+  ├ Fluxo do Bot             (BotFlowsAdmin)
+  ├ BotConversa              (BotConversaAdmin)
+  └ Integrações              (IntegrationsAdmin)
 
-### Edge Functions novas
+ANALYTICS
+  ├ Cadastros                (leads inline)
+  ├ Visitas                  (visits inline)
+  ├ Cliques                  (clicks inline)
+  └ Sessões                  (sessions inline)
 
-- **`integrations-dispatch`** — chamada quando um evento ocorre. Busca webhooks assinantes ativos, monta payload `{ event, occurred_at, data }`, assina com HMAC-SHA256 (`X-Lovable-Signature`), faz POST paralelo, grava `integration_deliveries`, agenda retry via `pg_cron` se falhar.
-- **`integrations-inbound/[slug]`** — recebe POST externo, valida `secret`/HMAC, roteia por `target` (cria lead, log, etc), responde 200.
-- **`integrations-api/*`** — API REST pública autenticada por `Authorization: Bearer <api_key>`. Endpoints iniciais: `GET /leads`, `POST /leads`, `GET /score/profiles`, `GET /score/daily-logs`. Valida scopes.
+CONTEÚDO
+  └ Blog                     (BlogAdmin)
+```
 
-### Helper interno
+Sidebar colapsa para tira de ícones; grupo do item ativo abre automaticamente.
 
-`src/lib/integrations.ts` → `emitEvent(key, data)` que invoca `integrations-dispatch`. Chamado (sem quebrar nada) nos pontos onde já existe envio pra BotConversa — o webhook do BotConversa vira **um dos assinantes** do evento, não o único caminho.
+## Dashboard "Visão Geral" (nova home)
 
----
+Grid de cards, todos alimentados por queries já existentes ou uma extensão simples do `loadData`:
 
-## UI: aba "Integrações" no `/admin`
+**Linha 1 — KPIs (6 cards compactos)**
+- Cadastros totais / últimos 7d
+- Mentorados ativos
+- Score: usuários ativos hoje
+- Visitas 7d + únicos
+- Cliques 7d
+- Tempo médio de sessão
 
-Novo componente `src/components/admin/IntegrationsAdmin.tsx` com sub-abas:
+**Linha 2 — Ações rápidas** (grid 2×3, ícone + label, cada botão navega para o módulo)
+- Convidar mentorado · Novo e-mail · Nova campanha WhatsApp · Testar BotConversa · Novo post do blog · Ver integrações
 
-### 1. Webhooks de Saída
-- Lista de webhooks (nome, URL, eventos assinados, status, última entrega)
-- Botão **Novo webhook**: form com URL, seleção multi de eventos (do catálogo), headers, secret (gerar/copiar), timeout, política de retry
-- Ações: **Editar**, **Testar** (envia sample_payload real), **Ver logs**, **Desativar**, **Excluir**
-- Painel de logs por webhook: tabela de deliveries com status, código HTTP, response body, botão **Reenviar**
+**Linha 3 — Feeds** (2 colunas)
+- Últimos 5 cadastros (nome, form_type, tempo relativo, atalho "virar mentorado")
+- Últimas 5 entregas de integração (`integration_deliveries` — status, evento, tempo)
 
-### 2. Endpoints de Entrada
-- Lista com slug, URL completa (copiável), tipo de alvo, contador de recebidos, último recebimento
-- Botão **Novo endpoint**: nome, slug, alvo, gerar secret
-- Exibe exemplo de `curl` pronto pra colar no sistema externo
+**Linha 4 — Saúde do sistema** (chips discretos)
+- Webhooks BotConversa ativos, integrações habilitadas, fila de e-mails pendente, últimos erros.
 
-### 3. Chaves de API
-- Lista com nome, prefixo, scopes, último uso, expiração
-- **Gerar nova chave**: mostra o valor completo UMA vez com botão copiar e aviso
-- Ações: **Revogar**, **Editar scopes**
-- Aba **Documentação**: lista dos endpoints REST disponíveis, exemplos de request
+## Etapas de implementação
 
-### 4. Catálogo de Eventos
-- Read-only. Lista todos os `integration_events` com key, categoria, sample_payload (JSON expansível).
-- Serve pra você saber o que pode assinar num webhook.
+1. **Shell de layout**
+   - Criar `src/components/admin/AdminLayout.tsx` com `SidebarProvider`, `AppSidebar`, header com `SidebarTrigger` + email + logout, e `<Outlet />`/children.
+   - Criar `src/components/admin/AdminSidebar.tsx` com grupos e itens acima, usando `NavLink` + `isActive`.
 
-### 5. Logs Globais
-- Feed cronológico de todas as `integration_deliveries` (saída) + recebimentos (entrada) + chamadas API.
-- Filtros: por webhook, evento, status, período.
+2. **Home do cockpit**
+   - Criar `src/components/admin/DashboardOverview.tsx` com KPIs, ações rápidas, feeds e saúde.
+   - Criar hook `src/hooks/useAdminOverview.ts` que agrega as consultas (leads, visits, clicks, sessions, integration_deliveries, mentees count, botconversa/integrations enabled counts). Reaproveitar o padrão de `loadData` atual.
+   - Componente reutilizável `src/components/admin/KpiCard.tsx` (variante do StatCard atual com sparkline opcional e delta 7d).
+   - Componente `src/components/admin/QuickAction.tsx`.
 
----
+3. **Refatoração de `src/pages/Admin.tsx`**
+   - Manter guarda de auth e estado de tab, mas trocar a tira horizontal pelo `AdminLayout` + `AdminSidebar`.
+   - Extrair os 4 blocos inline (leads/visits/clicks/sessions) para `src/components/admin/analytics/{LeadsTable,VisitsTable,ClicksTable,SessionsTable}.tsx` para desinchar o `Admin.tsx`.
+   - Roteamento interno via estado (sem mudar rotas do `App.tsx`): `view` controla qual módulo renderiza.
+   - Preservar `tab` param opcional via querystring (`?view=score`) para deep-link.
 
-## Seed inicial (eventos)
+4. **Ajustes visuais**
+   - Revisar `src/index.css` só se faltar token para o fundo do sidebar/cockpit (adicionar variáveis, não hardcode).
+   - Garantir dark mode consistente e contraste no acento laranja.
 
-**Leads:** `lead.contato`, `lead.mentoria_1a1_vendedores`, `lead.consultoria_operacional`, `lead.mentoria_estrategica`, `lead.lead_form_dialog`
+5. **Responsivo**
+   - Sidebar em `offcanvas` no mobile (via `useIsMobile`), header ganha `SidebarTrigger` visível.
+   - Dashboard: KPIs em grid 2 colunas no mobile, 3 no tablet, 6 no desktop.
 
-**Score:** `score.signup`, `score.onboarding_completed`, `score.daily_checkin`, `score.talk_to_gabriel`, `score.assistant_intent`, `score.weekly_diagnostic`, `score.inactive_recovery`, `score.upsell_requested`
+6. **Validação**
+   - Abrir cada item da sidebar e confirmar que o módulo antigo renderiza igual.
+   - Testar colapso do sidebar, deep-link `?view=…`, mobile.
+   - `tsgo` + build.
 
-**Mentorados:** `mentee.provisioned`, `mentee.meeting_scheduled`, `mentee.meeting_completed`, `mentee.homework_submitted`, `mentee.payment_received`, `mentee.payment_failed`
+## Arquivos envolvidos
 
-**BotConversa:** já cria 1 webhook default apontando pra URL atual (`.../catch/195152/eTId4HMCWYmw/`), assinando os eventos que hoje já disparam, **enabled=true** — comportamento idêntico ao de hoje.
+**Novos**
+- `src/components/admin/AdminLayout.tsx`
+- `src/components/admin/AdminSidebar.tsx`
+- `src/components/admin/DashboardOverview.tsx`
+- `src/components/admin/KpiCard.tsx`
+- `src/components/admin/QuickAction.tsx`
+- `src/components/admin/analytics/LeadsTable.tsx`
+- `src/components/admin/analytics/VisitsTable.tsx`
+- `src/components/admin/analytics/ClicksTable.tsx`
+- `src/components/admin/analytics/SessionsTable.tsx`
+- `src/hooks/useAdminOverview.ts`
 
----
+**Editados**
+- `src/pages/Admin.tsx` (trocar shell, remover blocos inline)
+- `src/index.css` (apenas se necessário adicionar token de sidebar/cockpit)
 
-## Segurança
+**Não tocados**
+- Todos os componentes de módulo existentes (`MenteesAdmin`, `ScoreAdmin`, `ContentsAdmin`, `MenteeEmailComposer`, `ProspectingBulk`, `WhatsAppAdmin`, `WhatsAppRitualAdmin`, `BotFlowsAdmin`, `BotConversaAdmin`, `IntegrationsAdmin`, `BlogAdmin`).
+- Rotas em `src/App.tsx`, edge functions, tabelas do backend, `.env`, tipos gerados.
 
-- RLS admin-only em todas as tabelas de config; `integration_deliveries` também admin-only.
-- API keys armazenadas como hash; valor completo só existe no momento da criação.
-- Webhooks de saída assinam payload com HMAC-SHA256 usando `secret` (opcional por webhook).
-- Endpoints inbound exigem `X-Webhook-Secret` ou assinatura HMAC.
-- Rate limit básico por API key (contador em memória do edge function; nota clara na UI de que não é limite forte).
-- Segredo global `INTEGRATIONS_DISPATCH_SECRET` gerado via `generate_secret` pra proteger chamadas internas ao dispatcher.
+## Premissas (corrija se necessário)
 
----
-
-## O que NÃO muda nesta entrega
-
-- Formulários existentes continuam chamando o helper atual — adicionamos `emitEvent()` em paralelo, sem remover `sendBotConversaLead`.
-- Nenhum edge function ativo tem sua lógica alterada (só ganha 1 linha de `emitEvent`).
-- `.env`, secrets do BotConversa, GPT Maker, WhatsApp — nada é tocado.
-
----
-
-## Entregáveis
-
-1. **Migrations**: 5 tabelas novas + RLS + GRANTs + seed de `integration_events` + seed do webhook default do BotConversa.
-2. **Edge functions**: `integrations-dispatch`, `integrations-inbound`, `integrations-api`.
-3. **Frontend**: `src/components/admin/IntegrationsAdmin.tsx` (com 5 sub-abas), adição da aba em `src/pages/Admin.tsx`.
-4. **Helper**: `src/lib/integrations.ts` + integração nos pontos de emissão existentes (sem alterar comportamento atual).
-5. **Cron job**: retry de deliveries falhas (roda a cada 1min via `pg_cron` chamando `integrations-dispatch` com flag `retry_pending`).
-
-## Escopo em fases (se preferir dividir)
-
-- **Fase 1 (MVP):** tabelas + webhooks de saída + catálogo + logs + UI das 2 sub-abas correspondentes. Já resolve o pedido central.
-- **Fase 2:** endpoints de entrada.
-- **Fase 3:** API keys + endpoints REST + documentação.
-
-Me confirma se quer tudo em uma leva ou fasear (recomendo fasear pela robustez). Quando aprovar, entro em build mode.
+- A sidebar substitui totalmente a tira de abas horizontal — sem manter as duas.
+- Os 4 KPIs atuais no topo continuam existindo, mas dentro da home "Visão Geral" (não em todas as telas).
+- Deep-link por querystring é suficiente; não é preciso criar sub-rotas (`/admin/mentorados`, etc.).
