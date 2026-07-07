@@ -1,5 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { syncScoreUser, sendOnboarding } from "../_shared/botconversa.ts";
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -54,7 +56,16 @@ Deno.serve(async (req) => {
         plan_started_at: planStartedAt,
         plan_expires_at: planExpiresAt,
       }).eq("cora_invoice_id", resourceId);
+
+      // Sincroniza no BotConversa e dispara onboarding (best-effort; não bloqueia webhook)
+      try {
+        await syncScoreUser(profile.user_id);
+        await sendOnboarding(profile.user_id);
+      } catch (e) {
+        console.error("botconversa post-payment sync failed:", e);
+      }
     }
+
 
     return new Response(JSON.stringify({ received: true, eventId, eventType, resourceId }), {
       status: 200,

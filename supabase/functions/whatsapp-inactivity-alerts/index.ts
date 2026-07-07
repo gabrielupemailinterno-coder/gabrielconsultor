@@ -1,6 +1,6 @@
 // Cron 10h BRT (13:00 UTC) diário: alertas para inatividade de 2, 5 e 10 dias.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { sendWhatsApp, normalizePhone, todayBRT } from "../_shared/gpt-maker.ts";
+import { sendTextByUser, sendTextByPhone, normalizePhone } from "../_shared/botconversa.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -27,6 +27,7 @@ function json(b: unknown, s = 200) {
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+function todayBRT(): string { const n=new Date(); return new Date(n.getTime()-3*3600*1000).toISOString().slice(0,10); }
 
 function daysSince(dateISO: string | null, today: string): number {
   if (!dateISO) return 9999;
@@ -54,7 +55,7 @@ Deno.serve(async (req) => {
     const out: any[] = [];
     for (const kind of ["alert_2", "alert_5", "alert_10"]) {
       const msg = (templates[kind] || DEFAULTS[kind]).replaceAll("{{nome}}", "amigo");
-      const r = await sendWhatsApp(settings.channel_id, phone, msg);
+      const r = await sendTextByPhone(phone, msg);
       await admin.from("score_whatsapp_messages").insert({
         phone, direction: "out", kind: `${kind}_test`,
         payload: { message: msg }, error: r.ok ? null : r.error,
@@ -102,7 +103,7 @@ Deno.serve(async (req) => {
     const first = (p.full_name || "").split(" ")[0] || "";
     const template = templates[kind] || DEFAULTS[kind];
     const msg = template.replaceAll("{{nome}}", first);
-    const r = await sendWhatsApp(settings.channel_id, phone, msg);
+    const r = await sendTextByUser(p.user_id, msg);
     await admin.from("score_whatsapp_messages").insert({
       user_id: p.user_id, phone, direction: "out", kind,
       payload: { message: msg, days }, error: r.ok ? null : r.error,

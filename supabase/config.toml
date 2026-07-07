@@ -27,5 +27,15 @@ project_id = "xhzsdnbztsnupbukmdjg"
     verify_jwt = false
   [functions.bot-flow-test]
     verify_jwt = true
+  [functions.botconversa-webhook]
+    verify_jwt = false
+  [functions.botconversa-sync-user]
+    verify_jwt = true
+  [functions.botconversa-start-onboarding]
+    verify_jwt = true
+  [functions.botconversa-send-checkin]
+    verify_jwt = true
+
+
 
 

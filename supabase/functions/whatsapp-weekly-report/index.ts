@@ -1,6 +1,6 @@
 // Cron segunda 08h BRT (11:00 UTC): diagnóstico semanal.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { sendWhatsApp, normalizePhone, todayBRT } from "../_shared/gpt-maker.ts";
+import { sendTextByUser, sendTextByPhone, normalizePhone } from "../_shared/botconversa.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,6 +14,7 @@ function json(b: unknown, s = 200) {
   return new Response(JSON.stringify(b), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 }
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+function todayBRT(): string { const n=new Date(); return new Date(n.getTime()-3*3600*1000).toISOString().slice(0,10); }
 const pct = (a: number, b: number) => (b > 0 ? Math.min(100, Math.round((a / b) * 100)) : 0);
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -76,7 +77,7 @@ Deno.serve(async (req) => {
 📚 Aula recomendada: https://gabrielconsultor.com/scoreapp/conteudos
 
 Quer que eu analise seu funil por 60 min? Responde "quero análise".`;
-    const r = await sendWhatsApp(settings.channel_id, phone, msg);
+    const r = await sendTextByPhone(phone, msg);
     await admin.from("score_whatsapp_messages").insert({
       phone, direction: "out", kind: "weekly_test",
       payload: { message: msg }, error: r.ok ? null : r.error,
@@ -120,7 +121,7 @@ Quer que eu analise seu funil por 60 min? Responde "quero análise".`;
 
 Quer que eu analise seu funil por 60 min numa sessão individual? Responde "quero análise" que te mando os detalhes.`;
 
-    const r = await sendWhatsApp(settings.channel_id, phone, msg);
+    const r = await sendTextByUser(p.user_id, msg);
     await admin.from("score_whatsapp_messages").insert({
       user_id: p.user_id, phone, direction: "out", kind: "weekly",
       payload: { message: msg, summary: c, gargalo }, error: r.ok ? null : r.error,
