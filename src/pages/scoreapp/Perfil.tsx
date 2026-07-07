@@ -55,7 +55,15 @@ export default function ScorePerfil() {
           <div><span className="text-muted-foreground text-xs">Telefone:</span> {profile.phone}</div>
           <div><span className="text-muted-foreground text-xs">Segmento:</span> {profile.segment}</div>
           <div><span className="text-muted-foreground text-xs">Plano:</span> {profile.plan}</div>
+      </div>
+
+      <div className="bg-card border border-border rounded-lg p-6 mb-6">
+        <h2 className="font-serif text-xl mb-3">WhatsApp conectado</h2>
+        <div className="grid md:grid-cols-2 gap-3 text-sm">
+          <div><span className="text-muted-foreground text-xs">Número:</span> <span className="font-mono">{profile.phone || "não cadastrado"}</span></div>
+          <div><span className="text-muted-foreground text-xs">Integração:</span> {(profile as any).botconversa_subscriber_id ? <span className="text-primary">conectado</span> : <span className="text-muted-foreground">não sincronizado</span>}</div>
         </div>
+
         <label className="mt-4 flex items-center gap-3 cursor-pointer border-t border-border pt-4">
           <input
             type="checkbox"
@@ -70,10 +78,55 @@ export default function ScorePerfil() {
           />
           <div>
             <div className="text-sm">Receber check-in diário no WhatsApp</div>
-            <div className="text-xs text-muted-foreground">Todo dia às 18h eu puxo seus números do dia. Você responde no WhatsApp e eu atualizo seu Score.</div>
+            <div className="text-xs text-muted-foreground">Todo dia eu puxo seus números do dia. Você responde no WhatsApp e eu atualizo seu Score.</div>
           </div>
         </label>
-      </div>
+
+        <label className="mt-4 block">
+          <span className="text-xs uppercase tracking-wider text-muted-foreground">Horário preferido do check-in</span>
+          <select
+            value={((profile as any).daily_checkin_time || "18:00:00").slice(0, 5)}
+            onChange={async (e) => {
+              const val = e.target.value + ":00";
+              const { error } = await supabase.from("score_profiles").update({ daily_checkin_time: val }).eq("user_id", uid!);
+              if (error) toast.error(error.message);
+              else { toast.success("Horário atualizado"); reload(); }
+            }}
+            className="w-full mt-1 bg-input border border-border rounded-md px-4 py-3 text-sm"
+          >
+            <option value="08:00">08:00</option>
+            <option value="12:00">12:00</option>
+            <option value="18:00">18:00</option>
+            <option value="20:00">20:00</option>
+          </select>
+        </label>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            onClick={async () => {
+              const { error } = await supabase.functions.invoke("botconversa-send-checkin", { body: { user_id: uid } });
+              if (error) toast.error(error.message); else toast.success("Check-in enviado no WhatsApp");
+            }}
+            disabled={!profile.phone}
+            className="text-sm px-4 py-2 bg-primary text-primary-foreground rounded-md disabled:opacity-50"
+          >
+            Receber check-in agora
+          </button>
+          <button
+            onClick={async () => {
+              const novo = prompt("Novo WhatsApp com DDD (ex: 32999998888):", profile.phone || "");
+              if (!novo) return;
+              const { error } = await supabase.from("score_profiles").update({ phone: novo.replace(/\D/g, "") }).eq("user_id", uid!);
+              if (error) return toast.error(error.message);
+              await supabase.functions.invoke("botconversa-sync-user", { body: { user_id: uid } });
+              toast.success("WhatsApp atualizado"); reload();
+            }}
+            className="text-sm px-4 py-2 border border-border rounded-md hover:bg-muted"
+          >
+            Atualizar meu WhatsApp
+          </button>
+        </div>
+
 
       <div className="bg-card border border-border rounded-lg p-6 space-y-3">
         <h2 className="font-serif text-xl mb-2">Minhas metas</h2>
