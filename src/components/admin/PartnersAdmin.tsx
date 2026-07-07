@@ -522,7 +522,7 @@ export default function PartnersAdmin() {
                       </td>
                     </tr>
                   )}
-                </>
+                </React.Fragment>
               );
             })}
           </tbody>
