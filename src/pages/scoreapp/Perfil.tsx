@@ -55,7 +55,10 @@ export default function ScorePerfil() {
           <div><span className="text-muted-foreground text-xs">Telefone:</span> {profile.phone}</div>
           <div><span className="text-muted-foreground text-xs">Segmento:</span> {profile.segment}</div>
           <div><span className="text-muted-foreground text-xs">Plano:</span> {profile.plan}</div>
+        </div>
       </div>
+
+
 
       <div className="bg-card border border-border rounded-lg p-6 mb-6">
         <h2 className="font-serif text-xl mb-3">WhatsApp conectado</h2>
