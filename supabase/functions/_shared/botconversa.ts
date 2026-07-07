@@ -282,6 +282,23 @@ export async function sendTextByUser(userId: string, message: string): Promise<{
   }
 }
 
+export async function sendTextByPhone(rawPhone: string, message: string): Promise<{ ok: boolean; error?: string }> {
+  const phone = normalizePhone(rawPhone);
+  if (!phone) return { ok: false, error: "telefone inválido" };
+  try {
+    const sub = await createOrUpdateSubscriber({ phone });
+    if (!sub.id) return { ok: false, error: "não foi possível criar subscriber" };
+    const r = await sendTextMessage(sub.id, message);
+    await logEvent({ phone, direction: "outbound", event_type: "text_message_by_phone", status: r.ok ? "ok" : "error", response: r.body, payload: { message } });
+    return { ok: r.ok };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    await logEvent({ phone, direction: "outbound", event_type: "text_message_by_phone", status: "error", error_message: msg });
+    return { ok: false, error: msg };
+  }
+}
+
+
 export const CORS = {
 
   "Access-Control-Allow-Origin": "*",
