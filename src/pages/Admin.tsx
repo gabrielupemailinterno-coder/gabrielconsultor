@@ -12,6 +12,8 @@ import WhatsAppRitualAdmin from "@/components/admin/WhatsAppRitualAdmin";
 import BotFlowsAdmin from "@/components/admin/BotFlowsAdmin";
 
 import ScoreAdmin from "@/components/admin/ScoreAdmin";
+import BotConversaAdmin from "@/components/admin/BotConversaAdmin";
+
 import ContentsAdmin from "@/components/admin/ContentsAdmin";
 import { FORM_LABELS, type FormType } from "@/lib/qualifying-forms";
 
@@ -150,6 +152,8 @@ const Admin = () => {
             { id: "whatsapp", label: "WhatsApp" },
             { id: "ritual", label: "Ritual WhatsApp" },
             { id: "botflow", label: "Fluxo do Bot" },
+            { id: "botconversa", label: "BotConversa" },
+
 
 
             { id: "leads", label: `Cadastros (${leads.length})` },
@@ -176,6 +180,8 @@ const Admin = () => {
         {tab === "whatsapp" && <WhatsAppAdmin />}
         {tab === "ritual" && <WhatsAppRitualAdmin />}
         {tab === "botflow" && <BotFlowsAdmin />}
+        {tab === "botconversa" && <BotConversaAdmin />}
+
 
 
         {tab === "leads" && (() => {
