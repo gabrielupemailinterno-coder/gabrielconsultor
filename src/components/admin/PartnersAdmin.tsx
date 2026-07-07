@@ -42,7 +42,7 @@ const genCode = (name: string) => {
 };
 
 const linkFor = (code: string) =>
-  `${typeof window !== "undefined" ? window.location.origin : ""}/scoreapp/landing?partner=${encodeURIComponent(code)}`;
+  `${typeof window !== "undefined" ? window.location.origin : ""}/scoreapp?partner=${encodeURIComponent(code)}`;
 
 export default function PartnersAdmin() {
   const [partners, setPartners] = useState<Partner[]>([]);
