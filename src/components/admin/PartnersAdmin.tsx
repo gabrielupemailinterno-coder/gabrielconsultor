@@ -345,7 +345,7 @@ export default function PartnersAdmin() {
               const isOpen = !!expanded[p.id];
               const tf = getTrialForm(p.id);
               return (
-                <>
+                <React.Fragment key={p.id}>
                   <tr key={p.id} className="border-t border-border align-top">
                     <td className="px-2 py-3">
                       <button onClick={() => toggleExpand(p.id)} className="text-muted-foreground hover:text-primary">
