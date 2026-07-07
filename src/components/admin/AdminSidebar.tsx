@@ -42,6 +42,7 @@ export type AdminView =
   | "botflow"
   | "botconversa"
   | "integrations"
+  | "partners"
   | "leads"
   | "visits"
   | "clicks"
