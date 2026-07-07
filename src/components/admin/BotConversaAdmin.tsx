@@ -215,6 +215,23 @@ function Stat({ label, value }: { label: string; value: number }) {
   );
 }
 
+function FlowConfigSection() {
+  return (
+    <section>
+      <h2 className="font-serif text-lg mb-3">Configuração por evento</h2>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {FLOW_CONFIG.map((f) => (
+          <div key={f.key} className="border border-border rounded-lg p-4">
+            <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">{f.key}</div>
+            <div className="font-serif text-base mt-1">{f.label}</div>
+            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{f.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function TestTriggers() {
   const [busy, setBusy] = useState<string | null>(null);
   const [results, setResults] = useState<Record<string, "ok" | "err">>({});
