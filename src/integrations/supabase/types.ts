@@ -1025,6 +1025,7 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          partner_id: string | null
           password_changed_at: string | null
           payment_notes: string | null
           payment_status: string
@@ -1054,6 +1055,7 @@ export type Database = {
           email: string
           full_name: string
           id?: string
+          partner_id?: string | null
           password_changed_at?: string | null
           payment_notes?: string | null
           payment_status?: string
@@ -1083,6 +1085,7 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          partner_id?: string | null
           password_changed_at?: string | null
           payment_notes?: string | null
           payment_status?: string
@@ -1100,6 +1103,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "mentees_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "mentees_plan_id_fkey"
             columns: ["plan_id"]
@@ -1314,6 +1324,50 @@ export type Database = {
           user_agent?: string | null
         }
         Relationships: []
+      }
+      partner_trials: {
+        Row: {
+          contact_email: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          notes: string | null
+          partner_id: string
+          product_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          contact_email?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          notes?: string | null
+          partner_id: string
+          product_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          contact_email?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          notes?: string | null
+          partner_id?: string
+          product_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_trials_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       partners: {
         Row: {
