@@ -226,7 +226,7 @@ export default function PartnersAdmin() {
 
   return (
     <div className="space-y-6">
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <section className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <div className="bg-card border border-border rounded-lg p-4">
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Total</p>
           <p className="font-mono text-2xl mt-1">{total}</p>
@@ -238,6 +238,11 @@ export default function PartnersAdmin() {
         <div className="bg-card border border-border rounded-lg p-4">
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Teste / Inativos</p>
           <p className="font-mono text-2xl mt-1">{inactive}</p>
+        </div>
+        <div className="bg-card border border-border rounded-lg p-4">
+          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Testes concedidos</p>
+          <p className="font-mono text-2xl mt-1">{trials.length}</p>
+          <p className="text-[10px] text-muted-foreground">{trials.filter((t) => t.status === "active").length} ativos</p>
         </div>
         <div className="bg-card border border-border rounded-lg p-4">
           <p className="text-[10px] uppercase tracking-widest text-muted-foreground">Últimos</p>
