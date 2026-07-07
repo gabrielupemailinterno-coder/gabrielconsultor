@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { sendBotConversaLead } from "@/lib/botconversa";
+
+const TEST_FLOWS: { key: string; label: string; nome: string; telefone: string }[] = [
+  { key: "onboarding", label: "Onboarding", nome: "TESTE Onboarding", telefone: "5511999990001" },
+  { key: "checkin", label: "Check-in diário", nome: "TESTE Checkin Diario", telefone: "5511999990002" },
+  { key: "gabriel", label: "Falar com Gabriel", nome: "TESTE Falar com Gabriel", telefone: "5511999990003" },
+  { key: "assistente", label: "Assistente", nome: "TESTE Assistente", telefone: "5511999990004" },
+  { key: "diagnostico", label: "Diagnóstico semanal", nome: "TESTE Diagnostico Semanal", telefone: "5511999990005" },
+  { key: "inativo", label: "Recuperação de inativo", nome: "TESTE Recuperacao Inativo", telefone: "5511999990006" },
+];
 
 type LogRow = {
   id: string;
@@ -94,6 +104,8 @@ export default function BotConversaAdmin() {
         <Stat label="Sincronizados no BotConversa" value={synced} />
         <Stat label="Webhooks pendentes" value={pending.length} />
       </div>
+
+      <TestTriggers />
 
       <section>
         <h2 className="font-serif text-xl mb-3">Usuários</h2>
@@ -189,5 +201,51 @@ function Stat({ label, value }: { label: string; value: number }) {
       <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="text-2xl font-serif mt-1">{value}</div>
     </div>
+  );
+}
+
+function TestTriggers() {
+  const [busy, setBusy] = useState<string | null>(null);
+  const [results, setResults] = useState<Record<string, "ok" | "err">>({});
+
+  async function fire(flow: typeof TEST_FLOWS[number]) {
+    setBusy(flow.key);
+    try {
+      await sendBotConversaLead(flow.nome, flow.telefone);
+      setResults((r) => ({ ...r, [flow.key]: "ok" }));
+      toast.success(`Gatilho "${flow.label}" disparado`);
+    } catch (e: any) {
+      setResults((r) => ({ ...r, [flow.key]: "err" }));
+      toast.error(e?.message || "falha");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <section className="border border-border rounded-lg p-4 bg-muted/20">
+      <h2 className="font-serif text-lg mb-1">Testes de gatilho BotConversa</h2>
+      <p className="text-xs text-muted-foreground mb-3">
+        Cada botão envia <code className="font-mono">{`{ nome, telefone }`}</code> de teste ao webhook compartilhado para validar o disparo.
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {TEST_FLOWS.map((f) => {
+          const r = results[f.key];
+          return (
+            <button
+              key={f.key}
+              onClick={() => fire(f)}
+              disabled={busy === f.key}
+              className={`text-xs px-3 py-1.5 border rounded hover:bg-muted disabled:opacity-40 ${
+                r === "ok" ? "border-primary text-primary" : r === "err" ? "border-destructive text-destructive" : "border-border"
+              }`}
+              title={`${f.nome} · ${f.telefone}`}
+            >
+              {busy === f.key ? "Enviando…" : f.label} {r === "ok" ? "✓" : r === "err" ? "✕" : ""}
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }
