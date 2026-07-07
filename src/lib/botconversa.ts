@@ -1,6 +1,6 @@
 const WEBHOOK_URL =
   import.meta.env.VITE_BOTCONVERSA_WEBHOOK_URL ||
-  "https://new-backend.botconversa.com.br/api/v1/webhooks-automation/catch/195152/bPy747j1w2e4/";
+  "https://new-backend.botconversa.com.br/api/v1/webhooks-automation/catch/195152/eTId4HMCWYmw/";
 
 export async function sendBotConversaLead(nome: string, telefone: string): Promise<void> {
   try {
