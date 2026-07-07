@@ -78,10 +78,13 @@ const linkFor = (code: string) =>
 
 export default function PartnersAdmin() {
   const [partners, setPartners] = useState<Partner[]>([]);
+  const [trials, setTrials] = useState<Trial[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [editing, setEditing] = useState<Partner | null>(null);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [trialForm, setTrialForm] = useState<Record<string, { product_type: string; contact_email: string; expires_at: string; notes: string }>>({});
 
   const [form, setForm] = useState({
     name: "",
@@ -94,17 +97,26 @@ export default function PartnersAdmin() {
 
   const load = async () => {
     setLoading(true);
-    const { data } = await (supabase as any)
-      .from("partners")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setPartners((data as Partner[]) || []);
+    const [pRes, tRes] = await Promise.all([
+      (supabase as any).from("partners").select("*").order("created_at", { ascending: false }),
+      (supabase as any).from("partner_trials").select("*").order("created_at", { ascending: false }),
+    ]);
+    setPartners((pRes.data as Partner[]) || []);
+    setTrials((tRes.data as Trial[]) || []);
     setLoading(false);
   };
 
   useEffect(() => {
     load();
   }, []);
+
+  const trialsByPartner = useMemo(() => {
+    const map: Record<string, Trial[]> = {};
+    trials.forEach((t) => {
+      (map[t.partner_id] ||= []).push(t);
+    });
+    return map;
+  }, [trials]);
 
   const resetForm = () =>
     setForm({ name: "", company_name: "", email: "", phone: "", partner_code: "", notes: "" });
