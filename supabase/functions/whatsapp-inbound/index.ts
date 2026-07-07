@@ -1,14 +1,7 @@
 // Webhook público chamado pelo GPT Maker quando o usuário responde no WhatsApp.
 // Requer header X-Webhook-Token = GPT_MAKER_WEBHOOK_TOKEN.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import {
-  sendWhatsApp,
-  normalizePhone,
-  todayBRT,
-  resolveChatId,
-  startHuman,
-  stopHuman,
-} from "../_shared/gpt-maker.ts";
+import { sendWhatsApp, normalizePhone, todayBRT, resolveChatId, startHuman, stopHuman } from "../_shared/gpt-maker.ts";
 import { parseWhatsAppLog } from "../_shared/whatsapp-parser.ts";
 import {
   BotFlow,
@@ -59,9 +52,40 @@ function computeDayScore(log: any): { score: number; label: string } {
 }
 
 const SCORE_FIELDS = [
-  "ligacoes", "whatsapps", "prospeccoes", "contatos_efetivos",
-  "reunioes_agendadas", "apresentacoes", "propostas", "vendas", "valor_vendido",
+  "ligacoes",
+  "whatsapps",
+  "prospeccoes",
+  "contatos_efetivos",
+  "reunioes_agendadas",
+  "apresentacoes",
+  "propostas",
+  "vendas",
+  "valor_vendido",
 ];
+
+const FIELD_LABELS: Record<string, string> = {
+  ligacoes: "Ligações",
+  whatsapps: "WhatsApps",
+  prospeccoes: "Novos leads/prospecções",
+  contatos_efetivos: "Contatos efetivos",
+  reunioes_agendadas: "Reuniões",
+  apresentacoes: "Apresentações",
+  propostas: "Propostas",
+  vendas: "Vendas",
+  valor_vendido: "Valor vendido",
+};
+
+function formatSavedFields(log: any, fields: string[]): string {
+  return fields
+    .map((field) => {
+      const value = Number(log[field]) || 0;
+      if (field === "valor_vendido") {
+        return `${FIELD_LABELS[field]}: ${value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
+      }
+      return `${FIELD_LABELS[field] || field}: ${value}`;
+    })
+    .join("\n");
+}
 
 function pickEmail(body: any): string {
   return firstString(
@@ -75,7 +99,9 @@ function pickEmail(body: any): string {
     valueAtPath(body, "payload.email"),
     valueAtPath(body, "data.email"),
     findByKey(body, ["email"]),
-  ).trim().toLowerCase();
+  )
+    .trim()
+    .toLowerCase();
 }
 
 function pickPhone(body: any): string {
@@ -271,7 +297,11 @@ async function parseWebhookBody(req: Request, url: URL): Promise<any> {
     const parsed: Record<string, unknown> = Object.fromEntries(new URLSearchParams(raw).entries());
     for (const [key, value] of Object.entries(parsed)) {
       if (typeof value === "string" && /^[\[{]/.test(value.trim())) {
-        try { parsed[key] = JSON.parse(value); } catch { /* keep text */ }
+        try {
+          parsed[key] = JSON.parse(value);
+        } catch {
+          /* keep text */
+        }
       }
     }
     return parsed;
@@ -313,7 +343,6 @@ function pickMessageId(body: any): string | null {
     null;
   return id ? String(id) : null;
 }
-
 
 function phoneCandidates(raw: string): Set<string> {
   const normalized = normalizePhone(raw);
@@ -372,8 +401,11 @@ async function getAdminSettings(admin: any) {
 
 async function computeStreak(admin: any, userId: string): Promise<number> {
   const { data } = await admin
-    .from("score_daily_logs").select("date").eq("user_id", userId)
-    .order("date", { ascending: false }).limit(365);
+    .from("score_daily_logs")
+    .select("date")
+    .eq("user_id", userId)
+    .order("date", { ascending: false })
+    .limit(365);
   if (!data || data.length === 0) return 0;
   const set = new Set((data as any[]).map((d) => d.date));
   const today = todayBRT();
@@ -403,12 +435,14 @@ async function persistAndReply(
   if (step.saveLogFor) {
     const { date, log } = step.saveLogFor;
     const { data: existing } = await admin
-      .from("score_daily_logs").select("*")
-      .eq("user_id", profile.user_id).eq("date", date).maybeSingle();
+      .from("score_daily_logs")
+      .select("*")
+      .eq("user_id", profile.user_id)
+      .eq("date", date)
+      .maybeSingle();
     const merged: any = { user_id: profile.user_id, date };
     for (const f of SCORE_FIELDS) merged[f] = Number(log[f] ?? existing?.[f]) || 0;
-    const { error: upErr } = await admin.from("score_daily_logs")
-      .upsert(merged, { onConflict: "user_id,date" });
+    const { error: upErr } = await admin.from("score_daily_logs").upsert(merged, { onConflict: "user_id,date" });
     if (upErr) console.error("upsert log error", upErr);
     if (step.markPenaltyZero) {
       await admin.from("score_profiles").update({ inactivity_penalty_days: 0 }).eq("user_id", profile.user_id);
@@ -421,10 +455,18 @@ async function persistAndReply(
   // 2) Resolve chatId uma vez para todo o step; se sessão continua, silencia o agente.
   let chatId = chatIdHint;
   if (channelId && !chatId) {
-    try { chatId = await resolveChatId(channelId, phone); } catch { chatId = null; }
+    try {
+      chatId = await resolveChatId(channelId, phone);
+    } catch {
+      chatId = null;
+    }
   }
   if (chatId && step.session) {
-    try { await startHuman(chatId); } catch { /* best effort */ }
+    try {
+      await startHuman(chatId);
+    } catch {
+      /* best effort */
+    }
   }
 
   // 3) Persistir sessão (upsert ou delete se encerrou)
@@ -463,17 +505,27 @@ async function persistAndReply(
       phone,
       direction: "out",
       kind: "bot_step",
-      payload: { message: msg, chatId: chatId || null, endpoint: r.endpoint, status: r.status, attempts: r.attempts, ...(scoreInfo || {}) },
+      payload: {
+        message: msg,
+        chatId: chatId || null,
+        endpoint: r.endpoint,
+        status: r.status,
+        attempts: r.attempts,
+        ...(scoreInfo || {}),
+      },
       error: r.ok ? null : r.error,
     });
   }
 
   // 5) Se o fluxo terminou, devolve controle ao agente.
   if (!step.session && chatId) {
-    try { await stopHuman(chatId); } catch { /* best effort */ }
+    try {
+      await stopHuman(chatId);
+    } catch {
+      /* best effort */
+    }
   }
 }
-
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -485,20 +537,35 @@ Deno.serve(async (req) => {
     req.headers.get("X-Webhook-Token"),
     req.headers.get("x-gptmaker-token"),
     req.headers.get("x-gpt-maker-token"),
+    req.headers.get("x-hashkey"),
+    req.headers.get("hashkey"),
+    req.headers.get("x-api-key"),
+    req.headers.get("api-key"),
     url.searchParams.get("token"),
     url.searchParams.get("webhook_token"),
+    url.searchParams.get("webhookToken"),
     url.searchParams.get("t"),
+    url.searchParams.get("hashkey"),
+    url.searchParams.get("hashKey"),
+    url.searchParams.get("key"),
+    url.searchParams.get("secret"),
     req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? null,
     url.pathname.split("/").filter(Boolean).at(-1) ?? null,
   ].filter((v): v is string => !!v);
   const matched = tokenCandidates.some((v) => v === WEBHOOK_TOKEN);
   console.log(
-    "[inbound:req] method=", req.method,
-    "contentType=", req.headers.get("content-type") || "",
-    "path=", url.pathname,
-    "hasQueryToken=", url.searchParams.has("token"),
-    "candidates=", tokenCandidates.length,
-    "auth=", matched ? "ok" : (tokenCandidates.length ? "invalid" : "missing"),
+    "[inbound:req] method=",
+    req.method,
+    "contentType=",
+    req.headers.get("content-type") || "",
+    "path=",
+    url.pathname,
+    "hasQueryToken=",
+    url.searchParams.has("token"),
+    "candidates=",
+    tokenCandidates.length,
+    "auth=",
+    matched ? "ok" : tokenCandidates.length ? "invalid" : "missing",
   );
   if (!matched) {
     // Fallback: check body for token before rejecting (GPT Maker may put it there).
@@ -518,11 +585,25 @@ Deno.serve(async (req) => {
   }
 
   let body: any;
-  try { body = await parseWebhookBody(req, url); } catch (error) {
+  try {
+    body = await parseWebhookBody(req, url);
+  } catch (error) {
     console.error("[inbound:req] invalid body", error instanceof Error ? error.message : String(error));
     return json({ error: "invalid body" }, 400);
   }
-  const bodyToken = firstString(body.token, body.webhook_token, body.webhookToken);
+  const bodyToken = firstString(
+    body.token,
+    body.webhook_token,
+    body.webhookToken,
+    body.hashkey,
+    body.hashKey,
+    body.key,
+    body.secret,
+    valueAtPath(body, "payload.token"),
+    valueAtPath(body, "payload.hashkey"),
+    valueAtPath(body, "data.token"),
+    valueAtPath(body, "data.hashkey"),
+  );
   if (bodyToken && bodyToken !== WEBHOOK_TOKEN) {
     console.warn("[inbound:req] invalid body token");
     return json({ error: "unauthorized" }, 401);
@@ -549,13 +630,20 @@ Deno.serve(async (req) => {
   ).toLowerCase();
   const isEchoRole = /(assistant|agent|bot|system|out|outbound|ai)/.test(roleRaw);
   console.log(
-    "[inbound:parsed] keys=", JSON.stringify(topLevelKeys(body)),
-    "hasPhone=", !!rawPhone,
-    "hasEmail=", !!email,
-    "hasMessage=", !!message,
-    "hasChatId=", !!chatIdIn,
-    "role=", roleRaw || "(none)",
-    "isEcho=", isEchoRole,
+    "[inbound:parsed] keys=",
+    JSON.stringify(topLevelKeys(body)),
+    "hasPhone=",
+    !!rawPhone,
+    "hasEmail=",
+    !!email,
+    "hasMessage=",
+    !!message,
+    "hasChatId=",
+    !!chatIdIn,
+    "role=",
+    roleRaw || "(none)",
+    "isEcho=",
+    isEchoRole,
   );
   if (isEchoRole) {
     console.log("[inbound] ignorando echo do próprio agente role=", roleRaw);
@@ -564,30 +652,64 @@ Deno.serve(async (req) => {
   if ((!rawPhone && !email && !chatIdIn) || !message) {
     // Registra payload não reconhecido para diagnóstico
     try {
-      await createClient(SUPABASE_URL, SERVICE_KEY).from("score_whatsapp_messages").insert({
-        phone: rawPhone || "unknown",
-        direction: "in",
-        kind: "invalid_payload",
-        payload: {
-          raw: body,
-          reason: "phone/email/chatId or message missing",
-          detected: { hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message, hasChatId: !!chatIdIn, keys: topLevelKeys(body) },
-        },
-      });
+      await createClient(SUPABASE_URL, SERVICE_KEY)
+        .from("score_whatsapp_messages")
+        .insert({
+          phone: rawPhone || "unknown",
+          direction: "in",
+          kind: "invalid_payload",
+          payload: {
+            raw: body,
+            reason: "phone/email/chatId or message missing",
+            detected: {
+              hasPhone: !!rawPhone,
+              hasEmail: !!email,
+              hasMessage: !!message,
+              hasChatId: !!chatIdIn,
+              keys: topLevelKeys(body),
+            },
+          },
+        });
     } catch {}
-    console.warn("[inbound:invalid_payload]", JSON.stringify({ hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message, hasChatId: !!chatIdIn, keys: topLevelKeys(body) }));
+    console.warn(
+      "[inbound:invalid_payload]",
+      JSON.stringify({
+        hasPhone: !!rawPhone,
+        hasEmail: !!email,
+        hasMessage: !!message,
+        hasChatId: !!chatIdIn,
+        keys: topLevelKeys(body),
+      }),
+    );
     return json({
       ok: true,
       accepted: true,
       ignored: "invalid_payload",
-      got: { hasPhone: !!rawPhone, hasEmail: !!email, hasMessage: !!message, hasChatId: !!chatIdIn, keys: topLevelKeys(body) },
+      got: {
+        hasPhone: !!rawPhone,
+        hasEmail: !!email,
+        hasMessage: !!message,
+        hasChatId: !!chatIdIn,
+        keys: topLevelKeys(body),
+      },
     });
   }
 
   const phone = normalizePhone(rawPhone);
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
-  console.log("[inbound] phone=", phone, "email=", email, "chatId=", chatIdIn, "msgId=", messageId, "message=", JSON.stringify(message));
+  console.log(
+    "[inbound] phone=",
+    phone,
+    "email=",
+    email,
+    "chatId=",
+    chatIdIn,
+    "msgId=",
+    messageId,
+    "message=",
+    JSON.stringify(message),
+  );
 
   // Dedup: ignora callback repetido da GPT Maker (mesma message_id nos últimos 5 min)
   if (messageId) {
@@ -606,14 +728,17 @@ Deno.serve(async (req) => {
   }
 
   await admin.from("score_whatsapp_messages").insert({
-    phone: phone || "unknown", direction: "in", kind: "inbound",
+    phone: phone || "unknown",
+    direction: "in",
+    kind: "inbound",
     payload: { message, email, message_id: messageId, chatId: chatIdIn, raw: body },
   });
 
-
   const { data: profiles } = await admin.from("score_profiles").select("user_id, full_name, email, phone").limit(500);
   const profile = (profiles || []).find((p: any) => {
-    const pe = String(p.email || "").trim().toLowerCase();
+    const pe = String(p.email || "")
+      .trim()
+      .toLowerCase();
     return (phone && phonesMatch(phone, p.phone || "")) || (email && pe === email);
   });
 
@@ -626,28 +751,38 @@ Deno.serve(async (req) => {
   let earlyChatId: string | null = chatIdIn;
   if (channelId && phone) {
     if (!earlyChatId) {
-      try { earlyChatId = await resolveChatId(channelId, phone); } catch { earlyChatId = null; }
+      try {
+        earlyChatId = await resolveChatId(channelId, phone);
+      } catch {
+        earlyChatId = null;
+      }
     }
     if (earlyChatId) {
-      try { await startHuman(earlyChatId); } catch { /* best effort */ }
+      try {
+        await startHuman(earlyChatId);
+      } catch {
+        /* best effort */
+      }
     } else {
       console.warn("[inbound] não consegui resolver chatId para silenciar agente phone=", phone);
     }
   }
 
-
-
-
   if (!profile) {
-    if (channelId) await sendWhatsApp(channelId, phone,
-      "Olá! Não encontrei seu cadastro no Score Comercial. Acesse a plataforma e complete seu perfil com esse número de WhatsApp.");
+    if (channelId)
+      await sendWhatsApp(
+        channelId,
+        phone,
+        "Olá! Não encontrei seu cadastro no Score Comercial. Acesse a plataforma e complete seu perfil com esse número de WhatsApp.",
+      );
     return json({ ok: false, error: "profile not found" });
   }
 
   // Comando global: cancelar
   if (isCancelCommand(message)) {
     await admin.from("bot_sessions").delete().eq("phone", phone);
-    if (channelId) await sendWhatsApp(channelId, phone, "Beleza, encerrei o registro. Quando quiser recomeçar, é só me chamar.");
+    if (channelId)
+      await sendWhatsApp(channelId, phone, "Beleza, encerrei o registro. Quando quiser recomeçar, é só me chamar.");
     return json({ ok: true, cancelled: true });
   }
 
@@ -687,16 +822,27 @@ Deno.serve(async (req) => {
   }
 
   // Sem sessão: tenta match de trigger contra fluxos ativos
-  const { data: flowsRows } = await admin.from("bot_flows")
-    .select("id, name, triggers, graph, priority").eq("is_active", true);
+  const { data: flowsRows } = await admin
+    .from("bot_flows")
+    .select("id, name, triggers, graph, priority")
+    .eq("is_active", true);
   const flows: BotFlow[] = (flowsRows || []).map((r: any) => ({
-    id: r.id, name: r.name, triggers: r.triggers || [], graph: r.graph, priority: r.priority || 0,
+    id: r.id,
+    name: r.name,
+    triggers: r.triggers || [],
+    graph: r.graph,
+    priority: r.priority || 0,
   }));
   const matchedDebug = matchFlowDebug(flows, message);
   const matched = matchedDebug?.flow ?? null;
-  console.log("[inbound] flows_ativos=", flows.length,
-    "flows=", JSON.stringify(flows.map((f) => ({ name: f.name, priority: f.priority, triggers: f.triggers }))),
-    "matched=", matched ? `${matched.name} (trigger=${matchedDebug?.trigger})` : "NONE");
+  console.log(
+    "[inbound] flows_ativos=",
+    flows.length,
+    "flows=",
+    JSON.stringify(flows.map((f) => ({ name: f.name, priority: f.priority, triggers: f.triggers }))),
+    "matched=",
+    matched ? `${matched.name} (trigger=${matchedDebug?.trigger})` : "NONE",
+  );
 
   if (matched && matchedDebug) {
     const step = await startSession(matched, phone, profile.user_id, { profileName: profile.full_name });
@@ -717,27 +863,41 @@ Deno.serve(async (req) => {
 
   // Fallback: parser one-shot rotulado (comportamento antigo)
   const parsed = parseWhatsAppLog(message);
-  if (parsed.ok && parsed.log && parsed.matched >= 4) {
+  if (parsed.ok && parsed.log && parsed.matched >= 1) {
     const date = todayBRT();
-    const { data: existing } = await admin.from("score_daily_logs")
-      .select("*").eq("user_id", profile.user_id).eq("date", date).maybeSingle();
+    const fields =
+      Array.isArray((parsed as any).fields) && (parsed as any).fields.length > 0
+        ? (parsed as any).fields
+        : SCORE_FIELDS.filter((f) => Number((parsed.log as any)[f]) !== 0);
+    const { data: existing } = await admin
+      .from("score_daily_logs")
+      .select("*")
+      .eq("user_id", profile.user_id)
+      .eq("date", date)
+      .maybeSingle();
     const merged: any = { user_id: profile.user_id, date };
-    for (const f of SCORE_FIELDS) merged[f] = Number((parsed.log as any)[f] ?? existing?.[f]) || 0;
+    for (const f of SCORE_FIELDS) {
+      merged[f] = fields.includes(f) ? Number((parsed.log as any)[f]) || 0 : Number(existing?.[f]) || 0;
+    }
     await admin.from("score_daily_logs").upsert(merged, { onConflict: "user_id,date" });
     await admin.from("score_profiles").update({ inactivity_penalty_days: 0 }).eq("user_id", profile.user_id);
     const { score, label } = computeDayScore(merged);
     const streak = await computeStreak(admin, profile.user_id);
     const firstName = (profile.full_name || "").split(" ")[0] || "";
     const streakLine = streak >= 2 ? `\n🔥 Streak: ${streak} dias consecutivos!` : "";
-    const reply = `Registrado ✅\n\nScore de hoje: ${score}/100 (${label})${streakLine}\n\nContinua firme${firstName ? `, ${firstName}` : ""}!`;
+    const saved = formatSavedFields(merged, fields);
+    const reply = `Registrado no seu Score de hoje ✅\n\n${saved}\n\nScore de hoje: ${score}/100 (${label})${streakLine}\n\nContinua firme${firstName ? `, ${firstName}` : ""}!`;
     if (channelId) {
       await sendWhatsApp(channelId, phone, reply);
       await admin.from("score_whatsapp_messages").insert({
-        user_id: profile.user_id, phone, direction: "out", kind: "reply_ok",
-        payload: { message: reply, score, label, streak },
+        user_id: profile.user_id,
+        phone,
+        direction: "out",
+        kind: "reply_ok",
+        payload: { message: reply, score, label, streak, fields },
       });
     }
-    return json({ ok: true, mode: "bulk", score, label, streak });
+    return json({ ok: true, mode: "direct_log", score, label, streak, fields });
   }
 
   // Nada casou: ajuda
@@ -745,7 +905,11 @@ Deno.serve(async (req) => {
     const help = `Não entendi 🤔\n\nDiga *registrar* para começar o registro de hoje, ou *registrar do dia 12/03* para uma data específica (até 7 dias atrás).\n\nDigite *cancelar* a qualquer momento para sair.`;
     await sendWhatsApp(channelId, phone, help);
     await admin.from("score_whatsapp_messages").insert({
-      user_id: profile.user_id, phone, direction: "out", kind: "reply_help", payload: { message: help },
+      user_id: profile.user_id,
+      phone,
+      direction: "out",
+      kind: "reply_help",
+      payload: { message: help },
     });
   }
   return json({
