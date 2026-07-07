@@ -105,7 +105,6 @@ export default function BotConversaAdmin() {
         <Stat label="Webhooks pendentes" value={pending.length} />
       </div>
 
-      <section>
       <TestTriggers />
 
       <section>
