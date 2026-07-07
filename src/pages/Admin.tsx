@@ -160,6 +160,7 @@ const Admin = () => {
       {view === "mentees" && <MenteesAdmin />}
       {view === "score" && <ScoreAdmin />}
       {view === "conteudos" && <ContentsAdmin />}
+      {view === "partners" && <PartnersAdmin />}
       {view === "emails" && <MenteeEmailComposer />}
       {view === "prospect" && <ProspectingBulk />}
       {view === "whatsapp" && <WhatsAppAdmin />}
