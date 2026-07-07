@@ -633,6 +633,140 @@ export type Database = {
           },
         ]
       }
+      integration_deliveries: {
+        Row: {
+          attempt: number
+          created_at: string
+          duration_ms: number | null
+          error: string | null
+          event_key: string
+          id: string
+          next_retry_at: string | null
+          payload: Json
+          response_body: string | null
+          response_status: number | null
+          status: string
+          webhook_id: string | null
+        }
+        Insert: {
+          attempt?: number
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          event_key: string
+          id?: string
+          next_retry_at?: string | null
+          payload?: Json
+          response_body?: string | null
+          response_status?: number | null
+          status?: string
+          webhook_id?: string | null
+        }
+        Update: {
+          attempt?: number
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          event_key?: string
+          id?: string
+          next_retry_at?: string | null
+          payload?: Json
+          response_body?: string | null
+          response_status?: number | null
+          status?: string
+          webhook_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_deliveries_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "integration_webhooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integration_events: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          label: string
+          sample_payload: Json
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          label: string
+          sample_payload?: Json
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          label?: string
+          sample_payload?: Json
+        }
+        Relationships: []
+      }
+      integration_webhooks: {
+        Row: {
+          backoff_seconds: number
+          created_at: string
+          enabled: boolean
+          event_keys: string[]
+          headers: Json
+          id: string
+          last_delivery_at: string | null
+          last_delivery_status: string | null
+          max_attempts: number
+          name: string
+          secret: string | null
+          timeout_ms: number
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          backoff_seconds?: number
+          created_at?: string
+          enabled?: boolean
+          event_keys?: string[]
+          headers?: Json
+          id?: string
+          last_delivery_at?: string | null
+          last_delivery_status?: string | null
+          max_attempts?: number
+          name: string
+          secret?: string | null
+          timeout_ms?: number
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          backoff_seconds?: number
+          created_at?: string
+          enabled?: boolean
+          event_keys?: string[]
+          headers?: Json
+          id?: string
+          last_delivery_at?: string | null
+          last_delivery_status?: string | null
+          max_attempts?: number
+          name?: string
+          secret?: string | null
+          timeout_ms?: number
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           answers: Json | null
