@@ -129,6 +129,9 @@ export default function ScorePerfil() {
             Atualizar meu WhatsApp
           </button>
         </div>
+      </div>
+
+
 
 
       <div className="bg-card border border-border rounded-lg p-6 space-y-3">
