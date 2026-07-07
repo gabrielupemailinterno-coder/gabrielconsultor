@@ -12,6 +12,15 @@ const TEST_FLOWS: { key: string; label: string; nome: string; telefone: string }
   { key: "inativo", label: "Recuperação de inativo", nome: "TESTE Recuperacao Inativo", telefone: "5511999990006" },
 ];
 
+const FLOW_CONFIG: { key: string; label: string; description: string }[] = [
+  { key: "onboarding", label: "Onboarding", description: "Fluxo de boas-vindas ativado no primeiro cadastro ou início de jornada." },
+  { key: "checkin", label: "Check-in diário", description: "Coleta rotineira de progresso, humor ou produtividade do usuário." },
+  { key: "gabriel", label: "Falar com Gabriel", description: "Roteia o usuário para contato direto ou notificação ao consultor." },
+  { key: "assistente", label: "Assistente", description: "Atendimento automático e respostas a dúvidas frequentes via WhatsApp." },
+  { key: "diagnostico", label: "Diagnóstico semanal", description: "Pesquisa semanal para avaliar evolução e identificar bloqueios." },
+  { key: "inativo", label: "Recuperação de inativo", description: "Reengajamento de usuários que pararam de interagir nos últimos dias." },
+];
+
 type LogRow = {
   id: string;
   user_id: string | null;
