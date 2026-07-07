@@ -1,134 +1,108 @@
 
-# Redesign do /admin — Cockpit de Gestão
+# Plano: Portal do Parceiro / Afiliado
 
-Transformar o painel atual (header + faixa horizontal de 15 abas) em um cockpit executivo com sidebar navegável, dashboard inicial com KPIs e ações rápidas, e agrupamento lógico dos módulos existentes. **Nenhum módulo é removido ou alterado internamente — apenas a moldura de navegação e a home mudam.**
+## 1. Modelo de dados (migrations novas, sem alterar `partners` existente)
 
-## Estado atual (diagnóstico)
+### 1.1 Vincular parceiro a um usuário (login do portal)
+Adicionar coluna `user_id uuid` (nullable, FK lógica para `auth.users.id`, UNIQUE) em `partners`. Permite que um parceiro autentique-se e o portal saiba qual `partner_id` mostrar. Nullable porque muitos parceiros hoje são só cadastro interno.
 
-- `src/pages/Admin.tsx` concentra: guarda de auth, carga de dados, 4 StatCards fixos no topo, faixa horizontal com 15 abas e o conteúdo inline de cada aba (leads, visits, clicks, sessions).
-- Componentes de módulo (Mentorados, Score, Conteúdos, E-mails, Prospecção, WhatsApp, Ritual, BotFlow, BotConversa, Integrações, Blog) já estão isolados em `src/components/admin/*` — só são renderizados condicionalmente.
-- A tira de 15 abas quebra visualmente e não escala. Não há home, não há hierarquia, não há atalhos.
+Nova role em `app_role`: `'partner'`. Atribuída via `user_roles` quando o admin conecta um `partners.user_id`. **Não dá acesso ao `/admin`** (guard atual usa `has_role(uid,'admin')`).
 
-## Direção visual
+### 1.2 Comissão configurável por parceiro
+Em `partners`: `commission_rate numeric(5,2) NOT NULL DEFAULT 70.00` (percentual). Permite override futuro sem mudar código.
 
-- Layout shell com **sidebar shadcn** (`collapsible="icon"`) à esquerda + header fino com breadcrumb e ações globais + área de conteúdo.
-- Paleta oficial da marca (Grafite/Petróleo/Laranja/Areia — memory: Visual Identity). Acento laranja `#C4632D` apenas em CTAs e estado ativo. Fundo Grafite, cards Petróleo, texto Off-white.
-- Tipografia: Libre Baskerville nos títulos de seção e KPIs numéricos em IBM Plex Mono.
-- Sem alterar tokens globais do projeto — só usar os tokens semânticos já existentes; se faltar variante, adicionar em `index.css` sem quebrar o resto.
+### 1.3 Novas tabelas
 
-## Estrutura de navegação (sidebar)
+**`partner_links`** — links de divulgação que o parceiro cria/copia.
+- `id`, `partner_id` (FK partners), `slug text UNIQUE` (ex.: código curto), `label text` (ex.: "Instagram bio"), `destination text` (rota interna: `/`, `/mentoria-profissional`, `/scoreapp`, etc.), `utm_source/medium/campaign text`, `active bool`, `created_at`, `updated_at`.
+- URL pública final: `https://gabrielconsultor.com/r/{slug}` ou querystring `?ref={partner_code}` (ver §3).
 
-Sidebar com grupos colapsáveis, cada item leva a uma view (mantendo os componentes atuais como conteúdo):
+**`partner_attributions`** — cliques rastreados.
+- `id`, `partner_id`, `link_id` (nullable), `partner_code`, `destination`, `session_id`, `ip_hash`, `user_agent`, `referrer`, `created_at`.
 
-```
-COCKPIT
-  └ Visão Geral              (nova home /admin)
+**`partner_conversions`** — leads/compras atribuídos.
+- `id`, `partner_id`, `partner_code`, `kind text CHECK IN ('lead','purchase')`, `source_table text` (`leads`/`mentees`/`score_profiles`), `source_id uuid`, `amount_cents int` (null p/ lead), `commission_cents int` (calculado no insert = `amount_cents * commission_rate / 100`), `commission_status text DEFAULT 'pending'` (`pending`|`approved`|`paid`|`canceled`), `notes`, `created_at`, `updated_at`.
+- UNIQUE `(source_table, source_id)` para idempotência.
 
-OPERAÇÃO
-  ├ Mentorados               (MenteesAdmin)
-  ├ Score Comercial          (ScoreAdmin)
-  └ Conteúdos                (ContentsAdmin)
+**Atribuição em tabelas existentes** — colunas nullable, sem quebrar dados:
+- `leads.partner_id uuid`, `leads.partner_code text`
+- `mentees.partner_id uuid`, `mentees.partner_code text`
+- `score_profiles.partner_id uuid`, `score_profiles.partner_code text`
 
-RELACIONAMENTO
-  ├ E-mails                  (MenteeEmailComposer)
-  ├ Prospecção               (ProspectingBulk)
-  ├ WhatsApp                 (WhatsAppAdmin)
-  └ Ritual WhatsApp          (WhatsAppRitualAdmin)
+### 1.4 RLS
+- `partners`: manter policy admin. Adicionar policy `SELECT` para o próprio parceiro (`user_id = auth.uid()`).
+- `partner_links`: admin ALL; parceiro `SELECT/INSERT/UPDATE` onde `partner_id = (select id from partners where user_id = auth.uid())`.
+- `partner_attributions`: admin ALL; parceiro SELECT do próprio. INSERT via edge function (service role) — nunca do cliente, para evitar fraude de clique.
+- `partner_conversions`: admin ALL (incl. update de `commission_status`); parceiro SELECT do próprio.
+- GRANTs padrão para `authenticated` + `service_role` em todas as novas tabelas.
 
-AUTOMAÇÕES
-  ├ Fluxo do Bot             (BotFlowsAdmin)
-  ├ BotConversa              (BotConversaAdmin)
-  └ Integrações              (IntegrationsAdmin)
+## 2. Portal do parceiro (`/parceiro`)
 
-ANALYTICS
-  ├ Cadastros                (leads inline)
-  ├ Visitas                  (visits inline)
-  ├ Cliques                  (clicks inline)
-  └ Sessões                  (sessions inline)
+Rotas novas em `src/pages/parceiro/`:
+- `/parceiro/login` — Supabase auth email/senha (magic link opcional). Após login: se `user_roles.role = 'partner'` e `partners.user_id = uid`, entra; senão erro.
+- `/parceiro` (dashboard):
+  - KPIs: cliques 7d/30d, leads atribuídos, vendas atribuídas, comissão acumulada (pending/approved/paid).
+  - Lista de **meus links** com botão Copiar, editar label/destino, criar novo, ativar/desativar.
+  - Tabela de conversões recentes (kind, valor, comissão, status) — somente leitura.
+  - Dados do parceiro (nome, email, taxa de comissão) — leitura.
+- Layout próprio (não reaproveita AdminLayout). Guard: se `!partner role` → redirect `/parceiro/login`. Se tentar `/admin` → guard admin atual já bloqueia (parceiro não tem role admin).
 
-CONTEÚDO
-  └ Blog                     (BlogAdmin)
-```
+Componentes reutilizáveis: `KpiCard`, `QuickAction` já existem.
 
-Sidebar colapsa para tira de ícones; grupo do item ativo abre automaticamente.
+## 3. Rastreio (clique → lead → compra)
 
-## Dashboard "Visão Geral" (nova home)
+### 3.1 Captura do `partner_code`
+- Middleware client-side em `App.tsx` (ou hook em Layout público): ao carregar qualquer rota, ler `?ref=CODE` do querystring. Se presente:
+  - Salvar em `localStorage.partner_ref = { code, ts }` (TTL 30 dias).
+  - Salvar cookie `partner_ref` (para SSR/edge).
+  - Chamar edge function `track-partner-click` (fire-and-forget) que valida o code em `partners` e insere `partner_attributions`.
+- Rota curta `/r/:slug` (React route): resolve `slug` via edge function → grava clique → `window.location.replace(destination + '?ref=CODE')`.
 
-Grid de cards, todos alimentados por queries já existentes ou uma extensão simples do `loadData`:
+### 3.2 Propagação para lead/compra
+- Ao enviar lead (`useLeadCapture`, `sendBotConversaLead`, forms do `/scoreapp`, checkout Asaas): incluir `partner_code` do localStorage no payload.
+- Backend (edge functions e triggers de insert em `leads`/`mentees`/`score_profiles`): resolver `partner_code → partner_id` e preencher colunas. Trigger `AFTER INSERT` em cada tabela cria linha em `partner_conversions` (kind='lead' ou 'purchase' conforme tabela/valor).
+- `provision_mentee` já é SECURITY DEFINER: adicionar params `_partner_code`, gravar em `mentees`, e inserir `partner_conversions` kind='purchase' com `amount_cents` do plano.
 
-**Linha 1 — KPIs (6 cards compactos)**
-- Cadastros totais / últimos 7d
-- Mentorados ativos
-- Score: usuários ativos hoje
-- Visitas 7d + únicos
-- Cliques 7d
-- Tempo médio de sessão
+## 4. Comissão (sem pagamento automático)
 
-**Linha 2 — Ações rápidas** (grid 2×3, ícone + label, cada botão navega para o módulo)
-- Convidar mentorado · Novo e-mail · Nova campanha WhatsApp · Testar BotConversa · Novo post do blog · Ver integrações
+- Cálculo no insert de `partner_conversions.commission_cents` = `amount_cents * partners.commission_rate / 100` (default 70%). Feito por trigger `BEFORE INSERT` para garantir consistência.
+- Status inicial `pending`. Admin altera manualmente para `approved` (após período de reembolso) → `paid` (quando pagar off-platform).
+- Nada de gateway/split agora. Apenas relatório: total `pending`, `approved`, `paid` por parceiro, exportável em CSV do admin.
 
-**Linha 3 — Feeds** (2 colunas)
-- Últimos 5 cadastros (nome, form_type, tempo relativo, atalho "virar mentorado")
-- Últimas 5 entregas de integração (`integration_deliveries` — status, evento, tempo)
+## 5. Integração com `/admin` (PartnersAdmin)
 
-**Linha 4 — Saúde do sistema** (chips discretos)
-- Webhooks BotConversa ativos, integrações habilitadas, fila de e-mails pendente, últimos erros.
+Adicionar abas dentro de `PartnersAdmin.tsx`:
+- **Parceiros** (existente).
+- **Testes** (existente).
+- **Links** — todos os `partner_links` com filtro por parceiro.
+- **Conversões** — tabela de `partner_conversions` com filtro parceiro/status/período, ação "aprovar"/"marcar como pago", exportar CSV.
+- No card resumo do parceiro: cliques 30d, conversões, comissão pendente, botão "Vincular usuário" (input email → cria/associa `auth.users` + `user_roles.partner` + `partners.user_id`).
 
-## Etapas de implementação
+Reaproveitar `KpiCard` e agrupamento visual do cockpit atual.
 
-1. **Shell de layout**
-   - Criar `src/components/admin/AdminLayout.tsx` com `SidebarProvider`, `AppSidebar`, header com `SidebarTrigger` + email + logout, e `<Outlet />`/children.
-   - Criar `src/components/admin/AdminSidebar.tsx` com grupos e itens acima, usando `NavLink` + `isActive`.
+## 6. Isolamento de acesso
 
-2. **Home do cockpit**
-   - Criar `src/components/admin/DashboardOverview.tsx` com KPIs, ações rápidas, feeds e saúde.
-   - Criar hook `src/hooks/useAdminOverview.ts` que agrega as consultas (leads, visits, clicks, sessions, integration_deliveries, mentees count, botconversa/integrations enabled counts). Reaproveitar o padrão de `loadData` atual.
-   - Componente reutilizável `src/components/admin/KpiCard.tsx` (variante do StatCard atual com sparkline opcional e delta 7d).
-   - Componente `src/components/admin/QuickAction.tsx`.
+- Guard atual do `/admin` verifica `has_role(uid,'admin')`. Nova role `'partner'` **não** concede admin — nenhum código muda em `Admin.tsx`.
+- Portal `/parceiro` tem guard próprio exigindo role `partner`. Admin também pode entrar (útil para suporte), mas não parceiro no admin.
+- RLS garante que mesmo com token válido, parceiro só lê linhas próprias.
+- Edge functions de vinculação (criar usuário parceiro, alterar `commission_status`) exigem `has_role(admin)`.
 
-3. **Refatoração de `src/pages/Admin.tsx`**
-   - Manter guarda de auth e estado de tab, mas trocar a tira horizontal pelo `AdminLayout` + `AdminSidebar`.
-   - Extrair os 4 blocos inline (leads/visits/clicks/sessions) para `src/components/admin/analytics/{LeadsTable,VisitsTable,ClicksTable,SessionsTable}.tsx` para desinchar o `Admin.tsx`.
-   - Roteamento interno via estado (sem mudar rotas do `App.tsx`): `view` controla qual módulo renderiza.
-   - Preservar `tab` param opcional via querystring (`?view=score`) para deep-link.
+## 7. Detalhes técnicos
 
-4. **Ajustes visuais**
-   - Revisar `src/index.css` só se faltar token para o fundo do sidebar/cockpit (adicionar variáveis, não hardcode).
-   - Garantir dark mode consistente e contraste no acento laranja.
+- Migrations: 1 migration para colunas em `partners`/`leads`/`mentees`/`score_profiles` + role `partner`; outra para as 3 novas tabelas com GRANTs, RLS, triggers de comissão e `updated_at`.
+- Edge functions novas: `track-partner-click`, `resolve-partner-link` (para `/r/:slug`), `create-partner-user` (admin), `update-conversion-status` (admin).
+- Alterar `provision_mentee` assinatura com `_partner_code` default null (retrocompatível).
+- Rota `/r/:slug` no `App.tsx`.
+- Novos componentes em `src/components/partner/` e páginas em `src/pages/parceiro/`.
 
-5. **Responsivo**
-   - Sidebar em `offcanvas` no mobile (via `useIsMobile`), header ganha `SidebarTrigger` visível.
-   - Dashboard: KPIs em grid 2 colunas no mobile, 3 no tablet, 6 no desktop.
+## 8. Fora de escopo desta fase
+- Pagamento automático da comissão (split Asaas/Cora).
+- Multi-nível/sub-afiliados.
+- Materiais de marketing (banners/vídeos) — pode virar tabela `partner_assets` depois.
+- Antifraude avançado (dedupe de clique por device fingerprint além de ip_hash+ua).
 
-6. **Validação**
-   - Abrir cada item da sidebar e confirmar que o módulo antigo renderiza igual.
-   - Testar colapso do sidebar, deep-link `?view=…`, mobile.
-   - `tsgo` + build.
-
-## Arquivos envolvidos
-
-**Novos**
-- `src/components/admin/AdminLayout.tsx`
-- `src/components/admin/AdminSidebar.tsx`
-- `src/components/admin/DashboardOverview.tsx`
-- `src/components/admin/KpiCard.tsx`
-- `src/components/admin/QuickAction.tsx`
-- `src/components/admin/analytics/LeadsTable.tsx`
-- `src/components/admin/analytics/VisitsTable.tsx`
-- `src/components/admin/analytics/ClicksTable.tsx`
-- `src/components/admin/analytics/SessionsTable.tsx`
-- `src/hooks/useAdminOverview.ts`
-
-**Editados**
-- `src/pages/Admin.tsx` (trocar shell, remover blocos inline)
-- `src/index.css` (apenas se necessário adicionar token de sidebar/cockpit)
-
-**Não tocados**
-- Todos os componentes de módulo existentes (`MenteesAdmin`, `ScoreAdmin`, `ContentsAdmin`, `MenteeEmailComposer`, `ProspectingBulk`, `WhatsAppAdmin`, `WhatsAppRitualAdmin`, `BotFlowsAdmin`, `BotConversaAdmin`, `IntegrationsAdmin`, `BlogAdmin`).
-- Rotas em `src/App.tsx`, edge functions, tabelas do backend, `.env`, tipos gerados.
-
-## Premissas (corrija se necessário)
-
-- A sidebar substitui totalmente a tira de abas horizontal — sem manter as duas.
-- Os 4 KPIs atuais no topo continuam existindo, mas dentro da home "Visão Geral" (não em todas as telas).
-- Deep-link por querystring é suficiente; não é preciso criar sub-rotas (`/admin/mentorados`, etc.).
+## Premissas a confirmar
+1. Comissão 70% incide sobre valor bruto da compra do plano de mentoria; leads do Score não geram comissão (só tracking). OK?
+2. Janela de atribuição: 30 dias no localStorage — confirma?
+3. Formato do link: preferir `/r/{slug}` curto ou `?ref={code}` na URL atual? Plano suporta os dois.
+4. Login do parceiro: email/senha padrão; magic link só se pedir.

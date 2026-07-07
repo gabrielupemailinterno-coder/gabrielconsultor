@@ -778,6 +778,8 @@ export type Database = {
           id: string
           main_pain: string | null
           name: string
+          partner_code: string | null
+          partner_id: string | null
           phone: string
           revenue: string | null
           source: string | null
@@ -792,6 +794,8 @@ export type Database = {
           id?: string
           main_pain?: string | null
           name: string
+          partner_code?: string | null
+          partner_id?: string | null
           phone: string
           revenue?: string | null
           source?: string | null
@@ -806,6 +810,8 @@ export type Database = {
           id?: string
           main_pain?: string | null
           name?: string
+          partner_code?: string | null
+          partner_id?: string | null
           phone?: string
           revenue?: string | null
           source?: string | null
@@ -1025,6 +1031,7 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          partner_code: string | null
           partner_id: string | null
           password_changed_at: string | null
           payment_notes: string | null
@@ -1055,6 +1062,7 @@ export type Database = {
           email: string
           full_name: string
           id?: string
+          partner_code?: string | null
           partner_id?: string | null
           password_changed_at?: string | null
           payment_notes?: string | null
@@ -1085,6 +1093,7 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          partner_code?: string | null
           partner_id?: string | null
           password_changed_at?: string | null
           payment_notes?: string | null
@@ -1325,6 +1334,163 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_attributions: {
+        Row: {
+          created_at: string
+          destination: string | null
+          id: string
+          ip_hash: string | null
+          link_id: string | null
+          partner_code: string
+          partner_id: string
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          destination?: string | null
+          id?: string
+          ip_hash?: string | null
+          link_id?: string | null
+          partner_code: string
+          partner_id: string
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          destination?: string | null
+          id?: string
+          ip_hash?: string | null
+          link_id?: string | null
+          partner_code?: string
+          partner_id?: string
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_attributions_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "partner_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "partner_attributions_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_conversions: {
+        Row: {
+          amount_cents: number | null
+          commission_cents: number
+          commission_status: string
+          created_at: string
+          id: string
+          kind: string
+          notes: string | null
+          partner_code: string
+          partner_id: string
+          source_id: string
+          source_table: string
+          updated_at: string
+        }
+        Insert: {
+          amount_cents?: number | null
+          commission_cents?: number
+          commission_status?: string
+          created_at?: string
+          id?: string
+          kind: string
+          notes?: string | null
+          partner_code: string
+          partner_id: string
+          source_id: string
+          source_table: string
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number | null
+          commission_cents?: number
+          commission_status?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          notes?: string | null
+          partner_code?: string
+          partner_id?: string
+          source_id?: string
+          source_table?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_conversions_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_links: {
+        Row: {
+          active: boolean
+          created_at: string
+          destination: string
+          id: string
+          label: string | null
+          partner_id: string
+          slug: string
+          updated_at: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          destination?: string
+          id?: string
+          label?: string | null
+          partner_id: string
+          slug: string
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          destination?: string
+          id?: string
+          label?: string | null
+          partner_id?: string
+          slug?: string
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_links_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partners"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partner_trials: {
         Row: {
           contact_email: string | null
@@ -1371,6 +1537,7 @@ export type Database = {
       }
       partners: {
         Row: {
+          commission_rate: number
           company_name: string | null
           created_at: string
           email: string | null
@@ -1381,8 +1548,10 @@ export type Database = {
           phone: string | null
           status: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
+          commission_rate?: number
           company_name?: string | null
           created_at?: string
           email?: string | null
@@ -1393,8 +1562,10 @@ export type Database = {
           phone?: string | null
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
+          commission_rate?: number
           company_name?: string | null
           created_at?: string
           email?: string | null
@@ -1405,6 +1576,7 @@ export type Database = {
           phone?: string | null
           status?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1748,6 +1920,8 @@ export type Database = {
           is_active: boolean
           last_seen_at: string | null
           lead_origin: string | null
+          partner_code: string | null
+          partner_id: string | null
           payment_status: string | null
           phone: string | null
           plan: string
@@ -1791,6 +1965,8 @@ export type Database = {
           is_active?: boolean
           last_seen_at?: string | null
           lead_origin?: string | null
+          partner_code?: string | null
+          partner_id?: string | null
           payment_status?: string | null
           phone?: string | null
           plan?: string
@@ -1834,6 +2010,8 @@ export type Database = {
           is_active?: boolean
           last_seen_at?: string | null
           lead_origin?: string | null
+          partner_code?: string | null
+          partner_id?: string | null
           payment_status?: string | null
           phone?: string | null
           plan?: string
@@ -2123,7 +2301,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user" | "mentee" | "scoreapp_user"
+      app_role: "admin" | "user" | "mentee" | "scoreapp_user" | "partner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2251,7 +2429,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user", "mentee", "scoreapp_user"],
+      app_role: ["admin", "user", "mentee", "scoreapp_user", "partner"],
     },
   },
 } as const
