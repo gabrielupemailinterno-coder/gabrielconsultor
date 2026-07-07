@@ -16,6 +16,38 @@ type Partner = {
   updated_at: string;
 };
 
+type Trial = {
+  id: string;
+  partner_id: string;
+  product_type: "score_comercial" | "mentoria" | "ambos";
+  contact_email: string | null;
+  status: "pending" | "active" | "expired" | "revoked";
+  expires_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+const PRODUCT_LABEL: Record<string, string> = {
+  score_comercial: "Score Comercial",
+  mentoria: "Mentoria",
+  ambos: "Ambos",
+};
+
+const TRIAL_STATUS = ["pending", "active", "expired", "revoked"] as const;
+const trialStatusLabel: Record<string, string> = {
+  pending: "Pendente",
+  active: "Ativo",
+  expired: "Expirado",
+  revoked: "Revogado",
+};
+const trialStatusClass: Record<string, string> = {
+  pending: "bg-yellow-500/15 text-yellow-600",
+  active: "bg-primary/15 text-primary",
+  expired: "bg-muted text-muted-foreground",
+  revoked: "bg-destructive/15 text-destructive",
+};
+
 const STATUS_OPTIONS = ["active", "trial", "inactive"] as const;
 
 const statusLabel: Record<string, string> = {
