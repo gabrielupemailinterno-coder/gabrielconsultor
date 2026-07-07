@@ -5,6 +5,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { trackClick } from "@/hooks/useAnalytics";
 import { FORM_SCHEMAS, type FormType } from "@/lib/qualifying-forms";
+import { sendBotConversaLead } from "@/lib/botconversa";
 
 interface QualifyingFormProps {
   open: boolean;
@@ -99,6 +100,7 @@ const QualifyingForm = ({ open, onClose, formType }: QualifyingFormProps) => {
         answers,
       });
       if (error) throw error;
+      void sendBotConversaLead(result.data.name, result.data.phone);
       trackClick("form_submit", `form_${formType}`);
       setStatus("success");
       setTimeout(() => {
