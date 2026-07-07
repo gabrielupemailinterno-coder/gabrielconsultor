@@ -78,13 +78,14 @@ export function useAdminOverview(): AdminOverview {
 
       const leadsTotal = val(0).count ?? 0;
       const leads7d = val(1).count ?? 0;
-      const visitsData = (val(2).data ?? []) as { session_id: string }[];
-      const clicks7d = val(3).count ?? 0;
-      const sessionsData = (val(4).data ?? []) as { duration_seconds: number }[];
-      const menteesActive = val(5).count ?? 0;
-      const integrationsEnabled = val(6).count ?? 0;
-      const recentLeads = (val(7).data ?? []) as OverviewLead[];
-      const recentDeliveries = (val(8).data ?? []) as OverviewDelivery[];
+      const visits7d = val(2).count ?? 0;
+      const visitsDataUnique = (val(3).data ?? []) as { session_id: string }[];
+      const clicks7d = val(4).count ?? 0;
+      const sessionsData = (val(5).data ?? []) as { duration_seconds: number }[];
+      const menteesActive = val(6).count ?? 0;
+      const integrationsEnabled = val(7).count ?? 0;
+      const recentLeads = (val(8).data ?? []) as OverviewLead[];
+      const recentDeliveries = (val(9).data ?? []) as OverviewDelivery[];
 
       const avgSessionSec = sessionsData.length
         ? Math.round(sessionsData.reduce((a, s) => a + (s.duration_seconds || 0), 0) / sessionsData.length)
