@@ -167,6 +167,50 @@ export default function PartnersAdmin() {
     toast({ title: "Código copiado" });
   };
 
+  const getTrialForm = (pid: string) =>
+    trialForm[pid] || { product_type: "score_comercial", contact_email: "", expires_at: "", notes: "" };
+
+  const setTrialFormFor = (pid: string, patch: Partial<{ product_type: string; contact_email: string; expires_at: string; notes: string }>) => {
+    setTrialForm((prev) => ({ ...prev, [pid]: { ...getTrialForm(pid), ...patch } }));
+  };
+
+  const createTrial = async (partnerId: string) => {
+    const f = getTrialForm(partnerId);
+    const payload: any = {
+      partner_id: partnerId,
+      product_type: f.product_type,
+      contact_email: f.contact_email.trim() || null,
+      notes: f.notes.trim() || null,
+      status: "pending",
+      expires_at: f.expires_at ? new Date(f.expires_at).toISOString() : null,
+    };
+    const { error } = await (supabase as any).from("partner_trials").insert(payload);
+    if (error) {
+      toast({ title: "Erro ao criar teste", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Teste concedido" });
+    setTrialFormFor(partnerId, { contact_email: "", expires_at: "", notes: "" });
+    load();
+  };
+
+  const updateTrial = async (id: string, patch: Partial<Trial>) => {
+    const { error } = await (supabase as any).from("partner_trials").update(patch).eq("id", id);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+      return;
+    }
+    load();
+  };
+
+  const deleteTrial = async (id: string) => {
+    if (!confirm("Excluir este teste?")) return;
+    await (supabase as any).from("partner_trials").delete().eq("id", id);
+    load();
+  };
+
+  const toggleExpand = (id: string) => setExpanded((e) => ({ ...e, [id]: !e[id] }));
+
   const total = partners.length;
   const active = partners.filter((p) => p.status === "active").length;
   const inactive = partners.filter((p) => p.status !== "active").length;
