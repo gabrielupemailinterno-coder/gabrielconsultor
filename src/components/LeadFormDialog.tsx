@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackClick } from "@/hooks/useAnalytics";
 import { useLocale } from "@/contexts/LocaleContext";
 import { leadFormCopy } from "@/locales/copy";
+import { sendBotConversaLead } from "@/lib/botconversa";
 
 type LeadData = {
   name: string;
@@ -83,6 +84,7 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
         form_type: "contato",
       });
       if (error) throw error;
+      void sendBotConversaLead(result.data.name, result.data.phone);
       trackClick("form_submit", "lead_form_submitted");
       setStatus("success");
       if (onSuccess) {

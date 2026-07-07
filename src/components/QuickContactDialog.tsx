@@ -5,6 +5,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { trackClick } from "@/hooks/useAnalytics";
 import { useLocale } from "@/contexts/LocaleContext";
+import { sendBotConversaLead } from "@/lib/botconversa";
 
 interface QuickContactDialogProps {
   open: boolean;
@@ -88,6 +89,7 @@ const QuickContactDialog = ({ open, onClose, onSuccess }: QuickContactDialogProp
         form_type: "whatsapp",
       });
       if (error) throw error;
+      void sendBotConversaLead(r.data.name, r.data.phone);
       trackClick("form_submit", "quick_contact_submitted");
       setStatus("success");
       if (onSuccess) setTimeout(() => onSuccess(), 500);

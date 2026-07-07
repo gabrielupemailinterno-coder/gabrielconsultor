@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Trophy } from "lucide-react";
+import { sendBotConversaLead } from "@/lib/botconversa";
 
 export default function ScoreSignup() {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ export default function ScoreSignup() {
       },
     });
     if (error) { setError(error.message); setLoading(false); return; }
+    void sendBotConversaLead(form.full_name, form.phone);
     navigate("/scoreapp/onboarding", { replace: true });
   };
 
