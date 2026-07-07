@@ -32,8 +32,50 @@ import FeedbackDetalhe from "./pages/scoreapp/FeedbackDetalhe";
 import ScorePerfil from "./pages/scoreapp/Perfil";
 import ScorePlanos from "./pages/scoreapp/Planos";
 import ScoreCheckoutPix from "./pages/scoreapp/CheckoutPix";
+import RedirectPartnerLink from "./pages/RedirectPartnerLink";
+import PartnerLogin from "./pages/parceiro/PartnerLogin";
+import PartnerDashboard from "./pages/parceiro/PartnerDashboard";
+import { usePartnerRefCapture } from "@/hooks/usePartnerRef";
 
 const queryClient = new QueryClient();
+
+function AppRoutes() {
+  usePartnerRefCapture();
+  return (
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/auth" element={<Auth />} />
+      <Route path="/admin" element={<Admin />} />
+      <Route path="/mentoria-profissional" element={<MentoriaProfissional />} />
+      <Route path="/blog" element={<Blog />} />
+      <Route path="/blog/:slug" element={<BlogPost />} />
+      <Route path="/parceiros" element={<Parceiros />} />
+      <Route path="/parceiro/login" element={<PartnerLogin />} />
+      <Route path="/parceiro" element={<PartnerDashboard />} />
+      <Route path="/r/:slug" element={<RedirectPartnerLink />} />
+      <Route path="/mentorados/login" element={<PortalLogin />} />
+      <Route path="/mentorados/redefinir-senha" element={<PortalResetPassword />} />
+      <Route path="/mentorados" element={<PortalDashboard />} />
+      <Route path="/simulador-up" element={<SimuladorUP />} />
+      <Route path="/scoreapp" element={<ScoreLanding />} />
+      <Route path="/conhecascoreapp" element={<ConhecaScoreApp />} />
+      <Route path="/scoreapp/login" element={<ScoreLogin />} />
+      <Route path="/scoreapp/cadastro" element={<ScoreSignup />} />
+      <Route path="/scoreapp/onboarding" element={<ScoreOnboarding />} />
+      <Route path="/scoreapp/app" element={<ScoreDashboard />} />
+      <Route path="/scoreapp/app/registrar" element={<ScoreRegistrar />} />
+      <Route path="/scoreapp/app/conteudos" element={<ScoreConteudos />} />
+      <Route path="/scoreapp/app/conteudos/base/:slug" element={<ConteudoBase />} />
+      <Route path="/scoreapp/app/conteudos/feedback/:trigger" element={<FeedbackDetalhe />} />
+      <Route path="/scoreapp/app/conteudos/:slug" element={<ScoreModulo />} />
+      <Route path="/scoreapp/app/perfil" element={<ScorePerfil />} />
+      <Route path="/scoreapp/planos" element={<ScorePlanos />} />
+      <Route path="/scoreapp/checkout-pix" element={<ScoreCheckoutPix />} />
+      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -44,35 +86,7 @@ const App = () => (
         <BrowserRouter>
           <LanguageSwitcher />
           <WhatsAppFloatButton />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/mentoria-profissional" element={<MentoriaProfissional />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/parceiros" element={<Parceiros />} />
-            <Route path="/mentorados/login" element={<PortalLogin />} />
-            <Route path="/mentorados/redefinir-senha" element={<PortalResetPassword />} />
-            <Route path="/mentorados" element={<PortalDashboard />} />
-            <Route path="/simulador-up" element={<SimuladorUP />} />
-            <Route path="/scoreapp" element={<ScoreLanding />} />
-            <Route path="/conhecascoreapp" element={<ConhecaScoreApp />} />
-            <Route path="/scoreapp/login" element={<ScoreLogin />} />
-            <Route path="/scoreapp/cadastro" element={<ScoreSignup />} />
-            <Route path="/scoreapp/onboarding" element={<ScoreOnboarding />} />
-            <Route path="/scoreapp/app" element={<ScoreDashboard />} />
-            <Route path="/scoreapp/app/registrar" element={<ScoreRegistrar />} />
-            <Route path="/scoreapp/app/conteudos" element={<ScoreConteudos />} />
-            <Route path="/scoreapp/app/conteudos/base/:slug" element={<ConteudoBase />} />
-            <Route path="/scoreapp/app/conteudos/feedback/:trigger" element={<FeedbackDetalhe />} />
-            <Route path="/scoreapp/app/conteudos/:slug" element={<ScoreModulo />} />
-            <Route path="/scoreapp/app/perfil" element={<ScorePerfil />} />
-            <Route path="/scoreapp/planos" element={<ScorePlanos />} />
-            <Route path="/scoreapp/checkout-pix" element={<ScoreCheckoutPix />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppRoutes />
         </BrowserRouter>
       </LocaleProvider>
     </TooltipProvider>
