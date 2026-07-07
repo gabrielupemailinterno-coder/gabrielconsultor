@@ -49,6 +49,10 @@ const Admin = () => {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [clicks, setClicks] = useState<Click[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [leadsTotal, setLeadsTotal] = useState(0);
+  const [visitsTotal, setVisitsTotal] = useState(0);
+  const [clicksTotal, setClicksTotal] = useState(0);
+  const [sessionsTotal, setSessionsTotal] = useState(0);
   const [view, setView] = useState<AdminView>(getInitialView);
 
   useEffect(() => {
