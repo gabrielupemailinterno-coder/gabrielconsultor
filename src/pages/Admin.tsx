@@ -79,16 +79,24 @@ const Admin = () => {
   }, [view]);
 
   const loadData = async () => {
-    const [l, v, c, s] = await Promise.all([
+    const [l, v, c, s, lc, vc, cc, sc] = await Promise.all([
       supabase.from("leads").select("*").order("created_at", { ascending: false }).limit(500),
       supabase.from("page_visits").select("*").order("created_at", { ascending: false }).limit(500),
       supabase.from("page_clicks").select("*").order("created_at", { ascending: false }).limit(500),
       supabase.from("page_sessions").select("session_id, duration_seconds, started_at, referrer").order("started_at", { ascending: false }).limit(500),
+      supabase.from("leads").select("*", { count: "exact", head: true }),
+      supabase.from("page_visits").select("*", { count: "exact", head: true }),
+      supabase.from("page_clicks").select("*", { count: "exact", head: true }),
+      supabase.from("page_sessions").select("*", { count: "exact", head: true }),
     ]);
     setLeads((l.data as Lead[]) || []);
     setVisits((v.data as Visit[]) || []);
     setClicks((c.data as Click[]) || []);
     setSessions((s.data as Session[]) || []);
+    setLeadsTotal(lc.count ?? 0);
+    setVisitsTotal(vc.count ?? 0);
+    setClicksTotal(cc.count ?? 0);
+    setSessionsTotal(sc.count ?? 0);
   };
 
   const handleLogout = async () => {
