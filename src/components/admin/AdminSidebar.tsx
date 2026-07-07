@@ -65,6 +65,7 @@ const GROUPS: Group[] = [
       { view: "mentees", label: "Mentorados", icon: Users },
       { view: "score", label: "Score Comercial", icon: Trophy },
       { view: "conteudos", label: "Conteúdos", icon: BookOpen },
+      { view: "partners", label: "Parceiros", icon: Handshake },
     ],
   },
   {
