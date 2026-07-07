@@ -261,10 +261,61 @@ export default function PartnersAdmin() {
 
   const toggleExpand = (id: string) => setExpanded((e) => ({ ...e, [id]: !e[id] }));
 
+  const linkUserToPartner = async (partnerId: string) => {
+    const email = (linkEmail[partnerId] || "").trim();
+    if (!email) {
+      toast({ title: "Informe um e-mail", variant: "destructive" });
+      return;
+    }
+    setLinkingPid(partnerId);
+    const { data, error } = await supabase.functions.invoke("partner-admin", {
+      body: { action: "link_user", partner_id: partnerId, email, redirect_to: `${window.location.origin}/parceiro` },
+    });
+    setLinkingPid(null);
+    if (error || (data as any)?.error) {
+      toast({ title: "Erro ao vincular", description: (error as any)?.message || (data as any)?.error, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Usuário vinculado", description: "Link de acesso enviado por e-mail." });
+    setLinkEmail((m) => ({ ...m, [partnerId]: "" }));
+    load();
+  };
+
+  const updateConversionStatus = async (id: string, status: string) => {
+    const { data, error } = await supabase.functions.invoke("partner-admin", {
+      body: { action: "update_conversion_status", id, status },
+    });
+    if (error || (data as any)?.error) {
+      toast({ title: "Erro", description: (error as any)?.message || (data as any)?.error, variant: "destructive" });
+      return;
+    }
+    load();
+  };
+
+  const linksByPartner = useMemo(() => {
+    const m: Record<string, PartnerLink[]> = {};
+    links.forEach((l) => ((m[l.partner_id] ||= []).push(l)));
+    return m;
+  }, [links]);
+
+  const convByPartner = useMemo(() => {
+    const m: Record<string, Conversion[]> = {};
+    conversions.forEach((c) => ((m[c.partner_id] ||= []).push(c)));
+    return m;
+  }, [conversions]);
+
+  const totalPending = conversions.filter((c) => c.commission_status === "pending").reduce((a, b) => a + b.commission_cents, 0);
+  const totalApproved = conversions.filter((c) => c.commission_status === "approved").reduce((a, b) => a + b.commission_cents, 0);
+  const totalPaid = conversions.filter((c) => c.commission_status === "paid").reduce((a, b) => a + b.commission_cents, 0);
+
+  const filteredConversions = conversions.filter((c) => convFilter === "all" || c.commission_status === convFilter);
+  const partnerName = (pid: string) => partners.find((p) => p.id === pid)?.name || pid.slice(0, 6);
+
   const total = partners.length;
   const active = partners.filter((p) => p.status === "active").length;
   const inactive = partners.filter((p) => p.status !== "active").length;
   const recent = partners.slice(0, 3);
+
 
   if (loading) {
     return (
