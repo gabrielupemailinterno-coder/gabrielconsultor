@@ -51,7 +51,21 @@ async function sendToGroup(chatId: string, message: string) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Auth: accept a shared cron secret (X-Dispatch-Secret) OR a service_role /
+  // admin-user JWT. Without this, anyone can force-send queued campaigns.
+  const dispatchSecret = Deno.env.get("DISPATCH_SECRET");
+  const providedSecret = req.headers.get("x-dispatch-secret");
+  const secretOk = !!dispatchSecret && !!providedSecret && providedSecret === dispatchSecret;
+  if (!secretOk) {
+    const { requireAdminOrService } = await import("../_shared/require-admin.ts");
+    const authCheck = await requireAdminOrService(req, corsHeaders);
+    if (authCheck instanceof Response) return authCheck;
+  }
+
   if (!TOKEN) return json({ error: "GPT_MAKER_API_TOKEN não configurado" }, 400);
+
+
 
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
   const { data: due, error } = await admin

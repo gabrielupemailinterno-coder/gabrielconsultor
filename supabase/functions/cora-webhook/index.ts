@@ -7,6 +7,27 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    // Authenticate the webhook: Cora must be configured to send our shared
+    // secret in either `x-webhook-secret` or `Authorization: Bearer …`.
+    // Without this, an attacker could POST `webhook-event-type: invoice.paid`
+    // with a guessed invoice id and activate any account.
+    const expected = Deno.env.get("CORA_WEBHOOK_SECRET");
+    if (!expected) {
+      return new Response(JSON.stringify({ error: "webhook not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const provided =
+      req.headers.get("x-webhook-secret") ??
+      (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "").trim();
+    if (!provided || provided !== expected) {
+      return new Response(JSON.stringify({ error: "unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -22,6 +43,7 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
 
     // Log the raw webhook for audit/debugging
     await supabase.from("score_profiles").update({

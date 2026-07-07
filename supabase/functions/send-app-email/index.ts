@@ -9,12 +9,14 @@ import { ActivityAvailableEmail } from '../_shared/app-email-templates/activity-
 import { BlogInsightEmail } from '../_shared/app-email-templates/blog-insight.tsx'
 import { ProspectingEmail } from '../_shared/app-email-templates/prospecting.tsx'
 import { ScheduleFirstMeetingEmail } from '../_shared/app-email-templates/schedule-first-meeting.tsx'
+import { requireAdminOrService } from '../_shared/require-admin.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
+
 
 const TEMPLATES: Record<string, { component: React.ComponentType<any>; subject: (data: any) => string }> = {
   'welcome-mentee': {
@@ -50,8 +52,14 @@ const TEMPLATES: Record<string, { component: React.ComponentType<any>; subject: 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
+  // Require admin JWT or service_role — otherwise the function can be abused
+  // to send arbitrary emails (including welcome-mentee with temp passwords).
+  const auth = await requireAdminOrService(req, corsHeaders)
+  if (auth instanceof Response) return auth
+
   try {
     const { template, to, data, subject: customSubject, replyTo } = await req.json()
+
 
     if (!template || !to || !data) {
       return new Response(JSON.stringify({ error: 'template, to and data are required' }),
