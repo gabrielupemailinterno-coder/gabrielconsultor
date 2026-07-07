@@ -265,7 +265,25 @@ export async function requireAuthUser(req: Request): Promise<{ userId: string } 
   return { userId: u.user.id };
 }
 
+export async function sendTextByUser(userId: string, message: string): Promise<{ ok: boolean; error?: string }> {
+  const { subscriberId, phone } = await resolveSubscriberId(userId);
+  if (!subscriberId) {
+    await logEvent({ user_id: userId, direction: "outbound", event_type: "text_message", status: "error", error_message: "sem subscriber" });
+    return { ok: false, error: "sem subscriber" };
+  }
+  try {
+    const r = await sendTextMessage(subscriberId, message);
+    await logEvent({ user_id: userId, phone, direction: "outbound", event_type: "text_message", status: r.ok ? "ok" : "error", response: r.body, payload: { message } });
+    return { ok: r.ok, error: r.ok ? undefined : `HTTP ${r.status}` };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    await logEvent({ user_id: userId, phone, direction: "outbound", event_type: "text_message", status: "error", error_message: msg });
+    return { ok: false, error: msg };
+  }
+}
+
 export const CORS = {
+
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-webhook-secret",
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
