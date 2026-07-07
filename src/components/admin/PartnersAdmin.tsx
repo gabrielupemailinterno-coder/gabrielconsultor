@@ -119,12 +119,17 @@ const linkFor = (code: string) =>
 export default function PartnersAdmin() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [trials, setTrials] = useState<Trial[]>([]);
+  const [links, setLinks] = useState<PartnerLink[]>([]);
+  const [conversions, setConversions] = useState<Conversion[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [editing, setEditing] = useState<Partner | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [trialForm, setTrialForm] = useState<Record<string, { product_type: string; contact_email: string; expires_at: string; notes: string }>>({});
+  const [linkEmail, setLinkEmail] = useState<Record<string, string>>({});
+  const [linkingPid, setLinkingPid] = useState<string | null>(null);
+  const [convFilter, setConvFilter] = useState<string>("all");
 
   const [form, setForm] = useState({
     name: "",
@@ -137,14 +142,19 @@ export default function PartnersAdmin() {
 
   const load = async () => {
     setLoading(true);
-    const [pRes, tRes] = await Promise.all([
+    const [pRes, tRes, lRes, cRes] = await Promise.all([
       (supabase as any).from("partners").select("*").order("created_at", { ascending: false }),
       (supabase as any).from("partner_trials").select("*").order("created_at", { ascending: false }),
+      (supabase as any).from("partner_links").select("*").order("created_at", { ascending: false }),
+      (supabase as any).from("partner_conversions").select("*").order("created_at", { ascending: false }),
     ]);
     setPartners((pRes.data as Partner[]) || []);
     setTrials((tRes.data as Trial[]) || []);
+    setLinks((lRes.data as PartnerLink[]) || []);
+    setConversions((cRes.data as Conversion[]) || []);
     setLoading(false);
   };
+
 
   useEffect(() => {
     load();
