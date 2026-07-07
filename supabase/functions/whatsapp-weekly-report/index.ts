@@ -1,6 +1,6 @@
 // Cron segunda 08h BRT (11:00 UTC): diagnóstico semanal.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { sendWhatsApp, normalizePhone, todayBRT } from "../_shared/gpt-maker.ts";
+import { sendTextByUser, sendTextByPhone, normalizePhone } from "../_shared/botconversa.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

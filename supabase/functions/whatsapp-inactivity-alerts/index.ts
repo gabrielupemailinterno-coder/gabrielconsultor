@@ -1,6 +1,6 @@
 // Cron 10h BRT (13:00 UTC) diário: alertas para inatividade de 2, 5 e 10 dias.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { sendWhatsApp, normalizePhone, todayBRT } from "../_shared/gpt-maker.ts";
+import { sendTextByUser, sendTextByPhone, normalizePhone } from "../_shared/botconversa.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
