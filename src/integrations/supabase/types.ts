@@ -195,6 +195,78 @@ export type Database = {
           },
         ]
       }
+      botconversa_integration_logs: {
+        Row: {
+          created_at: string
+          direction: string
+          error_message: string | null
+          event_type: string
+          id: string
+          payload: Json | null
+          phone: string | null
+          response: Json | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          error_message?: string | null
+          event_type: string
+          id?: string
+          payload?: Json | null
+          phone?: string | null
+          response?: Json | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          phone?: string | null
+          response?: Json | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      botconversa_pending_webhooks: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          payload: Json
+          phone: string | null
+          reason: string | null
+          resolved_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          payload: Json
+          phone?: string | null
+          reason?: string | null
+          resolved_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          payload?: Json
+          phone?: string | null
+          reason?: string | null
+          resolved_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       campaign_logs: {
         Row: {
           campaign_id: string
@@ -1427,6 +1499,7 @@ export type Database = {
           address: string | null
           address_complement: string | null
           address_number: string | null
+          botconversa_subscriber_id: string | null
           city: string | null
           cora_customer_id: string | null
           cora_due_date: string | null
@@ -1439,6 +1512,7 @@ export type Database = {
           cora_subscription_id: string | null
           cpf: string | null
           created_at: string
+          daily_checkin_time: string
           email: string
           experience_level: string | null
           full_name: string
@@ -1468,6 +1542,7 @@ export type Database = {
           address?: string | null
           address_complement?: string | null
           address_number?: string | null
+          botconversa_subscriber_id?: string | null
           city?: string | null
           cora_customer_id?: string | null
           cora_due_date?: string | null
@@ -1480,6 +1555,7 @@ export type Database = {
           cora_subscription_id?: string | null
           cpf?: string | null
           created_at?: string
+          daily_checkin_time?: string
           email?: string
           experience_level?: string | null
           full_name?: string
@@ -1509,6 +1585,7 @@ export type Database = {
           address?: string | null
           address_complement?: string | null
           address_number?: string | null
+          botconversa_subscriber_id?: string | null
           city?: string | null
           cora_customer_id?: string | null
           cora_due_date?: string | null
@@ -1521,6 +1598,7 @@ export type Database = {
           cora_subscription_id?: string | null
           cpf?: string | null
           created_at?: string
+          daily_checkin_time?: string
           email?: string
           experience_level?: string | null
           full_name?: string
