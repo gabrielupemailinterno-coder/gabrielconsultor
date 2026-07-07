@@ -55,7 +55,7 @@ const Admin = () => {
   const [visits, setVisits] = useState<Visit[]>([]);
   const [clicks, setClicks] = useState<Click[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
-  const [tab, setTab] = useState<"mentees" | "score" | "conteudos" | "emails" | "prospect" | "whatsapp" | "ritual" | "botflow" | "leads" | "visits" | "clicks" | "sessions" | "blog">("mentees");
+  const [tab, setTab] = useState<"mentees" | "score" | "conteudos" | "emails" | "prospect" | "whatsapp" | "ritual" | "botflow" | "botconversa" | "leads" | "visits" | "clicks" | "sessions" | "blog">("mentees");
   const [leadFilter, setLeadFilter] = useState<FormType | "all">("all");
 
   useEffect(() => {
