@@ -480,16 +480,41 @@ Deno.serve(async (req) => {
   if (req.method !== "POST" && req.method !== "GET") return json({ error: "method not allowed" }, 405);
   if (!WEBHOOK_TOKEN) return json({ error: "webhook token not configured" }, 500);
   const url = new URL(req.url);
-  const token =
-    req.headers.get("x-webhook-token") ??
-    req.headers.get("X-Webhook-Token") ??
-    url.searchParams.get("token") ??
-    req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
-    url.pathname.split("/").filter(Boolean).at(-1);
-  console.log("[inbound:req] method=", req.method, "contentType=", req.headers.get("content-type") || "", "auth=", token ? "present" : "missing");
-  if (token !== WEBHOOK_TOKEN) {
-    console.warn("[inbound:req] unauthorized auth=", token ? "invalid" : "missing");
-    return json({ error: "unauthorized" }, 401);
+  const tokenCandidates = [
+    req.headers.get("x-webhook-token"),
+    req.headers.get("X-Webhook-Token"),
+    req.headers.get("x-gptmaker-token"),
+    req.headers.get("x-gpt-maker-token"),
+    url.searchParams.get("token"),
+    url.searchParams.get("webhook_token"),
+    url.searchParams.get("t"),
+    req.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? null,
+    url.pathname.split("/").filter(Boolean).at(-1) ?? null,
+  ].filter((v): v is string => !!v);
+  const matched = tokenCandidates.some((v) => v === WEBHOOK_TOKEN);
+  console.log(
+    "[inbound:req] method=", req.method,
+    "contentType=", req.headers.get("content-type") || "",
+    "path=", url.pathname,
+    "hasQueryToken=", url.searchParams.has("token"),
+    "candidates=", tokenCandidates.length,
+    "auth=", matched ? "ok" : (tokenCandidates.length ? "invalid" : "missing"),
+  );
+  if (!matched) {
+    // Fallback: check body for token before rejecting (GPT Maker may put it there).
+    try {
+      const cloned = req.clone();
+      const raw = await cloned.text();
+      if (raw && raw.includes(WEBHOOK_TOKEN)) {
+        console.log("[inbound:req] token matched via body scan");
+      } else {
+        console.warn("[inbound:req] unauthorized headerKeys=", [...req.headers.keys()].join(","));
+        return json({ error: "unauthorized" }, 401);
+      }
+    } catch {
+      console.warn("[inbound:req] unauthorized headerKeys=", [...req.headers.keys()].join(","));
+      return json({ error: "unauthorized" }, 401);
+    }
   }
 
   let body: any;
