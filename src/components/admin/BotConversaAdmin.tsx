@@ -12,13 +12,13 @@ const TEST_FLOWS: { key: string; label: string; nome: string; telefone: string }
   { key: "inativo", label: "Recuperação de inativo", nome: "TESTE Recuperacao Inativo", telefone: "5511999990006" },
 ];
 
-const FLOW_CONFIG: { key: string; label: string; description: string }[] = [
-  { key: "onboarding", label: "Onboarding", description: "Fluxo de boas-vindas ativado no primeiro cadastro ou início de jornada." },
-  { key: "checkin", label: "Check-in diário", description: "Coleta rotineira de progresso, humor ou produtividade do usuário." },
-  { key: "gabriel", label: "Falar com Gabriel", description: "Roteia o usuário para contato direto ou notificação ao consultor." },
-  { key: "assistente", label: "Assistente", description: "Atendimento automático e respostas a dúvidas frequentes via WhatsApp." },
-  { key: "diagnostico", label: "Diagnóstico semanal", description: "Pesquisa semanal para avaliar evolução e identificar bloqueios." },
-  { key: "inativo", label: "Recuperação de inativo", description: "Reengajamento de usuários que pararam de interagir nos últimos dias." },
+const FLOW_CONFIG: { key: string; label: string; description: string; functionName: string }[] = [
+  { key: "onboarding", label: "Onboarding", functionName: "botconversa-event-onboarding", description: "Fluxo de boas-vindas ativado no primeiro cadastro ou início de jornada." },
+  { key: "checkin", label: "Check-in diário", functionName: "botconversa-event-checkin", description: "Coleta rotineira de progresso, humor ou produtividade do usuário." },
+  { key: "gabriel", label: "Falar com Gabriel", functionName: "botconversa-event-gabriel", description: "Roteia o usuário para contato direto ou notificação ao consultor." },
+  { key: "assistente", label: "Assistente", functionName: "botconversa-event-assistente", description: "Atendimento automático e respostas a dúvidas frequentes via WhatsApp." },
+  { key: "diagnostico", label: "Diagnóstico semanal", functionName: "botconversa-event-diagnostico", description: "Pesquisa semanal para avaliar evolução e identificar bloqueios." },
+  { key: "inativo", label: "Recuperação de inativo", functionName: "botconversa-event-inativo", description: "Reengajamento de usuários que pararam de interagir nos últimos dias." },
 ];
 
 type LogRow = {
@@ -216,6 +216,18 @@ function Stat({ label, value }: { label: string; value: number }) {
 }
 
 function FlowConfigSection() {
+  const [copied, setCopied] = useState<string | null>(null);
+
+  async function copy(text: string, key: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(key);
+      setTimeout(() => setCopied(null), 1500);
+    } catch {
+      toast.error("Não foi possível copiar");
+    }
+  }
+
   return (
     <section>
       <h2 className="font-serif text-lg mb-3">Configuração por evento</h2>
@@ -224,6 +236,15 @@ function FlowConfigSection() {
           <div key={f.key} className="border border-border rounded-lg p-4">
             <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">{f.key}</div>
             <div className="font-serif text-base mt-1">{f.label}</div>
+            <div className="mt-2 flex items-center justify-between gap-2 border border-border rounded px-2 py-1.5 bg-muted/20">
+              <span className="font-mono text-xs truncate">{f.functionName}</span>
+              <button
+                onClick={() => copy(f.functionName, f.key)}
+                className="text-xs px-2 py-1 border border-border rounded hover:bg-muted whitespace-nowrap"
+              >
+                {copied === f.key ? "Copiado" : "Copiar"}
+              </button>
+            </div>
             <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{f.description}</p>
           </div>
         ))}
