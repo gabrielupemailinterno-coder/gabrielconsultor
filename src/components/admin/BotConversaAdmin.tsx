@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { sendBotConversaLead } from "@/lib/botconversa";
+
+const TEST_FLOWS: { key: string; label: string; nome: string; telefone: string }[] = [
+  { key: "onboarding", label: "Onboarding", nome: "TESTE Onboarding", telefone: "5511999990001" },
+  { key: "checkin", label: "Check-in diário", nome: "TESTE Checkin Diario", telefone: "5511999990002" },
+  { key: "gabriel", label: "Falar com Gabriel", nome: "TESTE Falar com Gabriel", telefone: "5511999990003" },
+  { key: "assistente", label: "Assistente", nome: "TESTE Assistente", telefone: "5511999990004" },
+  { key: "diagnostico", label: "Diagnóstico semanal", nome: "TESTE Diagnostico Semanal", telefone: "5511999990005" },
+  { key: "inativo", label: "Recuperação de inativo", nome: "TESTE Recuperacao Inativo", telefone: "5511999990006" },
+];
 
 type LogRow = {
   id: string;
