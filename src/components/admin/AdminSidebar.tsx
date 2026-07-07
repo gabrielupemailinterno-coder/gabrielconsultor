@@ -15,6 +15,7 @@ import {
   MousePointerClick,
   Clock,
   FileText,
+  Handshake,
 } from "lucide-react";
 import {
   Sidebar,
@@ -41,6 +42,7 @@ export type AdminView =
   | "botflow"
   | "botconversa"
   | "integrations"
+  | "partners"
   | "leads"
   | "visits"
   | "clicks"
@@ -63,6 +65,7 @@ const GROUPS: Group[] = [
       { view: "mentees", label: "Mentorados", icon: Users },
       { view: "score", label: "Score Comercial", icon: Trophy },
       { view: "conteudos", label: "Conteúdos", icon: BookOpen },
+      { view: "partners", label: "Parceiros", icon: Handshake },
     ],
   },
   {

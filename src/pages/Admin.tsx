@@ -18,6 +18,7 @@ import ScoreAdmin from "@/components/admin/ScoreAdmin";
 import BotConversaAdmin from "@/components/admin/BotConversaAdmin";
 import IntegrationsAdmin from "@/components/admin/IntegrationsAdmin";
 import ContentsAdmin from "@/components/admin/ContentsAdmin";
+import PartnersAdmin from "@/components/admin/PartnersAdmin";
 
 import LeadsTable, { type Lead } from "@/components/admin/analytics/LeadsTable";
 import VisitsTable from "@/components/admin/analytics/VisitsTable";
@@ -29,7 +30,7 @@ type Click = { id: string; session_id: string; element_type: string | null; elem
 type Session = { session_id: string; duration_seconds: number; started_at: string; referrer: string | null };
 
 const VALID_VIEWS: AdminView[] = [
-  "overview", "mentees", "score", "conteudos", "emails", "prospect", "whatsapp",
+  "overview", "mentees", "score", "conteudos", "partners", "emails", "prospect", "whatsapp",
   "ritual", "botflow", "botconversa", "integrations", "leads", "visits", "clicks", "sessions", "blog",
 ];
 
@@ -159,6 +160,7 @@ const Admin = () => {
       {view === "mentees" && <MenteesAdmin />}
       {view === "score" && <ScoreAdmin />}
       {view === "conteudos" && <ContentsAdmin />}
+      {view === "partners" && <PartnersAdmin />}
       {view === "emails" && <MenteeEmailComposer />}
       {view === "prospect" && <ProspectingBulk />}
       {view === "whatsapp" && <WhatsAppAdmin />}
