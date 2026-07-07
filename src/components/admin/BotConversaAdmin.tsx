@@ -203,3 +203,49 @@ function Stat({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
+
+function TestTriggers() {
+  const [busy, setBusy] = useState<string | null>(null);
+  const [results, setResults] = useState<Record<string, "ok" | "err">>({});
+
+  async function fire(flow: typeof TEST_FLOWS[number]) {
+    setBusy(flow.key);
+    try {
+      await sendBotConversaLead(flow.nome, flow.telefone);
+      setResults((r) => ({ ...r, [flow.key]: "ok" }));
+      toast.success(`Gatilho "${flow.label}" disparado`);
+    } catch (e: any) {
+      setResults((r) => ({ ...r, [flow.key]: "err" }));
+      toast.error(e?.message || "falha");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <section className="border border-border rounded-lg p-4 bg-muted/20">
+      <h2 className="font-serif text-lg mb-1">Testes de gatilho BotConversa</h2>
+      <p className="text-xs text-muted-foreground mb-3">
+        Cada botão envia <code className="font-mono">{`{ nome, telefone }`}</code> de teste ao webhook compartilhado para validar o disparo.
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {TEST_FLOWS.map((f) => {
+          const r = results[f.key];
+          return (
+            <button
+              key={f.key}
+              onClick={() => fire(f)}
+              disabled={busy === f.key}
+              className={`text-xs px-3 py-1.5 border rounded hover:bg-muted disabled:opacity-40 ${
+                r === "ok" ? "border-primary text-primary" : r === "err" ? "border-destructive text-destructive" : "border-border"
+              }`}
+              title={`${f.nome} · ${f.telefone}`}
+            >
+              {busy === f.key ? "Enviando…" : f.label} {r === "ok" ? "✓" : r === "err" ? "✕" : ""}
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
