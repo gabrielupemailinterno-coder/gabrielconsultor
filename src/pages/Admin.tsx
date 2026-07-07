@@ -136,10 +136,10 @@ const Admin = () => {
   }
 
   const counts: Partial<Record<AdminView, number>> = {
-    leads: leads.length,
-    visits: visits.length,
-    clicks: clicks.length,
-    sessions: sessions.length,
+    leads: leadsTotal,
+    visits: visitsTotal,
+    clicks: clicksTotal,
+    sessions: sessionsTotal,
   };
 
   const title = ADMIN_LABELS[view] || "Painel";
