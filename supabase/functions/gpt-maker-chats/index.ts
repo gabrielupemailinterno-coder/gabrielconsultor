@@ -21,9 +21,15 @@ async function api(path: string) {
   return { ok: r.ok, status: r.status, body: text };
 }
 
+import { requireAdminOrService } from "../_shared/require-admin.ts";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  // Admin-only utility: exposes contact identifiers (phone numbers) from GPT Maker.
+  const auth = await requireAdminOrService(req, corsHeaders);
+  if (auth instanceof Response) return auth;
   if (!TOKEN) return json({ error: "GPT_MAKER_API_TOKEN não configurado" }, 400);
+
 
   const url = new URL(req.url);
   const q = (url.searchParams.get("q") ?? "").toLowerCase().trim();

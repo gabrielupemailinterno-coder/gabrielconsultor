@@ -73,12 +73,20 @@ async function deliver(webhook: any, eventKey: string, payload: any, deliveryId:
   return { ok, status, nextStatus };
 }
 
+import { requireAdminOrService } from "../_shared/require-admin.ts";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  // Require admin JWT or service_role — otherwise anyone can trigger
+  // outbound POSTs to any registered webhook URL (SSRF) or replay deliveries.
+  const auth = await requireAdminOrService(req, corsHeaders);
+  if (auth instanceof Response) return auth;
 
   const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
   let body: any = {};
   try { body = await req.json(); } catch { /* empty */ }
+
 
   // Retry mode: process pending/retrying deliveries whose next_retry_at has passed
   if (body?.mode === "retry_pending") {

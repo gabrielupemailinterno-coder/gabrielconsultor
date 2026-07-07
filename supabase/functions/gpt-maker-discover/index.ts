@@ -26,9 +26,15 @@ async function api(path: string) {
   }
 }
 
+import { requireAdminOrService } from "../_shared/require-admin.ts";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  // Admin-only: leaks internal workspace/channel/agent IDs otherwise.
+  const auth = await requireAdminOrService(req, corsHeaders);
+  if (auth instanceof Response) return auth;
   if (!TOKEN) return json({ error: "GPT_MAKER_API_TOKEN não configurado" }, 400);
+
 
   try {
     const wsResp = await api("/v2/workspaces");
