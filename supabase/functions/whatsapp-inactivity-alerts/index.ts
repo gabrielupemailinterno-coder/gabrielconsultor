@@ -1,6 +1,7 @@
 // Cron 10h BRT (13:00 UTC) diário: alertas para inatividade de 2, 5 e 10 dias.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendTextByUser, sendTextByPhone, normalizePhone } from "../_shared/botconversa.ts";
+import { requireAdminOrService } from "../_shared/require-admin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
