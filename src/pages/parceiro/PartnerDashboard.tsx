@@ -2,7 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, LogOut, Copy, Check, Plus, ExternalLink } from "lucide-react";
+import { Loader2, Copy, Check, Plus, ExternalLink } from "lucide-react";
+import { AppLayout } from "@/components/app/AppLayout";
+import { PageHeader } from "@/components/app/PageHeader";
+import { SectionCard } from "@/components/app/SectionCard";
+import { KpiTile } from "@/components/app/KpiTile";
+import { EmptyState } from "@/components/app/EmptyState";
+import { StatusBadge } from "@/components/app/StatusBadge";
 
 type Partner = {
   id: string;
@@ -177,51 +183,38 @@ export default function PartnerDashboard() {
     if (partner) await reload(partner.id);
   };
 
-  const logout = async () => {
-    await supabase.auth.signOut();
-    navigate("/app/login", { replace: true });
-  };
 
   if (loading || !partner) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-        <Loader2 className="animate-spin text-primary" />
-      </div>
+      <AppLayout>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <Loader2 className="animate-spin text-primary" />
+        </div>
+      </AppLayout>
     );
   }
 
   const refLink = `${window.location.origin}/?ref=${encodeURIComponent(partner.partner_code)}`;
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <p className="text-[10px] uppercase tracking-widest text-primary">Portal do Parceiro</p>
-            <h1 className="font-serif text-xl">{partner.name}</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground hidden md:inline">
-              Comissão: <strong className="text-foreground">{Number(partner.commission_rate).toFixed(0)}%</strong>
-            </span>
-            <button onClick={logout} className="text-xs inline-flex items-center gap-1 bg-muted px-3 py-2 rounded-md">
-              <LogOut size={12} /> Sair
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-6xl mx-auto px-4 py-6 space-y-8">
+    <AppLayout>
+      <main className="max-w-6xl mx-auto px-4 md:px-6 py-6 space-y-8">
+        <PageHeader
+          eyebrow="Portal do Parceiro"
+          title={partner.name}
+          description={`Comissão vigente: ${Number(partner.commission_rate).toFixed(0)}%`}
+          actions={<StatusBadge tone={partner.status === "active" ? "success" : "warning"}>{partner.status}</StatusBadge>}
+        />
         {/* KPIs */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Kpi label="Cliques 7d" value={String(kpis.clicks7)} />
-          <Kpi label="Cliques 30d" value={String(kpis.clicks30)} />
-          <Kpi label="Leads" value={String(kpis.leads)} />
-          <Kpi label="Compras" value={String(kpis.purchases)} />
-          <Kpi label="Comissão pendente" value={brl(kpis.pending)} tone="yellow" />
-          <Kpi label="Comissão aprovada" value={brl(kpis.approved)} tone="primary" />
-          <Kpi label="Comissão paga" value={brl(kpis.paid)} tone="emerald" />
-          <Kpi label="Seu código" value={partner.partner_code} mono />
+          <KpiTile label="Cliques 7d" value={kpis.clicks7} />
+          <KpiTile label="Cliques 30d" value={kpis.clicks30} />
+          <KpiTile label="Leads" value={kpis.leads} />
+          <KpiTile label="Compras" value={kpis.purchases} />
+          <KpiTile label="Comissão pendente" value={brl(kpis.pending)} sub="a aprovar" />
+          <KpiTile label="Comissão aprovada" value={brl(kpis.approved)} sub="a pagar" accent />
+          <KpiTile label="Comissão paga" value={brl(kpis.paid)} sub="acumulado" />
+          <KpiTile label="Seu código" value={partner.partner_code} />
         </section>
 
         {/* Default ref link */}
@@ -457,33 +450,7 @@ export default function PartnerDashboard() {
           </div>
         </section>
       </main>
-    </div>
+    </AppLayout>
   );
 }
 
-function Kpi({
-  label,
-  value,
-  tone,
-  mono,
-}: {
-  label: string;
-  value: string;
-  tone?: "primary" | "yellow" | "emerald";
-  mono?: boolean;
-}) {
-  const toneClass =
-    tone === "primary"
-      ? "text-primary"
-      : tone === "yellow"
-      ? "text-yellow-600"
-      : tone === "emerald"
-      ? "text-emerald-600"
-      : "";
-  return (
-    <div className="bg-card border border-border rounded-lg p-4">
-      <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className={`mt-1 text-xl ${mono ? "font-mono" : "font-mono"} ${toneClass}`}>{value}</p>
-    </div>
-  );
-}
