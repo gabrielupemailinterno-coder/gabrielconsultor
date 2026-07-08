@@ -89,23 +89,18 @@ function AppRoutes() {
       <Route path="/redefinir-senha" element={<Navigate to="/app/redefinir-senha" replace />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/admin" element={<Navigate to="/app/admin" replace />} />
-      <Route path="/mentorados" element={<Navigate to="/app/mentorados" replace />} />
       <Route path="/mentorados/login" element={<Navigate to="/app/login" replace />} />
       <Route path="/mentorados/redefinir-senha" element={<Navigate to="/app/redefinir-senha" replace />} />
-      <Route path="/parceiro" element={<Navigate to="/app/parceiro" replace />} />
+      <Route path="/mentorados/*" element={<RewriteRedirect from="/mentorados" to="/app/mentorados" />} />
       <Route path="/parceiro/login" element={<Navigate to="/app/login" replace />} />
+      <Route path="/parceiro/*" element={<RewriteRedirect from="/parceiro" to="/app/parceiro" />} />
       <Route path="/scoreapp/login" element={<Navigate to="/app/login" replace />} />
       <Route path="/scoreapp/cadastro" element={<Navigate to="/app/cadastro" replace />} />
       <Route path="/scoreapp/onboarding" element={<Navigate to="/app/score/onboarding" replace />} />
       <Route path="/scoreapp/planos" element={<Navigate to="/app/planos" replace />} />
       <Route path="/scoreapp/checkout-pix" element={<Navigate to="/app/checkout-pix" replace />} />
-      <Route path="/scoreapp/app" element={<Navigate to="/app/score" replace />} />
-      <Route path="/scoreapp/app/registrar" element={<Navigate to="/app/score/registrar" replace />} />
-      <Route path="/scoreapp/app/conteudos" element={<Navigate to="/app/score/conteudos" replace />} />
-      <Route path="/scoreapp/app/conteudos/base/:slug" element={<Navigate to="/app/score/conteudos/base/:slug" replace />} />
-      <Route path="/scoreapp/app/conteudos/feedback/:trigger" element={<Navigate to="/app/score/conteudos/feedback/:trigger" replace />} />
-      <Route path="/scoreapp/app/conteudos/:slug" element={<Navigate to="/app/score/conteudos/:slug" replace />} />
-      <Route path="/scoreapp/app/perfil" element={<Navigate to="/app/score/perfil" replace />} />
+      <Route path="/scoreapp/app/*" element={<RewriteRedirect from="/scoreapp/app" to="/app/score" />} />
+
 
       {/* Catch-all */}
       <Route path="*" element={<NotFound />} />
