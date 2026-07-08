@@ -35,6 +35,11 @@ import Entrar from "./pages/Entrar";
 import EsqueciSenha from "./pages/EsqueciSenha";
 import RedefinirSenha from "./pages/RedefinirSenha";
 import AppHub from "./pages/AppHub";
+import EscolaIndex from "./pages/escola/EscolaIndex";
+import EscolaModulo from "./pages/escola/EscolaModulo";
+import EscolaAula from "./pages/escola/EscolaAula";
+import Configuracoes from "./pages/app/Configuracoes";
+import Notificacoes from "./pages/app/Notificacoes";
 import { usePartnerRefCapture } from "@/hooks/usePartnerRef";
 
 const queryClient = new QueryClient();
