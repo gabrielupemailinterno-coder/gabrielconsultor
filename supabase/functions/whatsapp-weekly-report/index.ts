@@ -1,6 +1,7 @@
 // Cron segunda 08h BRT (11:00 UTC): diagnóstico semanal.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendTextByUser, sendTextByPhone, normalizePhone } from "../_shared/botconversa.ts";
+import { requireAdminOrService } from "../_shared/require-admin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
