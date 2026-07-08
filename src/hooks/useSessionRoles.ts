@@ -21,10 +21,17 @@ export const moduleRoute: Record<Module, string> = {
 };
 
 export const moduleLabel: Record<Module, string> = {
-  admin: "Painel Admin",
-  mentee: "Portal do Mentorado",
-  partner: "Portal do Parceiro",
+  admin: "Administração",
+  mentee: "Mentoria Comercial",
+  partner: "Parceiros",
   scoreapp: "Score Comercial",
+};
+
+export const roleLabel: Record<AppRole, string> = {
+  admin: "Administrador",
+  mentee: "Mentorado",
+  partner: "Parceiro",
+  scoreapp_user: "Usuário Score",
 };
 
 export function useSessionRoles() {

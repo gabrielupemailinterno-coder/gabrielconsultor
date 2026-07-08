@@ -4,7 +4,7 @@ import { AppLayout } from "@/components/app/AppLayout";
 import { PageHeader } from "@/components/app/PageHeader";
 import { SectionCard } from "@/components/app/SectionCard";
 import { StatusBadge } from "@/components/app/StatusBadge";
-import { useSessionRoles, type Module } from "@/hooks/useSessionRoles";
+import { useSessionRoles, roleLabel, type Module } from "@/hooks/useSessionRoles";
 import {
   Briefcase,
   GraduationCap,
@@ -238,15 +238,15 @@ export default function AppHub() {
                 </div>
                 <div>
                   <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                    Papéis
+                    Acessos liberados
                   </dt>
                   <dd className="flex flex-wrap gap-1 mt-1">
                     {roles.length === 0 && (
-                      <span className="text-xs text-muted-foreground">Nenhum</span>
+                      <span className="text-xs text-muted-foreground">Nenhum acesso ativo</span>
                     )}
                     {roles.map((r) => (
                       <StatusBadge key={r} tone="info">
-                        {r}
+                        {roleLabel[r] ?? r}
                       </StatusBadge>
                     ))}
                   </dd>
