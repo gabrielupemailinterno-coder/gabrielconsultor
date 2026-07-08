@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Loader2, LogOut, CalendarDays, ListChecks, FolderOpen, BarChart3, UserCircle2 } from "lucide-react";
+import { Loader2, CalendarDays, ListChecks, FolderOpen, BarChart3, UserCircle2 } from "lucide-react";
 import { useMentee } from "@/hooks/useMentee";
 import { useMenteePresence } from "@/hooks/useMenteePresence";
 import CronogramaTab from "@/components/portal/CronogramaTab";
@@ -14,6 +14,9 @@ import RepositorioTab from "@/components/portal/RepositorioTab";
 import MetricasTab from "@/components/portal/MetricasTab";
 import PerfilTab from "@/components/portal/PerfilTab";
 import CheckoutDialog from "@/components/CheckoutDialog";
+import { AppLayout } from "@/components/app/AppLayout";
+import { PageHeader } from "@/components/app/PageHeader";
+import { SectionCard } from "@/components/app/SectionCard";
 
 export default function PortalDashboard() {
   const navigate = useNavigate();
