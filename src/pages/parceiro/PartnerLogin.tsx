@@ -22,11 +22,13 @@ export default function PartnerLogin() {
     setLoading(true);
     try {
       if (mode === "forgot") {
-        const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-          redirectTo: `${window.location.origin}/parceiro`,
+        const { error } = await supabase.functions.invoke("password-reset-dispatch", {
+          body: { email: email.trim().toLowerCase(), source: "partner" },
         });
         if (error) throw error;
-        toast({ title: "Enviamos um link de acesso para seu e-mail." });
+        toast({
+          title: "Se este e-mail estiver cadastrado, enviamos uma nova senha via WhatsApp.",
+        });
         setMode("login");
         return;
       }
