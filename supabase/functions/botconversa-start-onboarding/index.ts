@@ -8,6 +8,9 @@ function db() {
 }
 
 async function sendOnboardingAutomation(userId: string) {
+  if (!BOTCONVERSA_AUTOMATION_CATCH_URL) {
+    return { ok: false, error: "BOTCONVERSA_AUTOMATION_CATCH_URL not configured" };
+  }
   const admin = db();
   const { data: profile, error } = await admin
     .from("score_profiles")
