@@ -220,7 +220,6 @@ export default function PartnerDashboard() {
           <KpiTile label="Comissão paga" value={brl(kpis.paid)} sub="acumulado" />
           <KpiTile label="Seu código" value={partner.partner_code} />
         </section>
-        </section>
 
         {/* Default ref link */}
         <section className="bg-card border border-border rounded-lg p-4">
