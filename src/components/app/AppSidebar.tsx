@@ -5,12 +5,10 @@ import {
   Briefcase,
   Trophy,
   ShieldCheck,
-  BookOpen,
   Settings,
   Bell,
   CreditCard,
   User,
-  Radio,
   BarChart3,
   Plug,
   FileText,
@@ -48,11 +46,10 @@ function buildGroups(roles: string[]): Group[] {
   });
 
   const modules: Item[] = [];
-  if (isMentee) modules.push({ title: "Mentoria", url: "/app/mentorados", icon: GraduationCap });
-  if (isPartner) modules.push({ title: "Parceria", url: "/app/parceiro", icon: Briefcase });
+  if (isMentee) modules.push({ title: "Mentoria Comercial", url: "/app/mentorados", icon: GraduationCap });
   if (isScore) modules.push({ title: "Score Comercial", url: "/app/score", icon: Trophy });
-  modules.push({ title: "Escola Comercial", url: "/app/escola-comercial", icon: BookOpen });
-  if (modules.length) groups.push({ label: "Módulos", items: modules });
+  if (isPartner) modules.push({ title: "Parceiro/Afiliado", url: "/app/parceiro", icon: Briefcase });
+  if (modules.length) groups.push({ label: "Produtos", items: modules });
 
   if (isAdmin) {
     groups.push({
