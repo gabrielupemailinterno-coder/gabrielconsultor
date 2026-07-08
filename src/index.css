@@ -227,11 +227,12 @@
 
 /* ========== Admin cockpit — tema Neutro Nuvem + Laranja (Pipedrive-like) ========== */
 .admin-theme {
-  --background: 220 20% 98%;          /* #F7F8FA */
+  --background: 220 20% 96%;          /* canvas levemente mais escuro que os cards */
   --foreground: 222 47% 11%;          /* #111827 */
   --card: 0 0% 100%;
   --card-foreground: 222 47% 11%;
   --popover: 0 0% 100%;
+
   --popover-foreground: 222 47% 11%;
   --primary: 22 63% 47%;              /* #C4632D */
   --primary-foreground: 0 0% 100%;
