@@ -19,6 +19,7 @@ import BotConversaAdmin from "@/components/admin/BotConversaAdmin";
 import IntegrationsAdmin from "@/components/admin/IntegrationsAdmin";
 import ContentsAdmin from "@/components/admin/ContentsAdmin";
 import PartnersAdmin from "@/components/admin/PartnersAdmin";
+import SettingsAdmin from "@/components/admin/SettingsAdmin";
 
 import LeadsTable, { type Lead } from "@/components/admin/analytics/LeadsTable";
 import VisitsTable from "@/components/admin/analytics/VisitsTable";
