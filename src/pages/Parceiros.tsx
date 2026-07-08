@@ -34,7 +34,7 @@ const fadeUp = {
 
 const Parceiros = () => {
   const [formOpen, setFormOpen] = useState(false);
-  useAnalytics("/parceiros");
+  useAnalytics("/associadoacidel");
 
   useEffect(() => {
     document.title = "Associado ACIDEL REI tem desconto | Gabriel Consultor";
@@ -91,21 +91,21 @@ const Parceiros = () => {
           name="description"
           content={`Sou associado ACIDEL REI. Associados têm ${DESCONTO} de desconto na consultoria comercial e na mentoria estratégica do Gabriel Consultor. Processo, execução e resultado.`}
         />
-        <link rel="canonical" href="https://gabrielconsultor.com/parceiros" />
+        <link rel="canonical" href="https://gabrielconsultor.com/associadoacidel" />
         <meta property="og:title" content="Associado ACIDEL REI tem desconto | Gabriel Consultor" />
         <meta
           property="og:description"
           content={`Desconto exclusivo de ${DESCONTO} para associados da ACIDEL REI na consultoria e mentoria do Gabriel Consultor.`}
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://gabrielconsultor.com/parceiros" />
+        <meta property="og:url" content="https://gabrielconsultor.com/associadoacidel" />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Offer",
             name: "Desconto para associados ACIDEL REI",
             description: `Desconto de ${DESCONTO} na consultoria comercial e na mentoria estratégica do Gabriel Consultor para associados da ACIDEL REI.`,
-            url: "https://gabrielconsultor.com/parceiros",
+            url: "https://gabrielconsultor.com/associadoacidel",
             seller: {
               "@type": "Person",
               name: "Gabriel Consultor",
