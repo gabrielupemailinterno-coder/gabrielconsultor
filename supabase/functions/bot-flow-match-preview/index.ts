@@ -20,6 +20,8 @@ Deno.serve(async (req) => {
       status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+  const authCheck = await requireAdminOrService(req, corsHeaders);
+  if (authCheck instanceof Response) return authCheck;
 
   let body: any;
   try { body = await req.json(); } catch {
