@@ -12,7 +12,6 @@ import {
   Trophy,
   ShieldCheck,
   ArrowRight,
-  BookOpen,
   Settings,
   CreditCard,
   Sparkles,
@@ -131,28 +130,6 @@ export default function AppHub() {
                     );
                   })}
 
-                  <Link
-                    to="/app/escola-comercial"
-                    className="surface-elevated surface-elevated-hover p-4 flex flex-col gap-2 group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="w-9 h-9 rounded-md bg-primary/10 border border-primary/25 flex items-center justify-center">
-                        <BookOpen className="h-4 w-4 text-primary" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                          Novo
-                        </p>
-                        <h3 className="font-serif text-base leading-tight">Escola Comercial</h3>
-                      </div>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Trilhas por competência — fundamentos, prospecção, negociação e liderança.
-                    </p>
-                    <span className="mt-auto text-[11px] inline-flex items-center gap-1 text-primary opacity-70 group-hover:opacity-100">
-                      Explorar <ArrowRight className="h-3 w-3" />
-                    </span>
-                  </Link>
                 </div>
               </SectionCard>
 
@@ -167,7 +144,7 @@ export default function AppHub() {
                       Abrir <ArrowRight className="h-3 w-3" />
                     </Link>
                   </li>
-                  <li className="flex items-center justify-between gap-3 py-2 border-b border-border/50 last:border-0">
+                  <li className="flex items-center justify-between gap-3 py-2">
                     <span className="text-muted-foreground">Confira seu plano atual</span>
                     <Link
                       to="/app/planos"
@@ -176,17 +153,9 @@ export default function AppHub() {
                       Ver <ArrowRight className="h-3 w-3" />
                     </Link>
                   </li>
-                  <li className="flex items-center justify-between gap-3 py-2">
-                    <span className="text-muted-foreground">Explore a Escola Comercial</span>
-                    <Link
-                      to="/app/escola-comercial"
-                      className="text-[11px] text-primary inline-flex items-center gap-1"
-                    >
-                      Começar <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </li>
                 </ul>
               </SectionCard>
+
             </div>
 
             <div className="space-y-4">

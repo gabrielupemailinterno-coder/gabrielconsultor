@@ -43,28 +43,39 @@ type Group = {
 };
 
 export const ADMIN_GROUPS: Group[] = [
-  { label: "Cockpit", items: [{ view: "overview", label: "Visão Geral", icon: LayoutDashboard }] },
   {
-    label: "Operação",
+    label: "Visão Geral",
+    items: [{ view: "overview", label: "Dashboard", icon: LayoutDashboard }],
+  },
+  {
+    label: "Mentoria Comercial",
     items: [
       { view: "mentees", label: "Mentorados", icon: Users },
-      { view: "score", label: "Score Comercial", icon: Trophy },
       { view: "conteudos", label: "Conteúdos", icon: BookOpen },
-      { view: "partners", label: "Parceiros", icon: Handshake },
-    ],
-  },
-  {
-    label: "Relacionamento",
-    items: [
       { view: "emails", label: "E-mails", icon: Mail },
-      { view: "prospect", label: "Prospecção", icon: Send },
-      { view: "whatsapp", label: "WhatsApp", icon: MessageCircle },
-      { view: "ritual", label: "Ritual WhatsApp", icon: CalendarClock },
     ],
   },
   {
-    label: "Automações",
+    label: "Score Comercial",
+    items: [{ view: "score", label: "Usuários & Diagnósticos", icon: Trophy }],
+  },
+  {
+    label: "Parceiros/Afiliados",
+    items: [{ view: "partners", label: "Parceiros", icon: Handshake }],
+  },
+  {
+    label: "Marketing & Conteúdo",
     items: [
+      { view: "blog", label: "Blog", icon: FileText },
+      { view: "leads", label: "Leads", icon: UserPlus },
+      { view: "prospect", label: "Prospecção", icon: Send },
+    ],
+  },
+  {
+    label: "Automações & Integrações",
+    items: [
+      { view: "whatsapp", label: "WhatsApp", icon: MessageCircle },
+      { view: "ritual", label: "Ritual", icon: CalendarClock },
       { view: "botflow", label: "Fluxo do Bot", icon: Workflow },
       { view: "botconversa", label: "BotConversa", icon: Bot },
       { view: "integrations", label: "Integrações", icon: Plug },
@@ -73,13 +84,11 @@ export const ADMIN_GROUPS: Group[] = [
   {
     label: "Analytics",
     items: [
-      { view: "leads", label: "Cadastros", icon: UserPlus },
       { view: "visits", label: "Visitas", icon: Eye },
       { view: "clicks", label: "Cliques", icon: MousePointerClick },
       { view: "sessions", label: "Sessões", icon: Clock },
     ],
   },
-  { label: "Conteúdo", items: [{ view: "blog", label: "Blog", icon: FileText }] },
 ];
 
 export const ADMIN_LABELS: Record<AdminView, string> = ADMIN_GROUPS.reduce(
