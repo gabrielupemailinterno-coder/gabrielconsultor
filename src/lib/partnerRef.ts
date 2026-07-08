@@ -45,3 +45,25 @@ export function clearPartnerRef() {
     // ignore
   }
 }
+
+export function buildPartnerUrl(slug: string): string {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  return `${origin}/r/${slug}`;
+}
+
+export function generateSlug(label: string, partnerCode?: string): string {
+  const base = [partnerCode, label]
+    .filter(Boolean)
+    .join("-")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 42);
+  const suffix =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID().slice(0, 6)
+      : Math.random().toString(36).slice(2, 8);
+  return `${base || "link"}-${suffix}`;
+}
