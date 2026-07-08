@@ -41,26 +41,31 @@ export function useAnalytics(path: string = "/") {
       duration_seconds: 0,
     }, { onConflict: "session_id" }).then(() => {});
 
-    // Heartbeat: update duration every 15s
+    // Heartbeat: upsert duration every 15s (UPDATE policy is admin-only, use upsert with session_id)
     const interval = window.setInterval(() => {
       const seconds = Math.floor((Date.now() - startedAt) / 1000);
-      supabase.from("page_sessions").update({
-        duration_seconds: seconds,
+      supabase.from("page_sessions").upsert({
+        session_id: sessionId,
+        path,
+        referrer,
+        user_agent: userAgent,
+        started_at: new Date(startedAt).toISOString(),
         last_seen_at: new Date().toISOString(),
-      }).eq("session_id", sessionId).then(() => {});
+        duration_seconds: seconds,
+      }, { onConflict: "session_id" }).then(() => {});
     }, 15000);
 
     const flush = () => {
       const seconds = Math.floor((Date.now() - startedAt) / 1000);
-      const blob = new Blob([JSON.stringify({
-        duration_seconds: seconds,
+      supabase.from("page_sessions").upsert({
+        session_id: sessionId,
+        path,
+        referrer,
+        user_agent: userAgent,
+        started_at: new Date(startedAt).toISOString(),
         last_seen_at: new Date().toISOString(),
-      })], { type: "application/json" });
-      // Best-effort flush via REST
-      supabase.from("page_sessions").update({
         duration_seconds: seconds,
-        last_seen_at: new Date().toISOString(),
-      }).eq("session_id", sessionId).then(() => {});
+      }, { onConflict: "session_id" }).then(() => {});
     };
     window.addEventListener("beforeunload", flush);
     window.addEventListener("pagehide", flush);
