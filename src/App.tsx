@@ -35,6 +35,10 @@ import ScoreCheckoutPix from "./pages/scoreapp/CheckoutPix";
 import RedirectPartnerLink from "./pages/RedirectPartnerLink";
 import PartnerLogin from "./pages/parceiro/PartnerLogin";
 import PartnerDashboard from "./pages/parceiro/PartnerDashboard";
+import Entrar from "./pages/Entrar";
+import EsqueciSenha from "./pages/EsqueciSenha";
+import RedefinirSenha from "./pages/RedefinirSenha";
+import AppHub from "./pages/AppHub";
 import { usePartnerRefCapture } from "@/hooks/usePartnerRef";
 
 const queryClient = new QueryClient();
@@ -44,6 +48,10 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
+      <Route path="/entrar" element={<Entrar />} />
+      <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+      <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+      <Route path="/app" element={<AppHub />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/mentoria-profissional" element={<MentoriaProfissional />} />

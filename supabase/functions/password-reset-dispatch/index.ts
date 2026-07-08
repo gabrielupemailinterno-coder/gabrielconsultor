@@ -1,56 +1,60 @@
-// Public: generates a temporary password for a given identity (parceiro,
-// mentorado ou scoreapp), updates it via Auth Admin API and POSTs the
-// credentials to a single outbound webhook (BotConversa / WhatsApp forwarder).
-//
-// Sempre responde 200 { ok:true } para evitar enumeração de e-mails.
+// Public: generates a Supabase recovery link for a given e-mail and POSTs
+// { phone, reset_link, full_name, email, source_hint } to the outbound
+// webhook (BotConversa forwards it over WhatsApp).
+// Always responds { ok: true } to avoid e-mail enumeration.
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-type Source = "partner" | "mentee" | "scoreapp";
-
-function genPassword(len = 12): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
-  const arr = new Uint8Array(len);
-  crypto.getRandomValues(arr);
-  return Array.from(arr, (n) => chars[n % chars.length]).join("");
-}
+type SourceHint = "partner" | "mentee" | "scoreapp" | "admin" | "unknown";
 
 const ok = () =>
   new Response(JSON.stringify({ ok: true }), {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 
-async function findIdentity(
+async function pickIdentity(
   admin: ReturnType<typeof createClient>,
-  source: Source,
+  userId: string,
   email: string,
-): Promise<{ user_id: string; phone: string | null; name: string | null } | null> {
-  if (source === "partner") {
-    const { data } = await admin
-      .from("partners")
-      .select("user_id, phone, name, email")
-      .ilike("email", email)
-      .maybeSingle();
-    if (!data?.user_id) return null;
-    return { user_id: data.user_id, phone: (data as any).phone ?? null, name: (data as any).name ?? null };
-  }
-  if (source === "mentee") {
-    const { data } = await admin
-      .from("mentees")
-      .select("user_id, phone, full_name, email")
-      .ilike("email", email)
-      .maybeSingle();
-    if (!data?.user_id) return null;
-    return { user_id: data.user_id, phone: (data as any).phone ?? null, name: (data as any).full_name ?? null };
-  }
-  // scoreapp
-  const { data } = await admin
-    .from("score_profiles")
-    .select("user_id, phone, full_name, email")
-    .ilike("email", email)
+): Promise<{ phone: string | null; full_name: string | null; source_hint: SourceHint }> {
+  // Priority: partner > mentee > scoreapp. Admin only if no other module.
+  const partner = await admin
+    .from("partners")
+    .select("phone, name")
+    .eq("user_id", userId)
     .maybeSingle();
-  if (!data?.user_id) return null;
-  return { user_id: data.user_id, phone: (data as any).phone ?? null, name: (data as any).full_name ?? null };
+  if (partner.data) {
+    return {
+      phone: (partner.data as any).phone ?? null,
+      full_name: (partner.data as any).name ?? null,
+      source_hint: "partner",
+    };
+  }
+  const mentee = await admin
+    .from("mentees")
+    .select("phone, full_name")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (mentee.data) {
+    return {
+      phone: (mentee.data as any).phone ?? null,
+      full_name: (mentee.data as any).full_name ?? null,
+      source_hint: "mentee",
+    };
+  }
+  const score = await admin
+    .from("score_profiles")
+    .select("phone, full_name")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (score.data) {
+    return {
+      phone: (score.data as any).phone ?? null,
+      full_name: (score.data as any).full_name ?? null,
+      source_hint: "scoreapp",
+    };
+  }
+  return { phone: null, full_name: null, source_hint: "unknown" };
 }
 
 Deno.serve(async (req) => {
@@ -64,35 +68,50 @@ Deno.serve(async (req) => {
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
     const body = await req.json().catch(() => ({}));
-    const rawEmail = String(body?.email ?? "").trim().toLowerCase();
-    const source = (String(body?.source ?? "").trim().toLowerCase() as Source);
+    const email = String(body?.email ?? "").trim().toLowerCase();
+    const origin =
+      String(body?.origin ?? "").trim() ||
+      req.headers.get("origin") ||
+      "https://gabrielconsultor.com";
+    const redirectTo = `${origin.replace(/\/+$/, "")}/redefinir-senha`;
 
-    if (!rawEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail)) return ok();
-    if (!["partner", "mentee", "scoreapp"].includes(source)) return ok();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return ok();
 
-    const identity = await findIdentity(admin, source, rawEmail);
-    if (!identity) {
-      console.log("password-reset-dispatch: no identity for", source, rawEmail);
+    // Look up the user by e-mail (paginate defensively; small user base).
+    let userId: string | null = null;
+    let page = 1;
+    while (page <= 20) {
+      const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 200 });
+      if (error) break;
+      const found = data.users.find((u) => (u.email || "").toLowerCase() === email);
+      if (found) {
+        userId = found.id;
+        break;
+      }
+      if (data.users.length < 200) break;
+      page += 1;
+    }
+    if (!userId) {
+      console.log("password-reset-dispatch: no auth user for", email);
       return ok();
     }
 
-    const newPassword = genPassword(12);
-    const { error: updErr } = await admin.auth.admin.updateUserById(identity.user_id, {
-      password: newPassword,
-      email_confirm: true,
+    const identity = await pickIdentity(admin, userId, email);
+
+    // Generate the recovery link (Supabase verifies + redirects to /redefinir-senha)
+    const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+      type: "recovery",
+      email,
+      options: { redirectTo },
     });
-    if (updErr) {
-      console.error("updateUserById failed", updErr);
+    if (linkErr || !linkData?.properties?.action_link) {
+      console.error("generateLink failed", linkErr);
       return ok();
     }
-
-    // Reset password_changed_at flag when applicable (mentee portal banner)
-    if (source === "mentee") {
-      await admin.from("mentees").update({ password_changed_at: null }).ilike("email", rawEmail);
-    }
+    const reset_link = linkData.properties.action_link;
 
     if (!WEBHOOK_URL) {
-      console.warn("password-reset-dispatch: PASSWORD_RESET_WEBHOOK_URL not configured; skipping outbound POST");
+      console.warn("PASSWORD_RESET_WEBHOOK_URL not configured; skipping outbound POST");
       return ok();
     }
 
@@ -102,11 +121,11 @@ Deno.serve(async (req) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           event: "password.reset",
-          source,
-          email: rawEmail,
+          email,
           phone: identity.phone,
-          full_name: identity.name,
-          temp_password: newPassword,
+          full_name: identity.full_name,
+          source_hint: identity.source_hint,
+          reset_link,
           issued_at: new Date().toISOString(),
         }),
       });
