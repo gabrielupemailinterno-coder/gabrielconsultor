@@ -2,7 +2,7 @@
 // um número de teste (sem consumir input do usuário).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendWhatsApp, normalizePhone } from "../_shared/gpt-maker.ts";
-import { BotFlow, startSession } from "../_shared/bot-engine.ts";
+import { requireAdminOrService } from "../_shared/require-admin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
