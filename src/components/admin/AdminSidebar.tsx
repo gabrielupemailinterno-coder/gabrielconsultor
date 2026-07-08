@@ -17,18 +17,6 @@ import {
   FileText,
   Handshake,
 } from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarHeader,
-  useSidebar,
-} from "@/components/ui/sidebar";
 
 export type AdminView =
   | "overview"
@@ -54,11 +42,8 @@ type Group = {
   items: { view: AdminView; label: string; icon: any }[];
 };
 
-const GROUPS: Group[] = [
-  {
-    label: "Cockpit",
-    items: [{ view: "overview", label: "Visão Geral", icon: LayoutDashboard }],
-  },
+export const ADMIN_GROUPS: Group[] = [
+  { label: "Cockpit", items: [{ view: "overview", label: "Visão Geral", icon: LayoutDashboard }] },
   {
     label: "Operação",
     items: [
@@ -94,19 +79,10 @@ const GROUPS: Group[] = [
       { view: "sessions", label: "Sessões", icon: Clock },
     ],
   },
-  {
-    label: "Conteúdo",
-    items: [{ view: "blog", label: "Blog", icon: FileText }],
-  },
+  { label: "Conteúdo", items: [{ view: "blog", label: "Blog", icon: FileText }] },
 ];
 
-interface Props {
-  view: AdminView;
-  onChange: (v: AdminView) => void;
-  counts?: Partial<Record<AdminView, number>>;
-}
-
-export const ADMIN_LABELS: Record<AdminView, string> = GROUPS.reduce(
+export const ADMIN_LABELS: Record<AdminView, string> = ADMIN_GROUPS.reduce(
   (acc, g) => {
     g.items.forEach((i) => (acc[i.view] = i.label));
     return acc;
@@ -114,7 +90,7 @@ export const ADMIN_LABELS: Record<AdminView, string> = GROUPS.reduce(
   {} as Record<AdminView, string>,
 );
 
-export const ADMIN_GROUP_OF: Record<AdminView, string> = GROUPS.reduce(
+export const ADMIN_GROUP_OF: Record<AdminView, string> = ADMIN_GROUPS.reduce(
   (acc, g) => {
     g.items.forEach((i) => (acc[i.view] = g.label));
     return acc;
@@ -122,60 +98,50 @@ export const ADMIN_GROUP_OF: Record<AdminView, string> = GROUPS.reduce(
   {} as Record<AdminView, string>,
 );
 
-export default function AdminSidebar({ view, onChange, counts = {} }: Props) {
-  const { state } = useSidebar();
-  const collapsed = state === "collapsed";
+interface Props {
+  view: AdminView;
+  onChange: (v: AdminView) => void;
+  counts?: Partial<Record<AdminView, number>>;
+}
 
+/** Horizontal segmented sub-navigation used inside AppLayout for the Admin cockpit. */
+export default function AdminSubnav({ view, onChange, counts = {} }: Props) {
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b border-sidebar-border px-4 py-4">
-        {!collapsed ? (
-          <div>
-            <p className="font-serif text-base leading-tight">Cockpit</p>
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Consultoria GV
-            </p>
-          </div>
-        ) : (
-          <div className="text-primary font-serif text-lg text-center">GV</div>
-        )}
-      </SidebarHeader>
-      <SidebarContent>
-        {GROUPS.map((group) => (
-          <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {group.items.map((item) => {
-                  const active = view === item.view;
-                  const count = counts[item.view];
-                  return (
-                    <SidebarMenuItem key={item.view}>
-                      <SidebarMenuButton
-                        isActive={active}
-                        onClick={() => onChange(item.view)}
-                        tooltip={item.label}
-                      >
-                        <item.icon className="h-4 w-4" />
-                        {!collapsed && (
-                          <span className="flex-1 flex items-center justify-between">
-                            <span>{item.label}</span>
-                            {typeof count === "number" && (
-                              <span className="text-[10px] text-muted-foreground">
-                                {count}
-                              </span>
-                            )}
-                          </span>
-                        )}
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
-      </SidebarContent>
-    </Sidebar>
+    <div className="border-b border-border/60 bg-background/80 backdrop-blur-md sticky top-14 z-20">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-2 overflow-x-auto">
+        <div className="flex items-center gap-6 min-w-max">
+          {ADMIN_GROUPS.map((group) => (
+            <div key={group.label} className="flex items-center gap-1">
+              <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 mr-1 shrink-0">
+                {group.label}
+              </span>
+              {group.items.map((item) => {
+                const active = view === item.view;
+                const count = counts[item.view];
+                return (
+                  <button
+                    key={item.view}
+                    type="button"
+                    onClick={() => onChange(item.view)}
+                    className={
+                      "shrink-0 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] transition-colors " +
+                      (active
+                        ? "bg-primary/15 text-primary border border-primary/25"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/60 border border-transparent")
+                    }
+                  >
+                    <item.icon className="h-3 w-3" />
+                    <span>{item.label}</span>
+                    {typeof count === "number" && (
+                      <span className="text-[10px] text-muted-foreground/70">({count})</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
