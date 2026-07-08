@@ -454,33 +454,7 @@ export default function PartnerDashboard() {
           </div>
         </section>
       </main>
-    </div>
+    </AppLayout>
   );
 }
 
-function Kpi({
-  label,
-  value,
-  tone,
-  mono,
-}: {
-  label: string;
-  value: string;
-  tone?: "primary" | "yellow" | "emerald";
-  mono?: boolean;
-}) {
-  const toneClass =
-    tone === "primary"
-      ? "text-primary"
-      : tone === "yellow"
-      ? "text-yellow-600"
-      : tone === "emerald"
-      ? "text-emerald-600"
-      : "";
-  return (
-    <div className="bg-card border border-border rounded-lg p-4">
-      <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
-      <p className={`mt-1 text-xl ${mono ? "font-mono" : "font-mono"} ${toneClass}`}>{value}</p>
-    </div>
-  );
-}
