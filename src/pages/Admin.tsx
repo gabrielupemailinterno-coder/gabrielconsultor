@@ -19,6 +19,7 @@ import BotConversaAdmin from "@/components/admin/BotConversaAdmin";
 import IntegrationsAdmin from "@/components/admin/IntegrationsAdmin";
 import ContentsAdmin from "@/components/admin/ContentsAdmin";
 import PartnersAdmin from "@/components/admin/PartnersAdmin";
+import SettingsAdmin from "@/components/admin/SettingsAdmin";
 
 import LeadsTable, { type Lead } from "@/components/admin/analytics/LeadsTable";
 import VisitsTable from "@/components/admin/analytics/VisitsTable";
@@ -31,7 +32,7 @@ type Session = { session_id: string; duration_seconds: number; started_at: strin
 
 const VALID_VIEWS: AdminView[] = [
   "overview", "mentees", "score", "conteudos", "partners", "emails", "prospect", "whatsapp",
-  "ritual", "botflow", "botconversa", "integrations", "leads", "visits", "clicks", "sessions", "blog",
+  "ritual", "botflow", "botconversa", "integrations", "leads", "visits", "clicks", "sessions", "blog", "settings",
 ];
 
 const getInitialView = (): AdminView => {
@@ -173,6 +174,7 @@ const Admin = () => {
       {view === "clicks" && <ClicksTable clicks={clicks} />}
       {view === "sessions" && <SessionsTable sessions={sessions} />}
       {view === "blog" && <BlogAdmin />}
+      {view === "settings" && <SettingsAdmin onNavigate={setView} />}
     </AdminLayout>
   );
 };

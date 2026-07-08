@@ -18,6 +18,21 @@ export type OverviewDelivery = {
   created_at: string;
 };
 
+export type OverviewMentee = {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  created_at: string;
+};
+
+export type OverviewPartner = {
+  id: string;
+  name: string;
+  partner_code: string;
+  status: string;
+  created_at: string;
+};
+
 export interface AdminOverview {
   loading: boolean;
   leadsTotal: number;
@@ -28,8 +43,13 @@ export interface AdminOverview {
   avgSessionSec: number;
   menteesActive: number;
   integrationsEnabled: number;
+  pendingCommissionsCount: number;
+  pendingCommissionsCents: number;
+  failedDeliveries7d: number;
   recentLeads: OverviewLead[];
   recentDeliveries: OverviewDelivery[];
+  recentMentees: OverviewMentee[];
+  recentPartners: OverviewPartner[];
   refresh: () => void;
 }
 
@@ -46,8 +66,13 @@ export function useAdminOverview(): AdminOverview {
     avgSessionSec: 0,
     menteesActive: 0,
     integrationsEnabled: 0,
+    pendingCommissionsCount: 0,
+    pendingCommissionsCents: 0,
+    failedDeliveries7d: 0,
     recentLeads: [],
     recentDeliveries: [],
+    recentMentees: [],
+    recentPartners: [],
   });
   const [nonce, setNonce] = useState(0);
 
@@ -67,6 +92,11 @@ export function useAdminOverview(): AdminOverview {
         anyDb.from("integration_webhooks").select("id", { count: "exact", head: true }).eq("enabled", true),
         supabase.from("leads").select("id,name,form_type,email,phone,created_at").order("created_at", { ascending: false }).limit(5),
         anyDb.from("integration_deliveries").select("id,event_key,status,status_code,created_at").order("created_at", { ascending: false }).limit(5),
+        anyDb.from("mentees").select("id,full_name,email,created_at").order("created_at", { ascending: false }).limit(5),
+        anyDb.from("partners").select("id,name,partner_code,status,created_at").order("created_at", { ascending: false }).limit(5),
+        anyDb.from("partner_conversions").select("id", { count: "exact", head: true }).eq("commission_status", "pending"),
+        anyDb.from("partner_conversions").select("commission_cents").eq("commission_status", "pending").limit(2000),
+        anyDb.from("integration_deliveries").select("id", { count: "exact", head: true }).eq("status", "error").gte("created_at", since7),
       ]);
 
       if (cancelled) return;
@@ -86,6 +116,15 @@ export function useAdminOverview(): AdminOverview {
       const integrationsEnabled = val(7).count ?? 0;
       const recentLeads = (val(8).data ?? []) as OverviewLead[];
       const recentDeliveries = (val(9).data ?? []) as OverviewDelivery[];
+      const recentMentees = (val(10).data ?? []) as OverviewMentee[];
+      const recentPartners = (val(11).data ?? []) as OverviewPartner[];
+      const pendingCommissionsCount = val(12).count ?? 0;
+      const pendingCommissionsRows = (val(13).data ?? []) as { commission_cents: number }[];
+      const pendingCommissionsCents = pendingCommissionsRows.reduce(
+        (a, r) => a + (r.commission_cents || 0),
+        0,
+      );
+      const failedDeliveries7d = val(14).count ?? 0;
 
       const avgSessionSec = sessionsData.length
         ? Math.round(sessionsData.reduce((a, s) => a + (s.duration_seconds || 0), 0) / sessionsData.length)
@@ -101,8 +140,13 @@ export function useAdminOverview(): AdminOverview {
         avgSessionSec,
         menteesActive,
         integrationsEnabled,
+        pendingCommissionsCount,
+        pendingCommissionsCents,
+        failedDeliveries7d,
         recentLeads,
         recentDeliveries,
+        recentMentees,
+        recentPartners,
       });
     })();
     return () => {
