@@ -2,6 +2,7 @@
 // Útil para debugar por que uma frase não está disparando o fluxo esperado.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { BotFlow, matchFlowDebug } from "../_shared/bot-engine.ts";
+import { requireAdminOrService } from "../_shared/require-admin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
