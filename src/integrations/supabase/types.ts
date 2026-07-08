@@ -721,7 +721,7 @@ export type Database = {
           backoff_seconds: number
           created_at: string
           enabled: boolean
-          event_keys: string[]
+          event_name: string
           headers: Json
           id: string
           last_delivery_at: string | null
@@ -737,7 +737,7 @@ export type Database = {
           backoff_seconds?: number
           created_at?: string
           enabled?: boolean
-          event_keys?: string[]
+          event_name: string
           headers?: Json
           id?: string
           last_delivery_at?: string | null
@@ -753,7 +753,7 @@ export type Database = {
           backoff_seconds?: number
           created_at?: string
           enabled?: boolean
-          event_keys?: string[]
+          event_name?: string
           headers?: Json
           id?: string
           last_delivery_at?: string | null

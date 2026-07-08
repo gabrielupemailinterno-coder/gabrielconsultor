@@ -6,7 +6,7 @@ import { Copy, Plus, Play, Trash2, RefreshCw, ChevronRight, Loader2 } from "luci
 type EventRow = { id: string; key: string; label: string; category: string; description: string | null; sample_payload: any };
 type Webhook = {
   id: string; name: string; url: string; enabled: boolean; secret: string | null;
-  event_keys: string[]; headers: Record<string, string>; timeout_ms: number;
+  event_name: string; headers: Record<string, string>; timeout_ms: number;
   max_attempts: number; backoff_seconds: number;
   last_delivery_at: string | null; last_delivery_status: string | null;
 };
@@ -17,7 +17,7 @@ type Delivery = {
 };
 
 const empty: Omit<Webhook, "id" | "last_delivery_at" | "last_delivery_status"> = {
-  name: "", url: "", enabled: true, secret: null, event_keys: [], headers: {},
+  name: "", url: "", enabled: true, secret: null, event_name: "", headers: {},
   timeout_ms: 10000, max_attempts: 3, backoff_seconds: 60,
 };
 
@@ -27,6 +27,10 @@ const statusColor: Record<string, string> = {
   retrying: "text-amber-600 bg-amber-50 border-amber-200",
   pending: "text-muted-foreground bg-muted border-border",
 };
+
+function isValidUrl(u: string) {
+  try { const x = new URL(u); return x.protocol === "http:" || x.protocol === "https:"; } catch { return false; }
+}
 
 export default function IntegrationsAdmin() {
   const [tab, setTab] = useState<"webhooks" | "events" | "logs">("webhooks");
@@ -42,7 +46,7 @@ export default function IntegrationsAdmin() {
     setLoading(true);
     const [e, w, d] = await Promise.all([
       supabase.from("integration_events").select("*").order("category").order("key"),
-      supabase.from("integration_webhooks").select("*").order("created_at", { ascending: false }),
+      supabase.from("integration_webhooks").select("*").order("event_name", { ascending: true }),
       supabase.from("integration_deliveries").select("*").order("created_at", { ascending: false }).limit(200),
     ]);
     setEvents((e.data as any) || []);
@@ -59,12 +63,35 @@ export default function IntegrationsAdmin() {
     return g;
   }, [events]);
 
+  const eventByKey = useMemo(() => {
+    const m: Record<string, EventRow> = {};
+    events.forEach((ev) => { m[ev.key] = ev; });
+    return m;
+  }, [events]);
+
+  const takenEvents = useMemo(() => {
+    const s = new Set<string>();
+    webhooks.forEach((w) => { if (w.event_name && w.id !== editing?.id) s.add(w.event_name); });
+    return s;
+  }, [webhooks, editing?.id]);
+
   const save = async () => {
-    if (!editing?.name || !editing?.url) { toast.error("Nome e URL são obrigatórios"); return; }
-    const payload = { ...empty, ...editing };
-    delete (payload as any).id;
-    delete (payload as any).last_delivery_at;
-    delete (payload as any).last_delivery_status;
+    if (!editing?.event_name) { toast.error("Escolha um evento"); return; }
+    if (!editing?.name?.trim()) { toast.error("Nome é obrigatório"); return; }
+    if (!editing?.url || !isValidUrl(editing.url)) { toast.error("URL inválida"); return; }
+
+    // Prevent duplicated event on create/edit
+    const dup = webhooks.find((w) => w.event_name === editing.event_name && w.id !== editing.id);
+    if (dup) {
+      toast.error("Este evento já possui um webhook configurado. Edite o webhook existente ou remova antes de criar outro.");
+      return;
+    }
+
+    const payload = { ...empty, ...editing } as any;
+    delete payload.id;
+    delete payload.last_delivery_at;
+    delete payload.last_delivery_status;
+
     if (editing.id) {
       const { error } = await supabase.from("integration_webhooks").update(payload).eq("id", editing.id);
       if (error) return toast.error(error.message);
@@ -86,10 +113,9 @@ export default function IntegrationsAdmin() {
   const test = async (wh: Webhook) => {
     setBusy(wh.id);
     try {
-      const eventKey = wh.event_keys[0];
-      const ev = events.find((e) => e.key === eventKey);
+      const ev = eventByKey[wh.event_name];
       const { data, error } = await supabase.functions.invoke("integrations-dispatch", {
-        body: { mode: "test", webhook_id: wh.id, event_key: eventKey || "test.ping", payload: ev?.sample_payload || { test: true } },
+        body: { mode: "test", webhook_id: wh.id, event_key: wh.event_name, payload: ev?.sample_payload || { test: true } },
       });
       if (error) throw error;
       if (data?.ok) toast.success(`OK (${data.status})`);
@@ -133,7 +159,7 @@ export default function IntegrationsAdmin() {
       {tab === "webhooks" && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">Sistemas externos que recebem eventos do app (Make, n8n, Zapier, BotConversa, CRMs).</p>
+            <p className="text-sm text-muted-foreground">Cada evento tem seu próprio webhook, com URL exclusiva de destino.</p>
             <div className="flex gap-2">
               <button onClick={runRetries} disabled={busy === "retry"} className="flex items-center gap-2 text-sm px-3 py-2 border border-border rounded-md hover:bg-secondary/50">
                 <RefreshCw size={14} className={busy === "retry" ? "animate-spin" : ""} /> Rodar retries
@@ -147,47 +173,50 @@ export default function IntegrationsAdmin() {
           {webhooks.length === 0 && <p className="text-sm text-muted-foreground italic">Nenhum webhook configurado.</p>}
 
           <div className="space-y-3">
-            {webhooks.map((wh) => (
-              <div key={wh.id} className="bg-card border border-border rounded-lg p-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`w-2 h-2 rounded-full ${wh.enabled ? "bg-emerald-500" : "bg-muted-foreground/40"}`} />
-                      <h3 className="font-medium">{wh.name}</h3>
-                      {wh.last_delivery_status && (
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full border ${statusColor[wh.last_delivery_status] || ""}`}>
-                          {wh.last_delivery_status}
-                        </span>
+            {webhooks.map((wh) => {
+              const ev = eventByKey[wh.event_name];
+              return (
+                <div key={wh.id} className="bg-card border border-border rounded-lg p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`w-2 h-2 rounded-full ${wh.enabled ? "bg-emerald-500" : "bg-muted-foreground/40"}`} />
+                        <span className="text-[10px] px-2 py-0.5 bg-secondary rounded font-mono">{wh.event_name}</span>
+                        <h3 className="font-medium">{wh.name}</h3>
+                        {wh.last_delivery_status && (
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full border ${statusColor[wh.last_delivery_status] || ""}`}>
+                            {wh.last_delivery_status}
+                          </span>
+                        )}
+                      </div>
+                      {ev && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {ev.label}{ev.description ? ` — ${ev.description}` : ""}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground font-mono">
+                        <code className="truncate">{wh.url}</code>
+                        <button onClick={() => { navigator.clipboard.writeText(wh.url); toast.success("URL copiada"); }} className="hover:text-foreground shrink-0">
+                          <Copy size={12} />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <div className="flex gap-1">
+                        <button onClick={() => test(wh)} disabled={busy === wh.id} className="p-2 text-sm hover:bg-secondary rounded-md disabled:opacity-40" title="Testar">
+                          {busy === wh.id ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />}
+                        </button>
+                        <button onClick={() => setEditing(wh)} className="px-3 py-1.5 text-xs border border-border rounded-md hover:bg-secondary">Editar</button>
+                        <button onClick={() => remove(wh.id)} className="p-2 text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
+                      </div>
+                      {wh.last_delivery_at && (
+                        <span className="text-[10px] text-muted-foreground">último: {new Date(wh.last_delivery_at).toLocaleString("pt-BR")}</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground font-mono">
-                      <code className="truncate">{wh.url}</code>
-                      <button onClick={() => { navigator.clipboard.writeText(wh.url); toast.success("URL copiada"); }} className="hover:text-foreground shrink-0">
-                        <Copy size={12} />
-                      </button>
-                    </div>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {wh.event_keys.map((k) => (
-                        <span key={k} className="text-[10px] px-2 py-0.5 bg-secondary rounded font-mono">{k}</span>
-                      ))}
-                      {wh.event_keys.length === 0 && <span className="text-[10px] text-muted-foreground italic">nenhum evento assinado</span>}
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-2 shrink-0">
-                    <div className="flex gap-1">
-                      <button onClick={() => test(wh)} disabled={busy === wh.id || wh.event_keys.length === 0} className="p-2 text-sm hover:bg-secondary rounded-md disabled:opacity-40" title="Testar">
-                        {busy === wh.id ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />}
-                      </button>
-                      <button onClick={() => setEditing(wh)} className="px-3 py-1.5 text-xs border border-border rounded-md hover:bg-secondary">Editar</button>
-                      <button onClick={() => remove(wh.id)} className="p-2 text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
-                    </div>
-                    {wh.last_delivery_at && (
-                      <span className="text-[10px] text-muted-foreground">último: {new Date(wh.last_delivery_at).toLocaleString("pt-BR")}</span>
-                    )}
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {editing && (
@@ -196,42 +225,42 @@ export default function IntegrationsAdmin() {
                 <h3 className="font-serif text-lg">{editing.id ? "Editar webhook" : "Novo webhook"}</h3>
 
                 <label className="block">
-                  <span className="text-xs text-muted-foreground uppercase tracking-wider">Nome</span>
-                  <input value={editing.name || ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-                    className="w-full mt-1 px-3 py-2 bg-background border border-border rounded-md text-sm" placeholder="Ex: Zapier — CRM" />
+                  <span className="text-xs text-muted-foreground uppercase tracking-wider">Evento</span>
+                  <select
+                    value={editing.event_name || ""}
+                    onChange={(e) => setEditing({ ...editing, event_name: e.target.value })}
+                    className="w-full mt-1 px-3 py-2 bg-background border border-border rounded-md text-sm font-mono"
+                  >
+                    <option value="">Selecione um evento…</option>
+                    {Object.entries(eventsByCat).map(([cat, evs]) => (
+                      <optgroup key={cat} label={cat}>
+                        {evs.map((ev) => {
+                          const taken = takenEvents.has(ev.key);
+                          return (
+                            <option key={ev.key} value={ev.key} disabled={taken}>
+                              {ev.key}{taken ? " (já configurado)" : ""}
+                            </option>
+                          );
+                        })}
+                      </optgroup>
+                    ))}
+                  </select>
+                  {editing.event_name && eventByKey[editing.event_name]?.description && (
+                    <p className="text-[11px] text-muted-foreground mt-1">{eventByKey[editing.event_name].description}</p>
+                  )}
                 </label>
 
                 <label className="block">
-                  <span className="text-xs text-muted-foreground uppercase tracking-wider">URL</span>
+                  <span className="text-xs text-muted-foreground uppercase tracking-wider">Nome do webhook</span>
+                  <input value={editing.name || ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+                    className="w-full mt-1 px-3 py-2 bg-background border border-border rounded-md text-sm" placeholder="Ex: BotConversa - lead.contato" />
+                </label>
+
+                <label className="block">
+                  <span className="text-xs text-muted-foreground uppercase tracking-wider">URL de destino</span>
                   <input value={editing.url || ""} onChange={(e) => setEditing({ ...editing, url: e.target.value })}
                     className="w-full mt-1 px-3 py-2 bg-background border border-border rounded-md text-sm font-mono" placeholder="https://..." />
                 </label>
-
-                <div>
-                  <span className="text-xs text-muted-foreground uppercase tracking-wider">Eventos assinados</span>
-                  <div className="mt-2 max-h-60 overflow-y-auto border border-border rounded-md p-3 space-y-3">
-                    {Object.entries(eventsByCat).map(([cat, evs]) => (
-                      <div key={cat}>
-                        <div className="text-[10px] uppercase text-muted-foreground mb-1">{cat}</div>
-                        {evs.map((ev) => {
-                          const checked = editing.event_keys?.includes(ev.key) || false;
-                          return (
-                            <label key={ev.key} className="flex items-start gap-2 py-1 cursor-pointer text-sm">
-                              <input type="checkbox" checked={checked} onChange={(e) => {
-                                const set = new Set(editing.event_keys || []);
-                                if (e.target.checked) set.add(ev.key); else set.delete(ev.key);
-                                setEditing({ ...editing, event_keys: Array.from(set) });
-                              }} className="mt-1" />
-                              <div className="min-w-0">
-                                <div>{ev.label} <span className="text-[10px] font-mono text-muted-foreground">{ev.key}</span></div>
-                              </div>
-                            </label>
-                          );
-                        })}
-                      </div>
-                    ))}
-                  </div>
-                </div>
 
                 <div className="grid grid-cols-3 gap-3">
                   <label className="block">
@@ -281,7 +310,7 @@ export default function IntegrationsAdmin() {
 
       {tab === "events" && (
         <div className="space-y-6">
-          <p className="text-sm text-muted-foreground">Eventos que o sistema pode disparar. Assine estes eventos num webhook pra receber os dados.</p>
+          <p className="text-sm text-muted-foreground">Eventos que o sistema pode disparar. Cada evento aceita 1 webhook configurado.</p>
           {Object.entries(eventsByCat).map(([cat, evs]) => (
             <div key={cat}>
               <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">{cat}</h3>
@@ -327,7 +356,7 @@ export default function IntegrationsAdmin() {
                   <ChevronRight size={14} className={`transition-transform ${open ? "rotate-90" : ""}`} />
                   <span className={`text-[10px] px-2 py-0.5 rounded-full border ${statusColor[d.status] || ""}`}>{d.status}</span>
                   <span className="text-xs font-mono text-muted-foreground">{d.event_key}</span>
-                  <span className="text-xs text-muted-foreground truncate flex-1">→ {wh?.name || "webhook removido"}</span>
+                  <span className="text-xs text-muted-foreground truncate flex-1">→ {wh?.name || "webhook removido"}{wh?.url ? ` · ${wh.url}` : ""}</span>
                   {d.response_status && <span className="text-xs">{d.response_status}</span>}
                   {d.duration_ms != null && <span className="text-[10px] text-muted-foreground">{d.duration_ms}ms</span>}
                   <span className="text-[10px] text-muted-foreground">{new Date(d.created_at).toLocaleString("pt-BR")}</span>
