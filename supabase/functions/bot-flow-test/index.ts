@@ -43,6 +43,8 @@ async function getAdminSettings(admin: ReturnType<typeof createClient>) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const authCheck = await requireAdminOrService(req, corsHeaders);
+  if (authCheck instanceof Response) return authCheck;
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
   const { flowId, phone, name } = await req.json();
   if (!flowId || !phone) {
