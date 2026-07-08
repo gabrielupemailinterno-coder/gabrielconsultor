@@ -5,9 +5,10 @@ import { useScoreData } from "@/hooks/useScoreData";
 import { computeConversions, computeDiagnostics, computeScore, evaluateBadges, monthLogs, fmtBRL, fmtPct, BADGES } from "@/lib/scoreapp/calc";
 import { recommendTrigger } from "@/lib/scoreapp/recommendations";
 import { computeStreakBRT, daysSinceLastLogBRT } from "@/lib/scoreapp/streak";
+import { todayBRT } from "@/lib/scoreapp/tz";
 import RecommendationCard from "@/components/scoreapp/RecommendationCard";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, TrendingUp, Trophy, Sparkles, Flame, AlertTriangle } from "lucide-react";
+import { Loader2, TrendingUp, Trophy, Sparkles, Flame, AlertTriangle, PlusCircle, CheckCircle2, ArrowRight } from "lucide-react";
 
 import { toast } from "sonner";
 
@@ -42,12 +43,39 @@ export default function ScoreDashboard() {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-primary" /></div>;
 
   const pctMeta = goals && goals.meta_mensal_valor > 0 ? Math.min(100, (conv.valor / goals.meta_mensal_valor) * 100) : 0;
+  const today = todayBRT();
+  const hasCheckinToday = logs.some((l) => l.date === today);
+  
 
   return (
     <ScoreLayout>
       <div className="mb-6">
         <p className="text-xs uppercase tracking-wider text-muted-foreground">Olá {profile?.full_name?.split(" ")[0] || ""}</p>
         <h1 className="font-serif text-3xl">Seu painel do mês</h1>
+      </div>
+
+      {/* CTA hero: check-in do dia */}
+      <div className={`rounded-lg border p-5 mb-6 flex flex-col sm:flex-row sm:items-center gap-4 ${hasCheckinToday ? "border-emerald-500/30 bg-emerald-500/5" : "border-primary/40 bg-gradient-to-br from-primary/10 to-transparent ring-1 ring-primary/20"}`}>
+        <div className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 ${hasCheckinToday ? "bg-emerald-500/15 text-emerald-500" : "bg-primary/15 text-primary"}`}>
+          {hasCheckinToday ? <CheckCircle2 size={20} /> : <PlusCircle size={20} />}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] uppercase tracking-widest font-medium text-muted-foreground">Check-in de hoje</p>
+          <h2 className="font-serif text-xl mt-0.5">
+            {hasCheckinToday ? "Check-in de hoje registrado" : "Você ainda não fez o check-in de hoje"}
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            {hasCheckinToday
+              ? "Volte amanhã para manter sua sequência. Enquanto isso, revise sua recomendação abaixo."
+              : "Registre suas atividades comerciais em menos de 1 minuto para atualizar seu Score."}
+          </p>
+        </div>
+        <Link
+          to="/app/score/registrar"
+          className={`inline-flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-medium transition-colors shrink-0 ${hasCheckinToday ? "border border-border text-foreground hover:bg-muted/60" : "bg-primary text-primary-foreground hover:bg-primary/90"}`}
+        >
+          {hasCheckinToday ? "Editar check-in" : "Fazer check-in agora"} <ArrowRight size={14} />
+        </Link>
       </div>
 
       {(() => {

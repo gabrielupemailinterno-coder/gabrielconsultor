@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Loader2, CalendarDays, ListChecks, FolderOpen, BarChart3, UserCircle2 } from "lucide-react";
+import { Loader2, LayoutDashboard, CalendarDays, ListChecks, FolderOpen, BarChart3, UserCircle2 } from "lucide-react";
 import { useMentee } from "@/hooks/useMentee";
 import { useMenteePresence } from "@/hooks/useMenteePresence";
 import CronogramaTab from "@/components/portal/CronogramaTab";
@@ -13,6 +13,7 @@ import TarefasTab from "@/components/portal/TarefasTab";
 import RepositorioTab from "@/components/portal/RepositorioTab";
 import MetricasTab from "@/components/portal/MetricasTab";
 import PerfilTab from "@/components/portal/PerfilTab";
+import MentoradoDashboardTab from "@/components/portal/MentoradoDashboardTab";
 import CheckoutDialog from "@/components/CheckoutDialog";
 import { AppLayout } from "@/components/app/AppLayout";
 import { PageHeader } from "@/components/app/PageHeader";
@@ -24,7 +25,7 @@ export default function PortalDashboard() {
   const [meetingsDone, setMeetingsDone] = useState(0);
   const [meetingsTotal, setMeetingsTotal] = useState(6);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [tab, setTab] = useState("cronograma");
+  const [tab, setTab] = useState("inicio");
 
   useMenteePresence(mentee?.id, mentee?.user_id);
 
@@ -117,13 +118,17 @@ export default function PortalDashboard() {
         </SectionCard>
 
         <Tabs value={tab} onValueChange={setTab} className="w-full">
-          <TabsList className="grid grid-cols-3 md:grid-cols-5 w-full h-auto p-1 bg-muted">
-            <TabsTrigger value="cronograma" className="gap-2 py-2.5"><CalendarDays size={15} /><span className="hidden sm:inline">Cronograma</span></TabsTrigger>
+          <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full h-auto p-1 bg-muted">
+            <TabsTrigger value="inicio" className="gap-2 py-2.5"><LayoutDashboard size={15} /><span className="hidden sm:inline">Início</span></TabsTrigger>
+            <TabsTrigger value="cronograma" className="gap-2 py-2.5"><CalendarDays size={15} /><span className="hidden sm:inline">Encontros</span></TabsTrigger>
             <TabsTrigger value="tarefas" className="gap-2 py-2.5"><ListChecks size={15} /><span className="hidden sm:inline">Tarefas</span></TabsTrigger>
-            <TabsTrigger value="repositorio" className="gap-2 py-2.5"><FolderOpen size={15} /><span className="hidden sm:inline">Repositório</span></TabsTrigger>
+            <TabsTrigger value="repositorio" className="gap-2 py-2.5"><FolderOpen size={15} /><span className="hidden sm:inline">Materiais</span></TabsTrigger>
             <TabsTrigger value="metricas" className="gap-2 py-2.5"><BarChart3 size={15} /><span className="hidden sm:inline">Métricas</span></TabsTrigger>
             <TabsTrigger value="perfil" className="gap-2 py-2.5"><UserCircle2 size={15} /><span className="hidden sm:inline">Perfil</span></TabsTrigger>
           </TabsList>
+          <TabsContent value="inicio" className="mt-6">
+            <MentoradoDashboardTab menteeId={mentee.id} onGoTo={setTab} />
+          </TabsContent>
           <TabsContent value="cronograma" className="mt-6">
             <CronogramaTab menteeId={mentee.id} menteeEmail={mentee.email} onChange={() => {
               supabase.from("meetings").select("id,status").eq("mentee_id", mentee.id).then(({ data }) => {
