@@ -16,6 +16,7 @@ import {
   Clock,
   FileText,
   Handshake,
+  Settings,
 } from "lucide-react";
 
 export type AdminView =
@@ -35,11 +36,12 @@ export type AdminView =
   | "visits"
   | "clicks"
   | "sessions"
-  | "blog";
+  | "blog"
+  | "settings";
 
 type Group = {
   label: string;
-  items: { view: AdminView; label: string; icon: any }[];
+  items: { view: AdminView; label: string; icon: any; hint?: string }[];
 };
 
 export const ADMIN_GROUPS: Group[] = [
@@ -50,24 +52,28 @@ export const ADMIN_GROUPS: Group[] = [
   {
     label: "Mentoria Comercial",
     items: [
-      { view: "mentees", label: "Mentorados", icon: Users },
-      { view: "conteudos", label: "Conteúdos", icon: BookOpen },
-      { view: "emails", label: "E-mails", icon: Mail },
+      { view: "mentees", label: "Mentorados", icon: Users, hint: "cadastros, tarefas e métricas" },
+      { view: "conteudos", label: "Materiais", icon: BookOpen },
+      { view: "emails", label: "Convites & E-mails", icon: Mail },
     ],
   },
   {
     label: "Score Comercial",
-    items: [{ view: "score", label: "Usuários & Diagnósticos", icon: Trophy }],
+    items: [
+      { view: "score", label: "Usuários & Check-ins", icon: Trophy, hint: "diagnósticos, feedbacks e planos" },
+    ],
   },
   {
     label: "Parceiros/Afiliados",
-    items: [{ view: "partners", label: "Parceiros", icon: Handshake }],
+    items: [
+      { view: "partners", label: "Parceiros", icon: Handshake, hint: "links, conversões e comissões" },
+    ],
   },
   {
     label: "Marketing & Conteúdo",
     items: [
-      { view: "blog", label: "Blog", icon: FileText },
       { view: "leads", label: "Leads", icon: UserPlus },
+      { view: "blog", label: "Blog", icon: FileText },
       { view: "prospect", label: "Prospecção", icon: Send },
     ],
   },
@@ -75,10 +81,10 @@ export const ADMIN_GROUPS: Group[] = [
     label: "Automações & Integrações",
     items: [
       { view: "whatsapp", label: "WhatsApp", icon: MessageCircle },
-      { view: "ritual", label: "Ritual", icon: CalendarClock },
-      { view: "botflow", label: "Fluxo do Bot", icon: Workflow },
+      { view: "ritual", label: "Ritual diário", icon: CalendarClock },
+      { view: "botflow", label: "Fluxos do bot", icon: Workflow },
       { view: "botconversa", label: "BotConversa", icon: Bot },
-      { view: "integrations", label: "Integrações", icon: Plug },
+      { view: "integrations", label: "Webhooks & API", icon: Plug },
     ],
   },
   {
@@ -88,6 +94,10 @@ export const ADMIN_GROUPS: Group[] = [
       { view: "clicks", label: "Cliques", icon: MousePointerClick },
       { view: "sessions", label: "Sessões", icon: Clock },
     ],
+  },
+  {
+    label: "Configurações",
+    items: [{ view: "settings", label: "Sistema", icon: Settings }],
   },
 ];
 
@@ -116,11 +126,12 @@ interface Props {
 /** Horizontal segmented sub-navigation used inside AppLayout for the Admin cockpit. */
 export default function AdminSubnav({ view, onChange, counts = {} }: Props) {
   return (
-    <div className="border-b border-border/60 bg-background/80 backdrop-blur-md">
+    <div className="border-b border-border/60 bg-background/80 backdrop-blur-md sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-2 overflow-x-auto">
-        <div className="flex items-center gap-6 min-w-max">
-          {ADMIN_GROUPS.map((group) => (
+        <div className="flex items-center gap-5 min-w-max">
+          {ADMIN_GROUPS.map((group, gi) => (
             <div key={group.label} className="flex items-center gap-1">
+              {gi > 0 && <span className="mx-1 h-4 w-px bg-border/60 shrink-0" aria-hidden />}
               <span className="text-[10px] uppercase tracking-widest text-muted-foreground/60 mr-1 shrink-0">
                 {group.label}
               </span>
@@ -132,6 +143,7 @@ export default function AdminSubnav({ view, onChange, counts = {} }: Props) {
                     key={item.view}
                     type="button"
                     onClick={() => onChange(item.view)}
+                    title={item.hint || item.label}
                     className={
                       "shrink-0 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] transition-colors " +
                       (active
