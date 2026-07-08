@@ -13,8 +13,6 @@ const json = (b: unknown, s = 200) =>
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 
-const CONVERSION_TABLES = new Set(["leads", "mentees", "score_profiles"]);
-const CONVERSION_KINDS = new Set(["lead", "purchase"]);
 
 async function hashIp(ip: string): Promise<string> {
   const buf = new TextEncoder().encode(ip + "|partner-salt");
