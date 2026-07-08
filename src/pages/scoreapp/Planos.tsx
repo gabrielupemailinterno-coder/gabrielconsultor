@@ -71,7 +71,7 @@ export default function ScorePlanos() {
       const { data: sess } = await supabase.auth.getSession();
       if (!sess.session) {
         toast({ title: "Faça login", description: "Entre na sua conta para assinar." });
-        navigate("/scoreapp/login");
+        navigate("/app/login");
         return;
       }
       if (needsData) {
@@ -100,7 +100,7 @@ export default function ScorePlanos() {
         });
         return;
       }
-      navigate(`/scoreapp/checkout-pix?invoice=${data.invoiceId}`);
+      navigate(`/app/checkout-pix?invoice=${data.invoiceId}`);
     } catch (err: any) {
       toast({ title: "Erro no checkout", description: err?.message || "Tente novamente.", variant: "destructive" });
     } finally {
@@ -119,7 +119,7 @@ export default function ScorePlanos() {
       }
       if (data?.paid) {
         toast({ title: "Pagamento confirmado!", description: "Liberando acesso..." });
-        setTimeout(() => navigate("/scoreapp/app", { replace: true }), 800);
+        setTimeout(() => navigate("/app/score", { replace: true }), 800);
       } else {
         toast({
           title: "Ainda não confirmado",
@@ -135,11 +135,11 @@ export default function ScorePlanos() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/scoreapp/app" className="flex items-center gap-2">
+          <Link to="/app/score" className="flex items-center gap-2">
             <Trophy className="text-primary" size={20} />
             <span className="font-serif text-lg">Score Comercial</span>
           </Link>
-          <Link to="/scoreapp/app" className="text-sm text-muted-foreground">
+          <Link to="/app/score" className="text-sm text-muted-foreground">
             Voltar
           </Link>
         </div>

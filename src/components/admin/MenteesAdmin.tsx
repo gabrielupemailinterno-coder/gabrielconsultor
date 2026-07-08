@@ -85,7 +85,7 @@ export default function MenteesAdmin() {
 
   const copyCredentials = async () => {
     if (!newPassword || !selected) return;
-    const txt = `Acesso ao portal:\nE-mail: ${selected.email}\nSenha: ${newPassword}\nLogin: ${window.location.origin}/mentorados/login`;
+    const txt = `Acesso ao portal:\nE-mail: ${selected.email}\nSenha: ${newPassword}\nLogin: ${window.location.origin}/app/login`;
     await navigator.clipboard.writeText(txt);
     toast.success("Credenciais copiadas.");
   };
@@ -333,7 +333,7 @@ export default function MenteesAdmin() {
                 <div className="flex gap-2 flex-wrap">
                   <Button size="sm" onClick={copyCredentials} className="gap-1.5"><Copy size={14} /> Copiar credenciais</Button>
                   <a
-                    href={`https://wa.me/?text=${encodeURIComponent(`Acesso ao portal:\nE-mail: ${selected.email}\nSenha: ${newPassword}\nLogin: ${window.location.origin}/mentorados/login`)}`}
+                    href={`https://wa.me/?text=${encodeURIComponent(`Acesso ao portal:\nE-mail: ${selected.email}\nSenha: ${newPassword}\nLogin: ${window.location.origin}/app/login`)}`}
                     target="_blank" rel="noreferrer"
                     className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 border border-border rounded-md hover:bg-secondary"
                   >Enviar por WhatsApp</a>

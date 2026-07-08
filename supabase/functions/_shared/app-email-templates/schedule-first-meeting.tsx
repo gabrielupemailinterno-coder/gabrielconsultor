@@ -9,7 +9,7 @@ interface Props {
   portalUrl?: string
 }
 
-export const ScheduleFirstMeetingEmail = ({ fullName, portalUrl = 'https://gabrielconsultor.com/mentorados' }: Props) => (
+export const ScheduleFirstMeetingEmail = ({ fullName, portalUrl = 'https://gabrielconsultor.com/app/mentorados' }: Props) => (
   <Html lang="pt-BR" dir="ltr">
     <Head />
     <Preview>Suas duas primeiras reuniões já estão liberadas. Agende agora.</Preview>

@@ -43,7 +43,7 @@ export default function ScoreSignup() {
       email: form.email,
       password: form.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/scoreapp/app`,
+        emailRedirectTo: `${window.location.origin}/app/score`,
         data: {
           source: "scoreapp",
           full_name: form.full_name,
@@ -71,7 +71,7 @@ export default function ScoreSignup() {
       return;
     }
     void sendBotConversaLead(form.full_name, form.phone);
-    navigate("/scoreapp/onboarding", { replace: true });
+    navigate("/app/score/onboarding", { replace: true });
   };
 
   return (
@@ -220,7 +220,7 @@ export default function ScoreSignup() {
           {error && <p className="text-destructive text-xs">{error}</p>}
           <p className="text-center text-xs text-muted-foreground">
             Já tem conta?{" "}
-            <Link to="/scoreapp/login" className="text-primary">
+            <Link to="/app/login" className="text-primary">
               Entrar
             </Link>
           </p>

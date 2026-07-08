@@ -155,7 +155,7 @@ const TEMPLATES: TemplateDef[] = [
     defaultSubject: () => "Bem-vindo à Mentoria Comercial · Gabriel Vieira",
     fields: [
       { key: "tempPassword", label: "Senha temporária", required: true, placeholder: "Ex.: Mentor@2025" },
-      { key: "portalUrl", label: "URL do portal (opcional)", placeholder: "https://gabrielconsultor.com/mentorados/login" },
+      { key: "portalUrl", label: "URL do portal (opcional)", placeholder: "https://gabrielconsultor.com/app/login" },
     ],
     buildData: (f, m) => ({
       fullName: m.full_name,

@@ -22,7 +22,7 @@ const formatDate = (iso: string) => {
   } catch { return iso }
 }
 
-export const MeetingScheduledEmail = ({ fullName, meetingTitle, scheduledAt, meetLink, portalUrl = 'https://gabrielconsultor.com/mentorados' }: Props) => (
+export const MeetingScheduledEmail = ({ fullName, meetingTitle, scheduledAt, meetLink, portalUrl = 'https://gabrielconsultor.com/app/mentorados' }: Props) => (
   <Html lang="pt-BR" dir="ltr">
     <Head />
     <Preview>Reunião agendada: {meetingTitle}</Preview>

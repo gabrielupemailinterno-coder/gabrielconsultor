@@ -49,8 +49,8 @@ export default function ConhecaScoreApp() {
             <span className="font-serif text-lg">Score Comercial</span>
           </div>
           <div className="flex gap-2 text-sm items-center">
-            <Link to="/scoreapp/login" className="px-4 py-2 text-muted-foreground hover:text-foreground hidden sm:inline">Entrar</Link>
-            <Link to="/scoreapp/cadastro" className="px-4 py-2 bg-primary text-primary-foreground rounded-md uppercase tracking-wide text-xs">Assinar</Link>
+            <Link to="/app/login" className="px-4 py-2 text-muted-foreground hover:text-foreground hidden sm:inline">Entrar</Link>
+            <Link to="/app/cadastro" className="px-4 py-2 bg-primary text-primary-foreground rounded-md uppercase tracking-wide text-xs">Assinar</Link>
           </div>
         </div>
       </header>
@@ -70,12 +70,12 @@ export default function ConhecaScoreApp() {
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           <Link
-            to="/scoreapp/cadastro"
+            to="/app/cadastro"
             className="bg-primary text-primary-foreground px-8 py-4 rounded-md text-sm uppercase tracking-wide flex items-center gap-2 hover:opacity-90 transition"
           >
             Começar agora — R$ 9,70/mês <ArrowRight size={16} />
           </Link>
-          <Link to="/scoreapp/login" className="text-sm text-muted-foreground hover:text-foreground px-4 py-4">
+          <Link to="/app/login" className="text-sm text-muted-foreground hover:text-foreground px-4 py-4">
             Já tenho conta
           </Link>
         </div>
@@ -178,7 +178,7 @@ export default function ConhecaScoreApp() {
                   <li key={f} className="flex items-center gap-2"><Check size={14} className="text-primary" /> {f}</li>
                 ))}
               </ul>
-              <Link to="/scoreapp/cadastro" className="mt-8 block text-center bg-secondary text-secondary-foreground py-3 rounded-md text-sm uppercase tracking-wide">Assinar mensal</Link>
+              <Link to="/app/cadastro" className="mt-8 block text-center bg-secondary text-secondary-foreground py-3 rounded-md text-sm uppercase tracking-wide">Assinar mensal</Link>
             </div>
             <div className="bg-card border-2 border-primary rounded-lg p-8 relative">
               <span className="absolute -top-3 left-6 text-[10px] uppercase tracking-wider bg-primary text-primary-foreground px-3 py-1 rounded">Mais escolhido · Economize 15%</span>
@@ -190,7 +190,7 @@ export default function ConhecaScoreApp() {
                   <li key={f} className="flex items-center gap-2"><Check size={14} className="text-primary" /> {f}</li>
                 ))}
               </ul>
-              <Link to="/scoreapp/cadastro" className="mt-8 block text-center bg-primary text-primary-foreground py-3 rounded-md text-sm uppercase tracking-wide">Assinar semestral</Link>
+              <Link to="/app/cadastro" className="mt-8 block text-center bg-primary text-primary-foreground py-3 rounded-md text-sm uppercase tracking-wide">Assinar semestral</Link>
             </div>
           </div>
         </div>
@@ -224,7 +224,7 @@ export default function ConhecaScoreApp() {
             Em 5 minutos você está com meta definida e pronto para o primeiro registro.
           </p>
           <Link
-            to="/scoreapp/cadastro"
+            to="/app/cadastro"
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-8 py-4 rounded-md text-sm uppercase tracking-wide hover:opacity-90 transition"
           >
             Criar minha conta <ArrowRight size={16} />
@@ -239,8 +239,8 @@ export default function ConhecaScoreApp() {
             <span>Score Comercial</span>
           </div>
           <div className="flex gap-4">
-            <Link to="/scoreapp/login" className="hover:text-foreground">Entrar</Link>
-            <Link to="/scoreapp/cadastro" className="hover:text-foreground">Criar conta</Link>
+            <Link to="/app/login" className="hover:text-foreground">Entrar</Link>
+            <Link to="/app/cadastro" className="hover:text-foreground">Criar conta</Link>
           </div>
         </div>
       </footer>

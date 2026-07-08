@@ -74,7 +74,7 @@ export default function ScoreRegistrar() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) navigate("/scoreapp/login", { replace: true });
+      if (!data.session) navigate("/app/login", { replace: true });
       else setUid(data.session.user.id);
     });
   }, [navigate]);

@@ -11,7 +11,7 @@ interface Props {
   portalUrl?: string
 }
 
-export const WelcomeMenteeEmail = ({ fullName, email, tempPassword, portalUrl = 'https://gabrielconsultor.com/mentorados/login' }: Props) => (
+export const WelcomeMenteeEmail = ({ fullName, email, tempPassword, portalUrl = 'https://gabrielconsultor.com/app/login' }: Props) => (
   <Html lang="pt-BR" dir="ltr">
     <Head />
     <Preview>Seu acesso ao Portal do Mentorado está liberado</Preview>

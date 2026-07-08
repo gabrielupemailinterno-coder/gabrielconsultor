@@ -269,7 +269,7 @@ export default function PartnersAdmin() {
     }
     setLinkingPid(partnerId);
     const { data, error } = await supabase.functions.invoke("partner-admin", {
-      body: { action: "link_user", partner_id: partnerId, email, redirect_to: `${window.location.origin}/parceiro` },
+      body: { action: "link_user", partner_id: partnerId, email, redirect_to: `${window.location.origin}/app/parceiro` },
     });
     setLinkingPid(null);
     if (error || (data as any)?.error) {

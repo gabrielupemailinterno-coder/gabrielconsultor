@@ -16,8 +16,8 @@ export default function ScoreDashboard() {
   const { profile, goals, logs, loading, uid, reload } = useScoreData();
 
   useEffect(() => {
-    if (!loading && !uid) navigate("/scoreapp/login", { replace: true });
-    if (!loading && uid && !goals) navigate("/scoreapp/onboarding", { replace: true });
+    if (!loading && !uid) navigate("/app/login", { replace: true });
+    if (!loading && uid && !goals) navigate("/app/score/onboarding", { replace: true });
   }, [loading, uid, goals, navigate]);
 
   const mLogs = useMemo(() => monthLogs(logs), [logs]);
@@ -175,8 +175,8 @@ export default function ScoreDashboard() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <Link to="/scoreapp/app/registrar" className="flex-1 bg-primary text-primary-foreground text-sm uppercase tracking-wide py-4 rounded-md text-center">Registrar dia</Link>
-        <Link to="/scoreapp/app/conteudos" className="flex-1 border border-border text-sm uppercase tracking-wide py-4 rounded-md text-center">Ver conteúdos</Link>
+        <Link to="/app/score/registrar" className="flex-1 bg-primary text-primary-foreground text-sm uppercase tracking-wide py-4 rounded-md text-center">Registrar dia</Link>
+        <Link to="/app/score/conteudos" className="flex-1 border border-border text-sm uppercase tracking-wide py-4 rounded-md text-center">Ver conteúdos</Link>
       </div>
     </ScoreLayout>
   );

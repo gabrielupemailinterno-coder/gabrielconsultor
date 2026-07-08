@@ -35,7 +35,7 @@ export default function ScoreModulo() {
 
   return (
     <ScoreLayout>
-      <Link to="/scoreapp/app/conteudos" className="inline-flex items-center gap-1 text-sm text-muted-foreground mb-4"><ArrowLeft size={14} /> Voltar</Link>
+      <Link to="/app/score/conteudos" className="inline-flex items-center gap-1 text-sm text-muted-foreground mb-4"><ArrowLeft size={14} /> Voltar</Link>
       <div className="bg-card border border-border rounded-lg p-6">
         <p className="text-xs uppercase tracking-wider text-muted-foreground">{m.categoria}</p>
         <h1 className="font-serif text-3xl mt-1">{m.titulo}</h1>

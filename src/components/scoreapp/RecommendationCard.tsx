@@ -41,7 +41,7 @@ export default function RecommendationCard({ triggerKey }: { triggerKey: Trigger
           </div>
         </div>
       )}
-      <Link to={`/scoreapp/app/conteudos/feedback/${f.trigger_key}`}
+      <Link to={`/app/score/conteudos/feedback/${f.trigger_key}`}
         className="mt-5 inline-flex items-center gap-2 bg-primary text-primary-foreground text-xs uppercase tracking-wide px-4 py-2.5 rounded-md">
         Ver recomendação <ArrowRight size={14} />
       </Link>
