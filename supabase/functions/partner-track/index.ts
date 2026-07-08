@@ -13,6 +13,9 @@ const json = (b: unknown, s = 200) =>
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 
+const CONVERSION_TABLES = new Set(["leads", "mentees", "score_profiles"]);
+const CONVERSION_KINDS = new Set(["lead", "purchase"]);
+
 async function hashIp(ip: string): Promise<string> {
   const buf = new TextEncoder().encode(ip + "|partner-salt");
   const digest = await crypto.subtle.digest("SHA-256", buf);
@@ -64,9 +67,7 @@ Deno.serve(async (req) => {
     if (!partner || partner.status !== "active") return json({ ok: false, reason: "unknown_code" });
 
     const ip =
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      req.headers.get("cf-connecting-ip") ||
-      "0.0.0.0";
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("cf-connecting-ip") || "0.0.0.0";
     const ip_hash = await hashIp(ip);
 
     await admin.from("partner_attributions").insert({
@@ -79,6 +80,34 @@ Deno.serve(async (req) => {
       user_agent: req.headers.get("user-agent")?.slice(0, 500) || null,
       referrer: (body.referrer || req.headers.get("referer") || "").slice(0, 500) || null,
     });
+
+    const sourceTable = String(body.source_table || "");
+    const sourceId = String(body.source_id || "");
+    const kind = String(body.kind || "");
+    if (CONVERSION_TABLES.has(sourceTable) && CONVERSION_KINDS.has(kind) && sourceId) {
+      const amountCents =
+        typeof body.amount_cents === "number" && Number.isFinite(body.amount_cents)
+          ? Math.max(0, Math.floor(body.amount_cents))
+          : null;
+
+      await admin
+        .from(sourceTable)
+        .update({ partner_id: partner.id, partner_code: partner.partner_code })
+        .eq("id", sourceId);
+
+      await admin.from("partner_conversions").upsert(
+        {
+          partner_id: partner.id,
+          partner_code: partner.partner_code,
+          kind,
+          source_table: sourceTable,
+          source_id: sourceId,
+          amount_cents: amountCents,
+          notes: body.notes || null,
+        },
+        { onConflict: "source_table,source_id", ignoreDuplicates: true },
+      );
+    }
 
     return json({ ok: true });
   } catch (e: any) {
