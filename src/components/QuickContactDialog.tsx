@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackClick } from "@/hooks/useAnalytics";
 import { useLocale } from "@/contexts/LocaleContext";
 import { sendBotConversaLead } from "@/lib/botconversa";
+import { getPartnerRef } from "@/lib/partnerRef";
 
 interface QuickContactDialogProps {
   open: boolean;
@@ -16,8 +17,7 @@ interface QuickContactDialogProps {
 const copy = {
   pt: {
     title: "Antes de te chamar no WhatsApp",
-    subtitle:
-      "Pra garantir que você vai ser respondido, me deixa seu nome e telefone. Aí já te chamo por lá.",
+    subtitle: "Pra garantir que você vai ser respondido, me deixa seu nome e telefone. Aí já te chamo por lá.",
     name: "Seu nome",
     phone: "WhatsApp com DDD",
     submit: "Abrir WhatsApp",
@@ -31,8 +31,7 @@ const copy = {
   },
   en: {
     title: "Before I reach you on WhatsApp",
-    subtitle:
-      "To make sure you get a reply, leave your name and phone. I'll message you there.",
+    subtitle: "To make sure you get a reply, leave your name and phone. I'll message you there.",
     name: "Your name",
     phone: "Phone with country code",
     submit: "Open WhatsApp",
@@ -56,7 +55,7 @@ const QuickContactDialog = ({ open, onClose, onSuccess }: QuickContactDialogProp
         name: z.string().trim().min(1, t.errName).max(100),
         phone: z.string().trim().min(6, t.errPhone).max(30),
       }),
-    [t]
+    [t],
   );
 
   const [form, setForm] = useState({ name: "", phone: "" });
@@ -81,14 +80,33 @@ const QuickContactDialog = ({ open, onClose, onSuccess }: QuickContactDialogProp
     }
     setStatus("loading");
     try {
+      const partnerCode = getPartnerRef();
+      const leadId =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : Math.random().toString(36).slice(2);
       const { error } = await supabase.from("leads").insert({
+        id: leadId,
         name: r.data.name,
         phone: r.data.phone,
         email: "",
         source: window.location.pathname,
         form_type: "whatsapp",
+        partner_code: partnerCode,
       });
       if (error) throw error;
+      if (partnerCode) {
+        void supabase.functions.invoke("partner-track", {
+          body: {
+            partner_code: partnerCode,
+            kind: "lead",
+            source_table: "leads",
+            source_id: leadId,
+            destination: window.location.pathname,
+            referrer: document.referrer,
+          },
+        });
+      }
       void sendBotConversaLead(r.data.name, r.data.phone);
       trackClick("form_submit", "quick_contact_submitted");
       setStatus("success");
@@ -144,7 +162,9 @@ const QuickContactDialog = ({ open, onClose, onSuccess }: QuickContactDialogProp
                 <p className="text-muted-foreground text-sm mb-6 leading-relaxed">{t.subtitle}</p>
                 <form onSubmit={submit} className="space-y-4">
                   <div>
-                    <label htmlFor="qc-name" className="sr-only">{t.name}</label>
+                    <label htmlFor="qc-name" className="sr-only">
+                      {t.name}
+                    </label>
                     <input
                       id="qc-name"
                       type="text"
@@ -157,7 +177,9 @@ const QuickContactDialog = ({ open, onClose, onSuccess }: QuickContactDialogProp
                     {errors.name && <p className="text-destructive text-xs mt-1">{errors.name}</p>}
                   </div>
                   <div>
-                    <label htmlFor="qc-phone" className="sr-only">{t.phone}</label>
+                    <label htmlFor="qc-phone" className="sr-only">
+                      {t.phone}
+                    </label>
                     <input
                       id="qc-phone"
                       type="tel"
