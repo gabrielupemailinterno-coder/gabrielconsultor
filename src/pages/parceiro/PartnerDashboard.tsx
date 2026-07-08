@@ -2,7 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, LogOut, Copy, Check, Plus, ExternalLink } from "lucide-react";
+import { Loader2, Copy, Check, Plus, ExternalLink } from "lucide-react";
+import { AppLayout } from "@/components/app/AppLayout";
+import { PageHeader } from "@/components/app/PageHeader";
+import { SectionCard } from "@/components/app/SectionCard";
+import { KpiTile } from "@/components/app/KpiTile";
+import { EmptyState } from "@/components/app/EmptyState";
+import { StatusBadge } from "@/components/app/StatusBadge";
 
 type Partner = {
   id: string;
