@@ -28,6 +28,77 @@ CREATE INDEX IF NOT EXISTS leads_partner_id_idx ON public.leads(partner_id);
 CREATE INDEX IF NOT EXISTS mentees_partner_id_idx ON public.mentees(partner_id);
 CREATE INDEX IF NOT EXISTS score_profiles_partner_id_idx ON public.score_profiles(partner_id);
 
+CREATE OR REPLACE FUNCTION public.handle_new_scoreapp_user()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  _partner_id uuid;
+  _partner_code text;
+BEGIN
+  IF (NEW.raw_user_meta_data->>'source') = 'scoreapp' THEN
+    _partner_code := NULLIF(NEW.raw_user_meta_data->>'partner_code', '');
+    IF _partner_code IS NOT NULL THEN
+      SELECT id, partner_code
+      INTO _partner_id, _partner_code
+      FROM public.partners
+      WHERE partner_code = _partner_code
+        AND status = 'active'
+      LIMIT 1;
+    END IF;
+
+    INSERT INTO public.score_profiles (
+      user_id, full_name, email, phone,
+      cpf, postal_code, address, address_number, address_complement, province, city, state,
+      profession, experience_level, lead_origin, segment, accepted_terms_at,
+      partner_id, partner_code
+    )
+    VALUES (
+      NEW.id,
+      COALESCE(NEW.raw_user_meta_data->>'full_name',''),
+      NEW.email,
+      NEW.raw_user_meta_data->>'phone',
+      NEW.raw_user_meta_data->>'cpf',
+      NEW.raw_user_meta_data->>'postal_code',
+      NEW.raw_user_meta_data->>'address',
+      NEW.raw_user_meta_data->>'address_number',
+      NEW.raw_user_meta_data->>'address_complement',
+      NEW.raw_user_meta_data->>'province',
+      NEW.raw_user_meta_data->>'city',
+      NEW.raw_user_meta_data->>'state',
+      NEW.raw_user_meta_data->>'profession',
+      NEW.raw_user_meta_data->>'experience_level',
+      NEW.raw_user_meta_data->>'lead_origin',
+      NEW.raw_user_meta_data->>'segment',
+      CASE WHEN (NEW.raw_user_meta_data->>'accepted_terms')::boolean THEN now() ELSE NULL END,
+      _partner_id,
+      _partner_code
+    ) ON CONFLICT (user_id) DO UPDATE SET
+      full_name = EXCLUDED.full_name,
+      phone = EXCLUDED.phone,
+      cpf = COALESCE(public.score_profiles.cpf, EXCLUDED.cpf),
+      postal_code = COALESCE(public.score_profiles.postal_code, EXCLUDED.postal_code),
+      address = COALESCE(public.score_profiles.address, EXCLUDED.address),
+      address_number = COALESCE(public.score_profiles.address_number, EXCLUDED.address_number),
+      address_complement = COALESCE(public.score_profiles.address_complement, EXCLUDED.address_complement),
+      province = COALESCE(public.score_profiles.province, EXCLUDED.province),
+      city = COALESCE(public.score_profiles.city, EXCLUDED.city),
+      state = COALESCE(public.score_profiles.state, EXCLUDED.state),
+      profession = EXCLUDED.profession,
+      experience_level = EXCLUDED.experience_level,
+      lead_origin = EXCLUDED.lead_origin,
+      segment = EXCLUDED.segment,
+      accepted_terms_at = EXCLUDED.accepted_terms_at,
+      partner_id = COALESCE(public.score_profiles.partner_id, EXCLUDED.partner_id),
+      partner_code = COALESCE(public.score_profiles.partner_code, EXCLUDED.partner_code);
+    INSERT INTO public.user_roles (user_id, role) VALUES (NEW.id, 'scoreapp_user') ON CONFLICT DO NOTHING;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
 -- 4. Allow partner to read own partners row
 DROP POLICY IF EXISTS "Partners can read own row" ON public.partners;
 CREATE POLICY "Partners can read own row"
@@ -74,6 +145,7 @@ ON public.partner_links FOR UPDATE TO authenticated
 USING (partner_id IN (SELECT id FROM public.partners WHERE user_id = auth.uid()))
 WITH CHECK (partner_id IN (SELECT id FROM public.partners WHERE user_id = auth.uid()));
 
+DROP TRIGGER IF EXISTS partner_links_touch_updated_at ON public.partner_links;
 CREATE TRIGGER partner_links_touch_updated_at
 BEFORE UPDATE ON public.partner_links
 FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
@@ -142,6 +214,7 @@ CREATE POLICY "Partners read own conversions"
 ON public.partner_conversions FOR SELECT TO authenticated
 USING (partner_id IN (SELECT id FROM public.partners WHERE user_id = auth.uid()));
 
+DROP TRIGGER IF EXISTS partner_conversions_touch_updated_at ON public.partner_conversions;
 CREATE TRIGGER partner_conversions_touch_updated_at
 BEFORE UPDATE ON public.partner_conversions
 FOR EACH ROW EXECUTE FUNCTION public.touch_updated_at();
@@ -170,6 +243,7 @@ BEGIN
   RETURN NEW;
 END $$;
 
+DROP TRIGGER IF EXISTS partner_conversions_calc_commission ON public.partner_conversions;
 CREATE TRIGGER partner_conversions_calc_commission
 BEFORE INSERT ON public.partner_conversions
 FOR EACH ROW EXECUTE FUNCTION public.partner_conversions_calc_commission();
