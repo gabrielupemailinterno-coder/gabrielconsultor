@@ -7,6 +7,7 @@ import { trackClick } from "@/hooks/useAnalytics";
 import { useLocale } from "@/contexts/LocaleContext";
 import { leadFormCopy } from "@/locales/copy";
 import { sendBotConversaLead } from "@/lib/botconversa";
+import { getPartnerRef } from "@/lib/partnerRef";
 
 type LeadData = {
   name: string;
@@ -39,7 +40,7 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
         revenue: z.string().trim().max(100).optional(),
         mainPain: z.string().trim().max(1000).optional(),
       }),
-    [c]
+    [c],
   );
 
   const [form, setForm] = useState<LeadData>({
@@ -73,7 +74,13 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
 
     setStatus("loading");
     try {
+      const partnerCode = getPartnerRef();
+      const leadId =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : Math.random().toString(36).slice(2);
       const { error } = await supabase.from("leads").insert({
+        id: leadId,
         name: result.data.name,
         phone: result.data.phone,
         email: result.data.email,
@@ -82,8 +89,21 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
         main_pain: result.data.mainPain || null,
         source: window.location.pathname,
         form_type: "contato",
+        partner_code: partnerCode,
       });
       if (error) throw error;
+      if (partnerCode) {
+        void supabase.functions.invoke("partner-track", {
+          body: {
+            partner_code: partnerCode,
+            kind: "lead",
+            source_table: "leads",
+            source_id: leadId,
+            destination: window.location.pathname,
+            referrer: document.referrer,
+          },
+        });
+      }
       void sendBotConversaLead(result.data.name, result.data.phone);
       trackClick("form_submit", "lead_form_submitted");
       setStatus("success");
@@ -141,7 +161,9 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
                 <p className="text-muted-foreground text-sm mb-6">{c.subtitle}</p>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label htmlFor="lead-name" className="sr-only">{c.placeholders.name}</label>
+                    <label htmlFor="lead-name" className="sr-only">
+                      {c.placeholders.name}
+                    </label>
                     <input
                       id="lead-name"
                       type="text"
@@ -154,7 +176,9 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
                     {errors.name && <p className="text-destructive text-xs mt-1">{errors.name}</p>}
                   </div>
                   <div>
-                    <label htmlFor="lead-phone" className="sr-only">{c.placeholders.phone}</label>
+                    <label htmlFor="lead-phone" className="sr-only">
+                      {c.placeholders.phone}
+                    </label>
                     <input
                       id="lead-phone"
                       type="tel"
@@ -167,7 +191,9 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
                     {errors.phone && <p className="text-destructive text-xs mt-1">{errors.phone}</p>}
                   </div>
                   <div>
-                    <label htmlFor="lead-email" className="sr-only">{c.placeholders.email}</label>
+                    <label htmlFor="lead-email" className="sr-only">
+                      {c.placeholders.email}
+                    </label>
                     <input
                       id="lead-email"
                       type="email"
@@ -180,7 +206,9 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
                     {errors.email && <p className="text-destructive text-xs mt-1">{errors.email}</p>}
                   </div>
                   <div>
-                    <label htmlFor="lead-company" className="sr-only">{c.placeholders.company}</label>
+                    <label htmlFor="lead-company" className="sr-only">
+                      {c.placeholders.company}
+                    </label>
                     <input
                       id="lead-company"
                       type="text"
@@ -192,7 +220,9 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
                     />
                   </div>
                   <div>
-                    <label htmlFor="lead-revenue" className="sr-only">{c.placeholders.revenue}</label>
+                    <label htmlFor="lead-revenue" className="sr-only">
+                      {c.placeholders.revenue}
+                    </label>
                     <input
                       id="lead-revenue"
                       type="text"
@@ -204,7 +234,9 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
                     />
                   </div>
                   <div>
-                    <label htmlFor="lead-pain" className="sr-only">{c.placeholders.pain}</label>
+                    <label htmlFor="lead-pain" className="sr-only">
+                      {c.placeholders.pain}
+                    </label>
                     <textarea
                       id="lead-pain"
                       placeholder={c.placeholders.pain}
