@@ -1,9 +1,7 @@
 import { CORS, json, requireAuthUser, syncScoreUser } from "../_shared/botconversa.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const BOTCONVERSA_AUTOMATION_CATCH_URL =
-  Deno.env.get("BOTCONVERSA_AUTOMATION_CATCH_URL") ||
-  "https://new-backend.botconversa.com.br/api/v1/webhooks-automation/catch/195152/bPy747j1w2e4/";
+const BOTCONVERSA_AUTOMATION_CATCH_URL = Deno.env.get("BOTCONVERSA_AUTOMATION_CATCH_URL") || "";
 
 function db() {
   return createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
