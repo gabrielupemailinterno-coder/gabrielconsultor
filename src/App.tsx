@@ -49,7 +49,8 @@ function AppRoutes() {
       <Route path="/mentoria-profissional" element={<MentoriaProfissional />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
-      <Route path="/parceiros" element={<Parceiros />} />
+      <Route path="/associadoacidel" element={<Parceiros />} />
+      <Route path="/parceiros" element={<Navigate to="/associadoacidel" replace />} />
       <Route path="/parceiro/login" element={<PartnerLogin />} />
       <Route path="/parceiro" element={<PartnerDashboard />} />
       <Route path="/r/:slug" element={<RedirectPartnerLink />} />
