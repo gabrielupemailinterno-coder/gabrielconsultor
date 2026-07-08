@@ -12,7 +12,6 @@ import {
   Trophy,
   ShieldCheck,
   ArrowRight,
-  BookOpen,
   Settings,
   CreditCard,
   Sparkles,
@@ -131,29 +130,30 @@ export default function AppHub() {
                     );
                   })}
 
-                  <Link
-                    to="/app/escola-comercial"
-                    className="surface-elevated surface-elevated-hover p-4 flex flex-col gap-2 group"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className="w-9 h-9 rounded-md bg-primary/10 border border-primary/25 flex items-center justify-center">
-                        <BookOpen className="h-4 w-4 text-primary" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                          Novo
-                        </p>
-                        <h3 className="font-serif text-base leading-tight">Escola Comercial</h3>
-                      </div>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Trilhas por competência — fundamentos, prospecção, negociação e liderança.
-                    </p>
-                    <span className="mt-auto text-[11px] inline-flex items-center gap-1 text-primary opacity-70 group-hover:opacity-100">
-                      Explorar <ArrowRight className="h-3 w-3" />
-                    </span>
-                  </Link>
                 </div>
+              </SectionCard>
+
+              <SectionCard title="Próximos passos">
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center justify-between gap-3 py-2 border-b border-border/50 last:border-0">
+                    <span className="text-muted-foreground">Confirme seu perfil e preferências</span>
+                    <Link
+                      to="/app/configuracoes"
+                      className="text-[11px] text-primary inline-flex items-center gap-1"
+                    >
+                      Abrir <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </li>
+                  <li className="flex items-center justify-between gap-3 py-2">
+                    <span className="text-muted-foreground">Confira seu plano atual</span>
+                    <Link
+                      to="/app/planos"
+                      className="text-[11px] text-primary inline-flex items-center gap-1"
+                    >
+                      Ver <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </li>
+                </ul>
               </SectionCard>
 
               <SectionCard title="Próximos passos">
