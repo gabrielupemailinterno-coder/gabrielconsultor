@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackClick } from "@/hooks/useAnalytics";
 import { FORM_SCHEMAS, type FormType } from "@/lib/qualifying-forms";
 import { sendBotConversaLead } from "@/lib/botconversa";
+import { getPartnerRef } from "@/lib/partnerRef";
 
 interface QualifyingFormProps {
   open: boolean;
@@ -89,7 +90,13 @@ const QualifyingForm = ({ open, onClose, formType }: QualifyingFormProps) => {
         .filter(Boolean)
         .join(" | ");
 
+      const partnerCode = getPartnerRef();
+      const leadId =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : Math.random().toString(36).slice(2);
       const { error } = await supabase.from("leads").insert({
+        id: leadId,
         name: result.data.name,
         phone: result.data.phone,
         email: result.data.email,
@@ -98,8 +105,21 @@ const QualifyingForm = ({ open, onClose, formType }: QualifyingFormProps) => {
         source: window.location.pathname,
         form_type: formType,
         answers,
+        partner_code: partnerCode,
       });
       if (error) throw error;
+      if (partnerCode) {
+        void supabase.functions.invoke("partner-track", {
+          body: {
+            partner_code: partnerCode,
+            kind: "lead",
+            source_table: "leads",
+            source_id: leadId,
+            destination: window.location.pathname,
+            referrer: document.referrer,
+          },
+        });
+      }
       void sendBotConversaLead(result.data.name, result.data.phone);
       trackClick("form_submit", `form_${formType}`);
       setStatus("success");
@@ -145,7 +165,9 @@ const QualifyingForm = ({ open, onClose, formType }: QualifyingFormProps) => {
               <div className="px-6 md:px-8 pt-6">
                 <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-3">
                   <span>{schema.title}</span>
-                  <span className="font-mono">{step + 1} / {totalSteps}</span>
+                  <span className="font-mono">
+                    {step + 1} / {totalSteps}
+                  </span>
                 </div>
                 <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
                   <motion.div
@@ -178,9 +200,7 @@ const QualifyingForm = ({ open, onClose, formType }: QualifyingFormProps) => {
                     {isContactStep ? (
                       <div>
                         <h3 className="font-serif text-2xl mb-1">Como te chamo?</h3>
-                        <p className="text-muted-foreground text-sm mb-6">
-                          Deixe seus contatos pra eu responder.
-                        </p>
+                        <p className="text-muted-foreground text-sm mb-6">Deixe seus contatos pra eu responder.</p>
                         <div className="space-y-3">
                           <div>
                             <input
@@ -223,9 +243,7 @@ const QualifyingForm = ({ open, onClose, formType }: QualifyingFormProps) => {
                       </div>
                     ) : (
                       <div>
-                        <h3 className="font-serif text-2xl mb-2 leading-snug">
-                          {currentQuestion!.label}
-                        </h3>
+                        <h3 className="font-serif text-2xl mb-2 leading-snug">{currentQuestion!.label}</h3>
                         {currentQuestion!.type === "multi" && (
                           <p className="text-muted-foreground text-xs mb-5">Pode marcar mais de uma.</p>
                         )}
