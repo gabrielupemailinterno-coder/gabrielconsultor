@@ -79,8 +79,9 @@ export default function AdminLayout({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <AppLayout>
+    <AppLayout themeClass="admin-theme">
       <div className="max-w-7xl mx-auto w-full px-4 md:px-6 py-6">
+
         {/* Mobile toggle */}
         <div className="md:hidden mb-4 flex items-center justify-between">
           <div>
