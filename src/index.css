@@ -263,11 +263,13 @@
   --sidebar-border: 220 13% 91%;
   --sidebar-ring: 22 63% 47%;
 }
-.admin-theme .font-mono-data {
+.admin-theme .font-mono-data,
+.admin-theme .font-mono {
   font-family: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
   font-feature-settings: "tnum";
   letter-spacing: -0.01em;
 }
+
 .admin-theme .surface-elevated {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
