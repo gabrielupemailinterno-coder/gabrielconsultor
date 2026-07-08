@@ -35,6 +35,10 @@ import ScoreCheckoutPix from "./pages/scoreapp/CheckoutPix";
 import RedirectPartnerLink from "./pages/RedirectPartnerLink";
 import PartnerLogin from "./pages/parceiro/PartnerLogin";
 import PartnerDashboard from "./pages/parceiro/PartnerDashboard";
+import Entrar from "./pages/Entrar";
+import EsqueciSenha from "./pages/EsqueciSenha";
+import RedefinirSenha from "./pages/RedefinirSenha";
+import AppHub from "./pages/AppHub";
 import { usePartnerRefCapture } from "@/hooks/usePartnerRef";
 
 const queryClient = new QueryClient();
