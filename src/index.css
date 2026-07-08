@@ -227,11 +227,12 @@
 
 /* ========== Admin cockpit — tema Neutro Nuvem + Laranja (Pipedrive-like) ========== */
 .admin-theme {
-  --background: 220 20% 98%;          /* #F7F8FA */
+  --background: 220 20% 96%;          /* canvas levemente mais escuro que os cards */
   --foreground: 222 47% 11%;          /* #111827 */
   --card: 0 0% 100%;
   --card-foreground: 222 47% 11%;
   --popover: 0 0% 100%;
+
   --popover-foreground: 222 47% 11%;
   --primary: 22 63% 47%;              /* #C4632D */
   --primary-foreground: 0 0% 100%;
@@ -243,9 +244,10 @@
   --accent-foreground: 0 0% 100%;
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
-  --border: 220 13% 91%;              /* #E5E7EB */
-  --input: 220 13% 91%;
+  --border: 220 13% 87%;              /* borda mais definida */
+  --input: 220 13% 87%;
   --ring: 22 63% 47%;
+
   --radius: 0.625rem;
 
   --surface-elevated: 0 0% 100%;
@@ -261,11 +263,13 @@
   --sidebar-border: 220 13% 91%;
   --sidebar-ring: 22 63% 47%;
 }
-.admin-theme .font-mono-data {
+.admin-theme .font-mono-data,
+.admin-theme .font-mono {
   font-family: 'IBM Plex Mono', ui-monospace, 'Courier New', monospace;
   font-feature-settings: "tnum";
   letter-spacing: -0.01em;
 }
+
 .admin-theme .surface-elevated {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
