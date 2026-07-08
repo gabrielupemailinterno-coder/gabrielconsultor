@@ -50,6 +50,15 @@
     --sidebar-accent-foreground: 30 30% 96%;
     --sidebar-border: 12 25% 20%;
     --sidebar-ring: 20 78% 58%;
+
+    /* macOS-inspired surfaces & shadows for /app area */
+    --surface-elevated: 12 28% 17%;
+    --surface-glass: 12 30% 14%;
+    --border-subtle: 30 15% 30% / 0.18;
+    --radius-card: 14px;
+    --shadow-macos-sm: 0 1px 2px hsl(0 0% 0% / 0.18), 0 1px 3px hsl(0 0% 0% / 0.12);
+    --shadow-macos-md: 0 4px 12px hsl(0 0% 0% / 0.22), 0 2px 4px hsl(0 0% 0% / 0.10);
+    --shadow-macos-lg: 0 24px 48px -12px hsl(0 0% 0% / 0.45), 0 8px 16px -8px hsl(0 0% 0% / 0.25);
   }
 }
 
