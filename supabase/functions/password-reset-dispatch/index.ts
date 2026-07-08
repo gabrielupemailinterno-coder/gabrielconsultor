@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
       String(body?.origin ?? "").trim() ||
       req.headers.get("origin") ||
       "https://gabrielconsultor.com";
-    const redirectTo = `${origin.replace(/\/+$/, "")}/redefinir-senha`;
+    const redirectTo = `${origin.replace(/\/+$/, "")}/app/redefinir-senha`;
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return ok();
 
@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
 
     const identity = await pickIdentity(admin, userId, email);
 
-    // Generate the recovery link (Supabase verifies + redirects to /redefinir-senha)
+    // Generate the recovery link (Supabase verifies + redirects to /app/redefinir-senha)
     const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
       type: "recovery",
       email,

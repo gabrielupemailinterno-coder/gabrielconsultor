@@ -25,7 +25,7 @@ export default function AppHub() {
   useEffect(() => {
     if (loading) return;
     if (!session) {
-      navigate("/entrar?next=/app", { replace: true });
+      navigate("/app/login??next=/app", { replace: true });
       return;
     }
     if (modules.length === 1) {
@@ -35,7 +35,7 @@ export default function AppHub() {
 
   const logout = async () => {
     await supabase.auth.signOut();
-    navigate("/entrar", { replace: true });
+    navigate("/app/login", { replace: true });
   };
 
   if (loading || !session || modules.length === 1) {
