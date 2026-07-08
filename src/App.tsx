@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LocaleProvider } from "@/contexts/LocaleContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import Index from "./pages/Index";
@@ -49,7 +49,8 @@ function AppRoutes() {
       <Route path="/mentoria-profissional" element={<MentoriaProfissional />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
-      <Route path="/parceiros" element={<Parceiros />} />
+      <Route path="/associadoacidel" element={<Parceiros />} />
+      <Route path="/parceiros" element={<Navigate to="/associadoacidel" replace />} />
       <Route path="/parceiro/login" element={<PartnerLogin />} />
       <Route path="/parceiro" element={<PartnerDashboard />} />
       <Route path="/r/:slug" element={<RedirectPartnerLink />} />
