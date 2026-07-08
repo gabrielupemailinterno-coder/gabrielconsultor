@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Trophy, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { getPartnerRef } from "@/lib/partnerRef";
 
 const planos = [
   { key: "mensal", nome: "Mensal", preco: "R$ 9,70", periodo: "/mês", destaque: false },
@@ -32,13 +33,19 @@ export default function ScorePlanos() {
     (async () => {
       const { data: sess } = await supabase.auth.getSession();
       if (!sess.session) return;
-      const { data } = await supabase.from("score_profiles").select("*").eq("user_id", sess.session.user.id).maybeSingle();
+      const { data } = await supabase
+        .from("score_profiles")
+        .select("*")
+        .eq("user_id", sess.session.user.id)
+        .maybeSingle();
       if (data) {
         setProfile(data);
         const init: Record<string, string> = {};
         requiredFields.forEach(([k]) => (init[k] = (data as any)[k] ?? ""));
         setForm(init);
-        const missing = ["cpf","postal_code","address","address_number","province","city","state"].some((k) => !(data as any)[k]);
+        const missing = ["cpf", "postal_code", "address", "address_number", "province", "city", "state"].some(
+          (k) => !(data as any)[k],
+        );
         setNeedsData(missing);
       }
     })();
@@ -68,16 +75,22 @@ export default function ScorePlanos() {
         return;
       }
       if (needsData) {
-        const missing = ["cpf","postal_code","address","address_number","province","city","state"].filter((k) => !form[k]?.trim());
+        const missing = ["cpf", "postal_code", "address", "address_number", "province", "city", "state"].filter(
+          (k) => !form[k]?.trim(),
+        );
         if (missing.length) {
-          toast({ title: "Complete seus dados", description: "Preencha os campos obrigatórios para continuar.", variant: "destructive" });
+          toast({
+            title: "Complete seus dados",
+            description: "Preencha os campos obrigatórios para continuar.",
+            variant: "destructive",
+          });
           return;
         }
         const ok = await saveProfile();
         if (!ok) return;
       }
       const { data, error } = await supabase.functions.invoke("cora-pix-checkout", {
-        body: { plan_key: planKey, terms_accepted: true },
+        body: { plan_key: planKey, terms_accepted: true, partner_code: getPartnerRef() },
       });
       if (error || data?.error) {
         toast({
@@ -122,8 +135,13 @@ export default function ScorePlanos() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/scoreapp/app" className="flex items-center gap-2"><Trophy className="text-primary" size={20} /><span className="font-serif text-lg">Score Comercial</span></Link>
-          <Link to="/scoreapp/app" className="text-sm text-muted-foreground">Voltar</Link>
+          <Link to="/scoreapp/app" className="flex items-center gap-2">
+            <Trophy className="text-primary" size={20} />
+            <span className="font-serif text-lg">Score Comercial</span>
+          </Link>
+          <Link to="/scoreapp/app" className="text-sm text-muted-foreground">
+            Voltar
+          </Link>
         </div>
       </header>
       <section className="max-w-4xl mx-auto px-6 py-16 text-center">
@@ -164,19 +182,35 @@ export default function ScorePlanos() {
                 />
               ))}
             </div>
-
           </div>
         )}
 
         <div className="grid md:grid-cols-2 gap-4">
           {planos.map((p) => (
-            <div key={p.key} className={`bg-card border rounded-lg p-8 text-left ${p.destaque ? "border-primary" : "border-border"}`}>
-              {p.destaque && <span className="text-[10px] uppercase tracking-wider bg-primary text-primary-foreground px-2 py-1 rounded">Mais escolhido</span>}
+            <div
+              key={p.key}
+              className={`bg-card border rounded-lg p-8 text-left ${p.destaque ? "border-primary" : "border-border"}`}
+            >
+              {p.destaque && (
+                <span className="text-[10px] uppercase tracking-wider bg-primary text-primary-foreground px-2 py-1 rounded">
+                  Mais escolhido
+                </span>
+              )}
               <div className="font-serif text-2xl mt-3">{p.nome}</div>
-              <div className="font-mono text-4xl text-primary mt-2">{p.preco}<span className="text-sm text-muted-foreground ml-1">{p.periodo}</span></div>
+              <div className="font-mono text-4xl text-primary mt-2">
+                {p.preco}
+                <span className="text-sm text-muted-foreground ml-1">{p.periodo}</span>
+              </div>
               <ul className="mt-6 space-y-2 text-sm text-muted-foreground">
-                {["Registro diário ilimitado","Score comercial e diagnóstico","Conteúdos de vendas","Badges de progresso"].map((f) => (
-                  <li key={f} className="flex items-center gap-2"><Check size={14} className="text-primary" /> {f}</li>
+                {[
+                  "Registro diário ilimitado",
+                  "Score comercial e diagnóstico",
+                  "Conteúdos de vendas",
+                  "Badges de progresso",
+                ].map((f) => (
+                  <li key={f} className="flex items-center gap-2">
+                    <Check size={14} className="text-primary" /> {f}
+                  </li>
                 ))}
               </ul>
               <button
