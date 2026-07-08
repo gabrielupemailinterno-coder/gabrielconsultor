@@ -51,15 +51,15 @@ export default function PortalLogin() {
     setLoading(true);
     setError(null);
     setInfo(null);
-    const { error } = await supabase.functions.invoke("mentee-forgot-password", {
-      body: { email },
+    const { error } = await supabase.functions.invoke("password-reset-dispatch", {
+      body: { email: email.trim().toLowerCase(), source: "mentee" },
     });
     setLoading(false);
     if (error) {
       setError("Não foi possível processar o pedido. Tente novamente em instantes.");
       return;
     }
-    setInfo("Se este e-mail estiver cadastrado, enviamos uma nova senha temporária. Verifique a caixa de entrada (e o spam).");
+    setInfo("Se este e-mail estiver cadastrado, enviamos uma nova senha temporária pelo WhatsApp.");
   };
 
   return (
