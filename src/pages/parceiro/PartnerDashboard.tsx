@@ -239,6 +239,78 @@ export default function PartnerDashboard() {
           </div>
         </section>
 
+        {/* Kits prontos de divulgação */}
+        <section className="space-y-3">
+          <div>
+            <h2 className="font-serif text-lg">Kits de divulgação</h2>
+            <p className="text-xs text-muted-foreground">
+              Links e textos prontos para vender Mentoria e ScoreApp com seu código <strong className="text-foreground font-mono">{partner.partner_code}</strong>.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {[
+              {
+                key: "mentoria",
+                title: "Mentoria Profissional",
+                desc: "Programa 1:1 para founders e times comerciais.",
+                path: "/mentoria-profissional",
+                pitch:
+                  "Se você quer previsibilidade no seu comercial, recomendo a Mentoria do Gabriel Consultor: processo, funil e execução prática, sem teoria. Entra pelo meu link 👉",
+              },
+              {
+                key: "scoreapp",
+                title: "ScoreApp (autogestão)",
+                desc: "App de rotina comercial + IA. Assinatura mensal.",
+                path: "/scoreapp",
+                pitch:
+                  "Ferramenta que uso para manter minha rotina comercial sob controle. Score diário, metas e feedback com IA. Testa pelo meu link 👉",
+              },
+              {
+                key: "planos",
+                title: "ScoreApp — Planos",
+                desc: "Vai direto para a página de assinatura.",
+                path: "/scoreapp/planos",
+                pitch:
+                  "Assinatura do ScoreApp com desconto de indicação. Assine pelo meu link 👉",
+              },
+            ].map((kit) => {
+              const url = `${window.location.origin}${kit.path}?ref=${encodeURIComponent(partner.partner_code)}`;
+              const pitch = `${kit.pitch} ${url}`;
+              return (
+                <div key={kit.key} className="bg-card border border-border rounded-lg p-4 flex flex-col gap-3">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-primary">{kit.title}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{kit.desc}</p>
+                  </div>
+                  <code className="font-mono text-[11px] bg-muted px-2 py-2 rounded break-all">{url}</code>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => copy(url, `kit-url-${kit.key}`)}
+                      className="text-xs bg-primary text-primary-foreground px-3 py-2 rounded inline-flex items-center gap-1"
+                    >
+                      {copied === `kit-url-${kit.key}` ? <Check size={12} /> : <Copy size={12} />} Copiar link
+                    </button>
+                    <button
+                      onClick={() => copy(pitch, `kit-pitch-${kit.key}`)}
+                      className="text-xs bg-muted hover:bg-muted/70 px-3 py-2 rounded inline-flex items-center gap-1"
+                    >
+                      {copied === `kit-pitch-${kit.key}` ? <Check size={12} /> : <Copy size={12} />} Copiar texto
+                    </button>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs bg-muted hover:bg-muted/70 px-3 py-2 rounded inline-flex items-center gap-1"
+                    >
+                      <ExternalLink size={12} /> Abrir
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
         {/* Links */}
         <section className="space-y-3">
           <div className="flex items-center justify-between">
