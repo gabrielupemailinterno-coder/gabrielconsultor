@@ -79,33 +79,11 @@ Deno.serve(async (req) => {
       referrer: (body.referrer || req.headers.get("referer") || "").slice(0, 500) || null,
     });
 
-    const sourceTable = String(body.source_table || "");
-    const sourceId = String(body.source_id || "");
-    const kind = String(body.kind || "");
-    if (CONVERSION_TABLES.has(sourceTable) && CONVERSION_KINDS.has(kind) && sourceId) {
-      const amountCents =
-        typeof body.amount_cents === "number" && Number.isFinite(body.amount_cents)
-          ? Math.max(0, Math.floor(body.amount_cents))
-          : null;
+    // Conversion attribution is intentionally NOT accepted from this public
+    // endpoint. Writing partner_id/partner_code onto leads/mentees/score_profiles
+    // or inserting into partner_conversions must be done server-side from
+    // trusted webhooks (e.g. payment confirmation) to prevent commission fraud.
 
-      await admin
-        .from(sourceTable)
-        .update({ partner_id: partner.id, partner_code: partner.partner_code })
-        .eq("id", sourceId);
-
-      await admin.from("partner_conversions").upsert(
-        {
-          partner_id: partner.id,
-          partner_code: partner.partner_code,
-          kind,
-          source_table: sourceTable,
-          source_id: sourceId,
-          amount_cents: amountCents,
-          notes: body.notes || null,
-        },
-        { onConflict: "source_table,source_id", ignoreDuplicates: true },
-      );
-    }
 
     return json({ ok: true });
   } catch (e: any) {
