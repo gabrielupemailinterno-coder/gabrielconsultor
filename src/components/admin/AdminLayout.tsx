@@ -24,15 +24,7 @@ export default function AdminLayout({
   return (
     <AppLayout>
       <AdminSubnav view={view} onChange={onChangeView} counts={counts} />
-      <div className="max-w-7xl mx-auto w-full px-4 md:px-6 pt-6 pb-2">
-        {breadcrumb && (
-          <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
-            {breadcrumb}
-          </p>
-        )}
-        <h1 className="font-serif text-2xl md:text-3xl leading-tight">{title}</h1>
-      </div>
-      <div className="max-w-7xl mx-auto w-full px-4 md:px-6 pb-8">{children}</div>
+      <div className="max-w-7xl mx-auto w-full px-4 md:px-6 py-6">{children}</div>
     </AppLayout>
   );
 }
