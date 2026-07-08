@@ -7,6 +7,7 @@ import { Download, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import TermoAdesao, { TERMO_ADESAO_VERSION, downloadTermoPdf } from "@/components/TermoAdesao";
+import { getPartnerRef } from "@/lib/partnerRef";
 
 type AccessMode = "full" | "trial_then_paid" | "friend_promo";
 
@@ -19,17 +20,32 @@ type CheckoutMentee = {
   accessMode?: AccessMode;
 };
 
-const PRICE = 457.90;
+const PRICE = 457.9;
 
 function planFor(mode: AccessMode | undefined) {
   if (mode === "trial_then_paid") {
-    return { installments: 2, value: PRICE, label: `2x de R$ ${PRICE.toFixed(2).replace(".", ",")}`, note: "Primeira mensalidade isenta pela modalidade de 3 encontros iniciais." };
+    return {
+      installments: 2,
+      value: PRICE,
+      label: `2x de R$ ${PRICE.toFixed(2).replace(".", ",")}`,
+      note: "Primeira mensalidade isenta pela modalidade de 3 encontros iniciais.",
+    };
   }
   if (mode === "friend_promo") {
     const v = +(PRICE * 0.85).toFixed(2);
-    return { installments: 2, value: v, label: `1º mês grátis + 2x de R$ ${v.toFixed(2).replace(".", ",")} (15% off)`, note: "Promoção Amigo: primeiro mês cortesia e 15% de desconto nas duas próximas mensalidades." };
+    return {
+      installments: 2,
+      value: v,
+      label: `1º mês grátis + 2x de R$ ${v.toFixed(2).replace(".", ",")} (15% off)`,
+      note: "Promoção Amigo: primeiro mês cortesia e 15% de desconto nas duas próximas mensalidades.",
+    };
   }
-  return { installments: 3, value: PRICE, label: `3x de R$ ${PRICE.toFixed(2).replace(".", ",")}`, note: null as string | null };
+  return {
+    installments: 3,
+    value: PRICE,
+    label: `3x de R$ ${PRICE.toFixed(2).replace(".", ",")}`,
+    note: null as string | null,
+  };
 }
 
 export default function CheckoutDialog({
@@ -42,9 +58,17 @@ export default function CheckoutDialog({
   mentee?: CheckoutMentee;
 }) {
   const [form, setForm] = useState({
-    name: "", email: "", phone: "", cpf: "",
-    postalCode: "", addressNumber: "", address: "", addressComplement: "",
-    province: "", city: "", state: "",
+    name: "",
+    email: "",
+    phone: "",
+    cpf: "",
+    postalCode: "",
+    addressNumber: "",
+    address: "",
+    addressComplement: "",
+    province: "",
+    city: "",
+    state: "",
   });
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -70,14 +94,17 @@ export default function CheckoutDialog({
     try {
       const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
       const j = await r.json();
-      if (!j.erro) setForm((s) => ({
-        ...s,
-        address: j.logradouro || s.address,
-        province: j.bairro || s.province,
-        city: j.localidade || s.city,
-        state: j.uf || s.state,
-      }));
-    } catch { /* ignore */ }
+      if (!j.erro)
+        setForm((s) => ({
+          ...s,
+          address: j.logradouro || s.address,
+          province: j.bairro || s.province,
+          city: j.localidade || s.city,
+          state: j.uf || s.state,
+        }));
+    } catch {
+      /* ignore */
+    }
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -90,12 +117,20 @@ export default function CheckoutDialog({
     const { data, error } = await supabase.functions.invoke("asaas-create-checkout", {
       body: {
         mentee_id: mentee?.id,
-        name: form.name, email: form.email, phone: form.phone, cpfCnpj: form.cpf.replace(/\D/g, ""),
-        postalCode: form.postalCode, addressNumber: form.addressNumber,
-        address: form.address, addressComplement: form.addressComplement,
-        province: form.province, city: form.city, state: form.state,
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        cpfCnpj: form.cpf.replace(/\D/g, ""),
+        postalCode: form.postalCode,
+        addressNumber: form.addressNumber,
+        address: form.address,
+        addressComplement: form.addressComplement,
+        province: form.province,
+        city: form.city,
+        state: form.state,
         terms_accepted: true,
         terms_version: TERMO_ADESAO_VERSION,
+        partner_code: getPartnerRef(),
       },
     });
     setLoading(false);
@@ -114,9 +149,7 @@ export default function CheckoutDialog({
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Mentoria Comercial 1:1</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Assinatura mensal · {plan.label} · 6 encontros em 3 meses
-          </p>
+          <p className="text-sm text-muted-foreground">Assinatura mensal · {plan.label} · 6 encontros em 3 meses</p>
           {plan.note && <p className="text-xs text-primary">{plan.note}</p>}
         </DialogHeader>
         <form onSubmit={submit} className="space-y-3">
@@ -132,11 +165,22 @@ export default function CheckoutDialog({
           </div>
           <div className="grid grid-cols-3 gap-3">
             <Input placeholder="CEP" value={form.postalCode} onChange={set("postalCode")} onBlur={onCepBlur} required />
-            <Input className="col-span-2" placeholder="Endereço (rua/avenida)" value={form.address} onChange={set("address")} required />
+            <Input
+              className="col-span-2"
+              placeholder="Endereço (rua/avenida)"
+              value={form.address}
+              onChange={set("address")}
+              required
+            />
           </div>
           <div className="grid grid-cols-3 gap-3">
             <Input placeholder="Número" value={form.addressNumber} onChange={set("addressNumber")} required />
-            <Input className="col-span-2" placeholder="Complemento (opcional)" value={form.addressComplement} onChange={set("addressComplement")} />
+            <Input
+              className="col-span-2"
+              placeholder="Complemento (opcional)"
+              value={form.addressComplement}
+              onChange={set("addressComplement")}
+            />
           </div>
           <div className="grid grid-cols-3 gap-3">
             <Input placeholder="Bairro" value={form.province} onChange={set("province")} required />
@@ -145,36 +189,54 @@ export default function CheckoutDialog({
           </div>
 
           <div className="pt-2">
-            <TermoAdesao data={{
-              name: form.name, cpf: form.cpf, email: form.email,
-              address: form.address, address_number: form.addressNumber,
-              address_complement: form.addressComplement, province: form.province,
-              city: form.city, state: form.state, postal_code: form.postalCode,
-              installments: plan.installments, installmentValue: plan.value,
-              totalValue: +(plan.value * plan.installments).toFixed(2),
-              accessMode: mentee?.accessMode,
-            }} />
+            <TermoAdesao
+              data={{
+                name: form.name,
+                cpf: form.cpf,
+                email: form.email,
+                address: form.address,
+                address_number: form.addressNumber,
+                address_complement: form.addressComplement,
+                province: form.province,
+                city: form.city,
+                state: form.state,
+                postal_code: form.postalCode,
+                installments: plan.installments,
+                installmentValue: plan.value,
+                totalValue: +(plan.value * plan.installments).toFixed(2),
+                accessMode: mentee?.accessMode,
+              }}
+            />
             <label className="flex items-start gap-2 mt-2 text-xs cursor-pointer select-none">
               <Checkbox checked={accepted} onCheckedChange={(v) => setAccepted(v === true)} className="mt-0.5" />
               <span>
                 Li e aceito o <strong>Termo de Adesão e Contrato de Prestação de Serviços de Mentoria</strong>,
-                incluindo multa de 2%, juros de 1% ao mês em caso de atraso, suspensão dos serviços e recebimento
-                de notificações de cobrança.
+                incluindo multa de 2%, juros de 1% ao mês em caso de atraso, suspensão dos serviços e recebimento de
+                notificações de cobrança.
               </span>
             </label>
             {accepted && (
               <button
                 type="button"
-                onClick={() => downloadTermoPdf({
-                  name: form.name, cpf: form.cpf, email: form.email,
-                  address: form.address, address_number: form.addressNumber,
-                  address_complement: form.addressComplement, province: form.province,
-                  city: form.city, state: form.state, postal_code: form.postalCode,
-                  installments: plan.installments, installmentValue: plan.value,
-                  totalValue: +(plan.value * plan.installments).toFixed(2),
-                  accessMode: mentee?.accessMode,
-                  acceptedAt: new Date().toISOString(),
-                })}
+                onClick={() =>
+                  downloadTermoPdf({
+                    name: form.name,
+                    cpf: form.cpf,
+                    email: form.email,
+                    address: form.address,
+                    address_number: form.addressNumber,
+                    address_complement: form.addressComplement,
+                    province: form.province,
+                    city: form.city,
+                    state: form.state,
+                    postal_code: form.postalCode,
+                    installments: plan.installments,
+                    installmentValue: plan.value,
+                    totalValue: +(plan.value * plan.installments).toFixed(2),
+                    accessMode: mentee?.accessMode,
+                    acceptedAt: new Date().toISOString(),
+                  })
+                }
                 className="mt-2 inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
               >
                 <Download size={13} /> Baixar PDF do termo aceito
