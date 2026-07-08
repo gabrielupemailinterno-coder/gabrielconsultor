@@ -57,7 +57,7 @@ export default function ScoreLayout({ children }: { children: ReactNode }) {
   return (
     <AppLayout>
       {/* Sub-nav horizontal do Score */}
-      <div className="border-b border-border/60 bg-background/80 backdrop-blur-md sticky top-14 z-20">
+      <div className="border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-2 overflow-x-auto">
           <nav className="flex items-center gap-1 min-w-max">
             {items.map((i) => (
