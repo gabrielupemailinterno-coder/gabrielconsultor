@@ -156,37 +156,6 @@ export default function AppHub() {
                 </ul>
               </SectionCard>
 
-              <SectionCard title="Próximos passos">
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center justify-between gap-3 py-2 border-b border-border/50 last:border-0">
-                    <span className="text-muted-foreground">Confirme seu perfil e preferências</span>
-                    <Link
-                      to="/app/configuracoes"
-                      className="text-[11px] text-primary inline-flex items-center gap-1"
-                    >
-                      Abrir <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </li>
-                  <li className="flex items-center justify-between gap-3 py-2 border-b border-border/50 last:border-0">
-                    <span className="text-muted-foreground">Confira seu plano atual</span>
-                    <Link
-                      to="/app/planos"
-                      className="text-[11px] text-primary inline-flex items-center gap-1"
-                    >
-                      Ver <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </li>
-                  <li className="flex items-center justify-between gap-3 py-2">
-                    <span className="text-muted-foreground">Explore a Escola Comercial</span>
-                    <Link
-                      to="/app/escola-comercial"
-                      className="text-[11px] text-primary inline-flex items-center gap-1"
-                    >
-                      Começar <ArrowRight className="h-3 w-3" />
-                    </Link>
-                  </li>
-                </ul>
-              </SectionCard>
             </div>
 
             <div className="space-y-4">
