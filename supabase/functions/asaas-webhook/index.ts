@@ -14,8 +14,8 @@ Deno.serve(async (req) => {
   // Validate webhook token (configured in Asaas panel as Auth Token header)
   const expectedToken = Deno.env.get("ASAAS_WEBHOOK_TOKEN");
   const receivedToken = req.headers.get("asaas-access-token");
-  if (expectedToken && receivedToken !== expectedToken) {
-    console.warn("invalid webhook token");
+  if (!expectedToken || receivedToken !== expectedToken) {
+    console.warn("invalid or missing webhook token");
     return new Response("unauthorized", { status: 401 });
   }
 

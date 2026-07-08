@@ -3,6 +3,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendWhatsApp, normalizePhone } from "../_shared/gpt-maker.ts";
 import { BotFlow, startSession } from "../_shared/bot-engine.ts";
+import { requireAdminOrService } from "../_shared/require-admin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -42,6 +43,8 @@ async function getAdminSettings(admin: ReturnType<typeof createClient>) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const authCheck = await requireAdminOrService(req, corsHeaders);
+  if (authCheck instanceof Response) return authCheck;
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
   const { flowId, phone, name } = await req.json();
   if (!flowId || !phone) {

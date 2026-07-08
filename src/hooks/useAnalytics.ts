@@ -52,11 +52,6 @@ export function useAnalytics(path: string = "/") {
 
     const flush = () => {
       const seconds = Math.floor((Date.now() - startedAt) / 1000);
-      const blob = new Blob([JSON.stringify({
-        duration_seconds: seconds,
-        last_seen_at: new Date().toISOString(),
-      })], { type: "application/json" });
-      // Best-effort flush via REST
       supabase.from("page_sessions").update({
         duration_seconds: seconds,
         last_seen_at: new Date().toISOString(),

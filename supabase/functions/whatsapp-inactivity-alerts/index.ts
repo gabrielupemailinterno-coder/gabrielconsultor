@@ -1,6 +1,7 @@
 // Cron 10h BRT (13:00 UTC) diário: alertas para inatividade de 2, 5 e 10 dias.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendTextByUser, sendTextByPhone, normalizePhone } from "../_shared/botconversa.ts";
+import { requireAdminOrService } from "../_shared/require-admin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -38,6 +39,13 @@ function daysSince(dateISO: string | null, today: string): number {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const dispatchSecret = Deno.env.get("DISPATCH_SECRET");
+  const provided = req.headers.get("x-dispatch-secret");
+  const secretOk = !!dispatchSecret && provided === dispatchSecret;
+  if (!secretOk) {
+    const authCheck = await requireAdminOrService(req, corsHeaders);
+    if (authCheck instanceof Response) return authCheck;
+  }
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
   const testPhone = req.method === "POST" ? (await req.json().catch(() => ({}))).testPhone : null;
 

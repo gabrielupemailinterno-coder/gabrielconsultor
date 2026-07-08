@@ -1,15 +1,16 @@
 import { CORS, json, requireAuthUser, syncScoreUser } from "../_shared/botconversa.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const BOTCONVERSA_AUTOMATION_CATCH_URL =
-  Deno.env.get("BOTCONVERSA_AUTOMATION_CATCH_URL") ||
-  "https://new-backend.botconversa.com.br/api/v1/webhooks-automation/catch/195152/bPy747j1w2e4/";
+const BOTCONVERSA_AUTOMATION_CATCH_URL = Deno.env.get("BOTCONVERSA_AUTOMATION_CATCH_URL") || "";
 
 function db() {
   return createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 }
 
 async function sendOnboardingAutomation(userId: string) {
+  if (!BOTCONVERSA_AUTOMATION_CATCH_URL) {
+    return { ok: false, error: "BOTCONVERSA_AUTOMATION_CATCH_URL not configured" };
+  }
   const admin = db();
   const { data: profile, error } = await admin
     .from("score_profiles")
