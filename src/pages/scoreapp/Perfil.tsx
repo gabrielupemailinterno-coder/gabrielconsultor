@@ -173,7 +173,7 @@ export default function ScorePerfil() {
 
         <button onClick={save} className="w-full bg-primary text-primary-foreground uppercase tracking-wide text-sm py-3 rounded-md">Salvar metas</button>
       </div>
-      <Link to="/scoreapp/planos" className="mt-6 inline-block text-sm text-primary">Ver planos →</Link>
+      <Link to="/app/planos" className="mt-6 inline-block text-sm text-primary">Ver planos →</Link>
     </ScoreLayout>
   );
 }

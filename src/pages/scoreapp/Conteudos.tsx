@@ -77,7 +77,7 @@ export default function ScoreConteudos() {
               <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-3">{cat}</h2>
               <div className="grid md:grid-cols-2 gap-3">
                 {list.map((m) => (
-                  <Link key={m.id} to={`/scoreapp/app/conteudos/base/${m.slug}`}
+                  <Link key={m.id} to={`/app/score/conteudos/base/${m.slug}`}
                     className="bg-card border border-border rounded-lg p-4 hover:border-primary/40 transition flex items-start gap-3">
                     {viewed.has(m.id) ? <CheckCircle2 className="text-primary shrink-0 mt-0.5" size={20} /> : <PlayCircle className="text-muted-foreground shrink-0 mt-0.5" size={20} />}
                     <div>
@@ -102,7 +102,7 @@ export default function ScoreConteudos() {
               <TrendingUp className="mx-auto text-primary mb-2" size={28} />
               <p className="font-serif text-lg">Seus indicadores estão saudáveis.</p>
               <p className="text-sm text-muted-foreground mt-1">Nenhum gargalo crítico identificado no momento. Continue registrando suas atividades para receber recomendações ao longo do tempo.</p>
-              <Link to="/scoreapp/app/registrar" className="inline-block mt-4 bg-primary text-primary-foreground text-xs uppercase tracking-wide px-4 py-2 rounded-md">
+              <Link to="/app/score/registrar" className="inline-block mt-4 bg-primary text-primary-foreground text-xs uppercase tracking-wide px-4 py-2 rounded-md">
                 Registrar dia
               </Link>
             </div>
@@ -118,7 +118,7 @@ export default function ScoreConteudos() {
               {top.feedback.short_description && (
                 <p className="text-sm text-muted-foreground mt-1">{top.feedback.short_description}</p>
               )}
-              <Link to={`/scoreapp/app/conteudos/feedback/${top.feedback.trigger_key}`}
+              <Link to={`/app/score/conteudos/feedback/${top.feedback.trigger_key}`}
                 className="inline-block mt-4 bg-primary text-primary-foreground text-xs uppercase tracking-wide px-4 py-2.5 rounded-md">
                 Ver recomendação
               </Link>
@@ -130,7 +130,7 @@ export default function ScoreConteudos() {
               <p className="text-xs uppercase tracking-wider text-muted-foreground mt-6 mb-2">Outros pontos de atenção</p>
               <div className="grid md:grid-cols-2 gap-3">
                 {others.map(({ hit, feedback }) => (
-                  <Link key={feedback.id} to={`/scoreapp/app/conteudos/feedback/${feedback.trigger_key}`}
+                  <Link key={feedback.id} to={`/app/score/conteudos/feedback/${feedback.trigger_key}`}
                     className="bg-card border border-border rounded-lg p-4 hover:border-primary/40 transition flex items-start gap-3">
                     {interacted.has(feedback.id) ? <CheckCircle2 className="text-primary shrink-0 mt-0.5" size={20} /> : <Sparkles className="text-muted-foreground shrink-0 mt-0.5" size={20} />}
                     <div>

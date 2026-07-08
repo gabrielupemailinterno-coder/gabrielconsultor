@@ -11,7 +11,7 @@ interface Props {
   portalUrl?: string
 }
 
-export const MeetingAvailableEmail = ({ fullName, meetingTitle, meetingSequence, portalUrl = 'https://gabrielconsultor.com/mentorados' }: Props) => (
+export const MeetingAvailableEmail = ({ fullName, meetingTitle, meetingSequence, portalUrl = 'https://gabrielconsultor.com/app/mentorados' }: Props) => (
   <Html lang="pt-BR" dir="ltr">
     <Head />
     <Preview>Nova sessão liberada: {meetingTitle}</Preview>

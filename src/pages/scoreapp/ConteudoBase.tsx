@@ -49,7 +49,7 @@ export default function ConteudoBase() {
 
   return (
     <ScoreLayout>
-      <Link to="/scoreapp/app/conteudos" className="inline-flex items-center gap-1 text-sm text-muted-foreground mb-4"><ArrowLeft size={14} /> Voltar</Link>
+      <Link to="/app/score/conteudos" className="inline-flex items-center gap-1 text-sm text-muted-foreground mb-4"><ArrowLeft size={14} /> Voltar</Link>
       <article className="bg-card border border-border rounded-lg p-6 md:p-8">
         <p className="text-xs uppercase tracking-wider text-muted-foreground">{c.category}</p>
         <h1 className="font-serif text-3xl mt-1">{c.title}</h1>

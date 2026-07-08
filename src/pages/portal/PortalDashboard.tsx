@@ -31,7 +31,7 @@ export default function PortalDashboard() {
   }, []);
 
   useEffect(() => {
-    if (error === "unauth") navigate("/mentorados/login", { replace: true });
+    if (error === "unauth") navigate("/app/login", { replace: true });
   }, [error, navigate]);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function PortalDashboard() {
 
   const logout = async () => {
     await supabase.auth.signOut();
-    navigate("/mentorados/login", { replace: true });
+    navigate("/app/login", { replace: true });
   };
 
   if (loading) {

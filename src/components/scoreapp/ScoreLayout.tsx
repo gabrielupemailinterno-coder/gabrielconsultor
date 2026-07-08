@@ -4,22 +4,22 @@ import { LayoutDashboard, PlusCircle, BookOpen, User, LogOut, Trophy, Loader2 } 
 import { supabase } from "@/integrations/supabase/client";
 
 const items = [
-  { to: "/scoreapp/app", label: "Painel", icon: LayoutDashboard, end: true },
-  { to: "/scoreapp/app/registrar", label: "Registrar", icon: PlusCircle },
-  { to: "/scoreapp/app/conteudos", label: "Conteúdos", icon: BookOpen },
-  { to: "/scoreapp/app/perfil", label: "Perfil", icon: User },
+  { to: "/app/score", label: "Painel", icon: LayoutDashboard, end: true },
+  { to: "/app/score/registrar", label: "Registrar", icon: PlusCircle },
+  { to: "/app/score/conteudos", label: "Conteúdos", icon: BookOpen },
+  { to: "/app/score/perfil", label: "Perfil", icon: User },
 ];
 
 export default function ScoreLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
-  const logout = async () => { await supabase.auth.signOut(); navigate("/scoreapp/login"); };
+  const logout = async () => { await supabase.auth.signOut(); navigate("/app/login"); };
 
   useEffect(() => {
     (async () => {
       const { data: sess } = await supabase.auth.getSession();
       if (!sess.session) {
-        navigate("/scoreapp/login", { replace: true });
+        navigate("/app/login", { replace: true });
         return;
       }
       const readProfile = async () => (await supabase
@@ -38,7 +38,7 @@ export default function ScoreLayout({ children }: { children: ReactNode }) {
         data = await readProfile();
       }
       if (!isActive(data)) {
-        navigate("/scoreapp/planos", { replace: true });
+        navigate("/app/planos", { replace: true });
         return;
       }
       setChecking(false);
@@ -57,7 +57,7 @@ export default function ScoreLayout({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background text-foreground pb-24 md:pb-0">
       <header className="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-40">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
-          <NavLink to="/scoreapp/app" className="flex items-center gap-2">
+          <NavLink to="/app/score" className="flex items-center gap-2">
             <Trophy size={18} className="text-primary" />
             <span className="font-serif text-lg">Score Comercial</span>
           </NavLink>

@@ -82,7 +82,7 @@ export default function Entrar() {
           <Link to="/esqueci-senha" className="text-muted-foreground hover:text-primary">
             Esqueci minha senha
           </Link>
-          <Link to="/scoreapp/cadastro" className="text-primary">
+          <Link to="/app/cadastro" className="text-primary">
             Criar conta Score
           </Link>
         </div>

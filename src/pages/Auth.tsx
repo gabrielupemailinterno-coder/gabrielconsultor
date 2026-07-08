@@ -11,10 +11,10 @@ const Auth = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate("/admin", { replace: true });
+      if (data.session) navigate("/app/admin", { replace: true });
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) navigate("/admin", { replace: true });
+      if (session) navigate("/app/admin", { replace: true });
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);

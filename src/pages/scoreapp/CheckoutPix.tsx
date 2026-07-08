@@ -24,11 +24,11 @@ export default function ScoreCheckoutPix() {
   const [lastCheckedAt, setLastCheckedAt] = useState<Date | null>(null);
 
   useEffect(() => {
-    if (!invoiceId) { navigate("/scoreapp/planos", { replace: true }); return; }
+    if (!invoiceId) { navigate("/app/planos", { replace: true }); return; }
     let stopped = false;
     const check = async () => {
       const { data: sess } = await supabase.auth.getSession();
-      if (!sess.session) { navigate("/scoreapp/login", { replace: true }); return; }
+      if (!sess.session) { navigate("/app/login", { replace: true }); return; }
       let fnResult: { paid?: boolean; status?: string; reason?: string; error?: string } | null = null;
       try {
         const { data, error } = await supabase.functions.invoke("cora-check-invoice", { body: {} });
@@ -50,7 +50,7 @@ export default function ScoreCheckoutPix() {
         if (status !== "paid") toast.success("Pagamento confirmado!");
         setStatus("paid");
         stopped = true;
-        setTimeout(() => navigate("/scoreapp/app", { replace: true }), 1500);
+        setTimeout(() => navigate("/app/score", { replace: true }), 1500);
       } else if (fnResult?.reason === "no_invoice") {
         setStatus("not_found");
       } else if (fnResult?.error) {
@@ -106,7 +106,7 @@ export default function ScoreCheckoutPix() {
               <p className="text-muted-foreground text-sm">{STATUS_META.not_found.hint}</p>
             </div>
             <button
-              onClick={() => navigate("/scoreapp/planos", { replace: true })}
+              onClick={() => navigate("/app/planos", { replace: true })}
               className="w-full bg-primary text-primary-foreground text-sm py-2 rounded-md"
             >
               Voltar aos planos

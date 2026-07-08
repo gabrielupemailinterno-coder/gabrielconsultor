@@ -14,10 +14,10 @@ const roleToModule: Record<AppRole, Module> = {
 };
 
 export const moduleRoute: Record<Module, string> = {
-  admin: "/admin",
-  mentee: "/mentorados",
-  partner: "/parceiro",
-  scoreapp: "/scoreapp/app",
+  admin: "/app/admin",
+  mentee: "/app/mentorados",
+  partner: "/app/parceiro",
+  scoreapp: "/app/score",
 };
 
 export const moduleLabel: Record<Module, string> = {

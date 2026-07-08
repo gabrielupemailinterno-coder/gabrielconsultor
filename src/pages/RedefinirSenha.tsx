@@ -44,7 +44,7 @@ export default function RedefinirSenha() {
     }
     await supabase.auth.signOut();
     toast({ title: "Senha atualizada", description: "Entre com sua nova senha." });
-    navigate("/entrar", { replace: true });
+    navigate("/app/login", { replace: true });
   };
 
   return (

@@ -75,7 +75,7 @@ export default function PartnerDashboard() {
     (async () => {
       const { data: sessionRes } = await supabase.auth.getSession();
       if (!sessionRes.session) {
-        navigate("/parceiro/login", { replace: true });
+        navigate("/app/login", { replace: true });
         return;
       }
       const uid = sessionRes.session.user.id;
@@ -91,7 +91,7 @@ export default function PartnerDashboard() {
       if (!role) {
         toast({ title: "Acesso negado", description: "Esta conta não está vinculada a um parceiro.", variant: "destructive" });
         await supabase.auth.signOut();
-        navigate("/parceiro/login", { replace: true });
+        navigate("/app/login", { replace: true });
         return;
       }
 
@@ -103,7 +103,7 @@ export default function PartnerDashboard() {
       if (!p) {
         toast({ title: "Nenhum parceiro vinculado", description: "Peça ao administrador para vincular sua conta.", variant: "destructive" });
         await supabase.auth.signOut();
-        navigate("/parceiro/login", { replace: true });
+        navigate("/app/login", { replace: true });
         return;
       }
       setPartner(p as Partner);
@@ -179,7 +179,7 @@ export default function PartnerDashboard() {
 
   const logout = async () => {
     await supabase.auth.signOut();
-    navigate("/parceiro/login", { replace: true });
+    navigate("/app/login", { replace: true });
   };
 
   if (loading || !partner) {
@@ -269,7 +269,7 @@ export default function PartnerDashboard() {
                 key: "planos",
                 title: "ScoreApp — Planos",
                 desc: "Vai direto para a página de assinatura.",
-                path: "/scoreapp/planos",
+                path: "/app/planos",
                 pitch:
                   "Assinatura do ScoreApp com desconto de indicação. Assine pelo meu link 👉",
               },

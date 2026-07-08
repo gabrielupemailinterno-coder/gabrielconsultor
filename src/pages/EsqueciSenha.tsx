@@ -42,7 +42,7 @@ export default function EsqueciSenha() {
               Se este e-mail estiver cadastrado, você receberá o link em instantes pelo WhatsApp.
             </p>
             <Link
-              to="/entrar"
+              to="/app/login"
               className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
             >
               <ArrowLeft size={12} /> Voltar ao login
@@ -67,7 +67,7 @@ export default function EsqueciSenha() {
               Enviar link
             </button>
             <Link
-              to="/entrar"
+              to="/app/login"
               className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary"
             >
               <ArrowLeft size={12} /> Voltar ao login

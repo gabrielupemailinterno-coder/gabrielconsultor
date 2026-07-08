@@ -21,10 +21,10 @@ export default function ScoreOnboarding() {
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
-      if (!data.session) { navigate("/scoreapp/login", { replace: true }); return; }
+      if (!data.session) { navigate("/app/login", { replace: true }); return; }
       setUid(data.session.user.id);
       const { data: existing } = await supabase.from("score_goals").select("*").eq("user_id", data.session.user.id).maybeSingle();
-      if (existing) navigate("/scoreapp/app", { replace: true });
+      if (existing) navigate("/app/score", { replace: true });
     });
   }, [navigate]);
 
@@ -36,7 +36,7 @@ export default function ScoreOnboarding() {
     if (!g.descricao_venda.trim()) return;
     setLoading(true);
     await supabase.from("score_goals").insert({ ...g, user_id: uid });
-    navigate("/scoreapp/app", { replace: true });
+    navigate("/app/score", { replace: true });
   };
 
   const fields: Array<[keyof typeof g, string]> = [

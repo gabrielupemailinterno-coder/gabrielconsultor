@@ -11,7 +11,7 @@ interface Props {
   portalUrl?: string
 }
 
-export const ActivityAvailableEmail = ({ fullName, activityTitle, activityDescription, portalUrl = 'https://gabrielconsultor.com/mentorados' }: Props) => (
+export const ActivityAvailableEmail = ({ fullName, activityTitle, activityDescription, portalUrl = 'https://gabrielconsultor.com/app/mentorados' }: Props) => (
   <Html lang="pt-BR" dir="ltr">
     <Head />
     <Preview>Nova atividade disponível: {activityTitle}</Preview>

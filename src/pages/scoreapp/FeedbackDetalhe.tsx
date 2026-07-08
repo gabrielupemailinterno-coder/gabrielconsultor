@@ -79,7 +79,7 @@ export default function FeedbackDetalhe() {
 
   return (
     <ScoreLayout>
-      <Link to="/scoreapp/app/conteudos" className="inline-flex items-center gap-1 text-sm text-muted-foreground mb-4"><ArrowLeft size={14} /> Voltar</Link>
+      <Link to="/app/score/conteudos" className="inline-flex items-center gap-1 text-sm text-muted-foreground mb-4"><ArrowLeft size={14} /> Voltar</Link>
       <article className="bg-card border border-border rounded-lg p-6 md:p-8">
         <p className="text-xs uppercase tracking-wider text-primary flex items-center gap-1"><Sparkles size={12} /> Feedback Inteligente</p>
         <h1 className="font-serif text-3xl mt-1">{f.title}</h1>

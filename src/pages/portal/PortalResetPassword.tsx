@@ -54,7 +54,7 @@ export default function PortalResetPassword() {
     }
     setSaving(false);
     toast({ title: "Senha redefinida", description: "Você já está logado." });
-    navigate("/mentorados", { replace: true });
+    navigate("/app/mentorados", { replace: true });
   };
 
   return (
@@ -75,7 +75,7 @@ export default function PortalResetPassword() {
               <p className="text-muted-foreground">
                 Link inválido ou expirado. Volte para o login e clique em "Esqueci minha senha" para receber um novo link.
               </p>
-              <Button onClick={() => navigate("/mentorados/login")} className="w-full">Voltar ao login</Button>
+              <Button onClick={() => navigate("/app/login")} className="w-full">Voltar ao login</Button>
             </div>
           ) : (
             <form onSubmit={submit} className="space-y-4">

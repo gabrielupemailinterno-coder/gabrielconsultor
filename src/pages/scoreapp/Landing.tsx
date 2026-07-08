@@ -25,7 +25,7 @@ export default function ScoreLanding() {
         data?.plan_status === "active" &&
         data?.payment_status === "paid" &&
         (!data?.plan_expires_at || new Date(data.plan_expires_at) > new Date());
-      navigate(active ? "/scoreapp/app" : "/scoreapp/planos", { replace: true });
+      navigate(active ? "/app/score" : "/app/planos", { replace: true });
     })();
   }, [navigate]);
 
