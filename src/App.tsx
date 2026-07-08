@@ -39,6 +39,14 @@ import { usePartnerRefCapture } from "@/hooks/usePartnerRef";
 
 const queryClient = new QueryClient();
 
+// Redirect helper: rewrites the prefix of the current pathname (keeps subpaths & query).
+function RewriteRedirect({ from, to }: { from: string; to: string }) {
+  const location = useLocation();
+  const rest = location.pathname.startsWith(from) ? location.pathname.slice(from.length) : "";
+  return <Navigate to={`${to}${rest}${location.search}${location.hash}`} replace />;
+}
+
+
 function AppRoutes() {
   usePartnerRefCapture();
   return (
