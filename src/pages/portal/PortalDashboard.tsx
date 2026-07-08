@@ -29,11 +29,6 @@ export default function PortalDashboard() {
   useMenteePresence(mentee?.id, mentee?.user_id);
 
   useEffect(() => {
-    document.documentElement.classList.add("portal-theme");
-    return () => document.documentElement.classList.remove("portal-theme");
-  }, []);
-
-  useEffect(() => {
     if (error === "unauth") navigate("/app/login", { replace: true });
   }, [error, navigate]);
 
@@ -52,56 +47,42 @@ export default function PortalDashboard() {
 
   if (loading) {
     return (
-      <main className="portal-theme min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="animate-spin text-primary" />
-      </main>
+      <AppLayout>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <Loader2 className="animate-spin text-primary" />
+        </div>
+      </AppLayout>
     );
   }
 
   if (!mentee) {
     return (
-      <main className="portal-theme min-h-screen bg-background text-foreground flex items-center justify-center p-6">
-        <Card className="max-w-md p-8 text-center space-y-3">
-          <h2 className="text-xl font-semibold">Sua mentoria ainda não está ativa</h2>
-          <p className="text-sm text-muted-foreground">
-            Assim que o pagamento for confirmado, seu acesso ao portal é liberado automaticamente.
-          </p>
-          <Button variant="outline" onClick={logout} className="mt-3">Sair</Button>
-        </Card>
-      </main>
+      <AppLayout>
+        <div className="max-w-md mx-auto p-6">
+          <Card className="p-8 text-center space-y-3">
+            <h2 className="text-xl font-semibold">Sua mentoria ainda não está ativa</h2>
+            <p className="text-sm text-muted-foreground">
+              Assim que o pagamento for confirmado, seu acesso ao portal é liberado automaticamente.
+            </p>
+            <Button variant="outline" onClick={logout} className="mt-3">Sair</Button>
+          </Card>
+        </div>
+      </AppLayout>
     );
   }
 
   const progress = meetingsTotal ? Math.round((meetingsDone / meetingsTotal) * 100) : 0;
 
   return (
-    <main className="portal-theme min-h-screen bg-background text-foreground">
-      <header className="border-b border-border/60 bg-sidebar">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">Portal do Mentorado</p>
-            <h1 className="text-xl md:text-2xl font-semibold truncate">
-              Bem-vindo de volta, {mentee.full_name.split(" ")[0]}
-            </h1>
-          </div>
-          <Button variant="ghost" size="sm" onClick={logout} className="gap-2">
-            <LogOut size={16} /> Sair
-          </Button>
-        </div>
+    <AppLayout>
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-6">
+        <PageHeader
+          eyebrow="Portal do Mentorado"
+          title={`Bem-vindo de volta, ${mentee.full_name.split(" ")[0]}`}
+          description={mentee.plan?.name ? `Plano ativo: ${mentee.plan.name}` : undefined}
+        />
 
-        <div className="max-w-7xl mx-auto px-6 pb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
-            <div>
-              <p className="text-sm text-muted-foreground">Plano ativo</p>
-              <p className="font-medium">{mentee.plan?.name ?? "Mentoria"}</p>
-            </div>
-            <div className="text-left md:text-right">
-              <p className="text-sm text-muted-foreground">Progresso da jornada</p>
-              <p className="font-mono-data text-lg">
-                {meetingsDone}/{meetingsTotal} <span className="text-muted-foreground text-sm">({progress}%)</span>
-              </p>
-            </div>
-          </div>
+        <SectionCard className="mb-6" title="Progresso da jornada" description={`${meetingsDone} de ${meetingsTotal} encontros concluídos (${progress}%)`}>
           <Progress value={progress} className="h-2" />
 
           {mentee.payment_status === "pending" && mentee.access_mode !== "full" && (
@@ -133,10 +114,8 @@ export default function PortalDashboard() {
               <Button size="sm" variant="outline" className="shrink-0" onClick={() => setTab("perfil")}>Definir minha senha</Button>
             </div>
           )}
-        </div>
-      </header>
+        </SectionCard>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
         <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="grid grid-cols-3 md:grid-cols-5 w-full h-auto p-1 bg-muted">
             <TabsTrigger value="cronograma" className="gap-2 py-2.5"><CalendarDays size={15} /><span className="hidden sm:inline">Cronograma</span></TabsTrigger>
@@ -170,6 +149,6 @@ export default function PortalDashboard() {
           accessMode: mentee.access_mode,
         }}
       />
-    </main>
+    </AppLayout>
   );
 }
