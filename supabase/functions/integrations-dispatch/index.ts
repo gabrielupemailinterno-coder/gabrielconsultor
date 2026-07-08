@@ -111,7 +111,7 @@ Deno.serve(async (req) => {
   if (body?.mode === "test" && body?.webhook_id) {
     const { data: wh } = await admin.from("integration_webhooks").select("*").eq("id", body.webhook_id).single();
     if (!wh) return new Response(JSON.stringify({ error: "webhook not found" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    const eventKey = body.event_key || (wh.event_keys?.[0] ?? "test.ping");
+    const eventKey = body.event_key || wh.event_name || "test.ping";
     const payload = body.payload ?? { test: true, sent_at: new Date().toISOString() };
     const { data: del } = await admin.from("integration_deliveries").insert({
       webhook_id: wh.id, event_key: eventKey, payload, attempt: 1, status: "pending",
@@ -122,7 +122,7 @@ Deno.serve(async (req) => {
     });
   }
 
-  // Emit mode: dispatch an event to all subscribing webhooks
+  // Emit mode: dispatch an event to the single webhook subscribing to it
   const eventKey: string | undefined = body?.event;
   const payload = body?.data ?? {};
   if (!eventKey) {
@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
     .from("integration_webhooks")
     .select("*")
     .eq("enabled", true)
-    .contains("event_keys", [eventKey]);
+    .eq("event_name", eventKey);
 
   const results = [];
   for (const wh of webhooks || []) {
@@ -146,3 +146,4 @@ Deno.serve(async (req) => {
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });
+
