@@ -88,6 +88,15 @@ function AppRoutes() {
       <Route path="/app/score/conteudos/:slug" element={<ScoreModulo />} />
       <Route path="/app/score/perfil" element={<ScorePerfil />} />
 
+      {/* Escola Comercial */}
+      <Route path="/app/escola-comercial" element={<EscolaIndex />} />
+      <Route path="/app/escola-comercial/:moduloSlug" element={<EscolaModulo />} />
+      <Route path="/app/escola-comercial/:moduloSlug/:aulaSlug" element={<EscolaAula />} />
+
+      {/* Conta */}
+      <Route path="/app/configuracoes" element={<Configuracoes />} />
+      <Route path="/app/notificacoes" element={<Notificacoes />} />
+
       {/* Redirects de compatibilidade (URLs antigas) */}
       <Route path="/entrar" element={<Navigate to="/app/login" replace />} />
       <Route path="/esqueci-senha" element={<Navigate to="/app/esqueci-senha" replace />} />
