@@ -174,6 +174,7 @@ const Admin = () => {
       {view === "clicks" && <ClicksTable clicks={clicks} />}
       {view === "sessions" && <SessionsTable sessions={sessions} />}
       {view === "blog" && <BlogAdmin />}
+      {view === "settings" && <SettingsAdmin onNavigate={setView} />}
     </AdminLayout>
   );
 };
