@@ -13,6 +13,7 @@ const prices: Record<string, { amount: number; description: string; recurring: b
 const bodySchema = z.object({
   plan_key: z.enum(["mensal", "semestral"]),
   terms_accepted: z.boolean().refine((v) => v === true, { message: "Aceite os termos" }),
+  partner_code: z.string().trim().optional().nullable(),
 });
 
 function getCoraClient() {
@@ -77,10 +78,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
+    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
     const { data: authData, error: authError } = await supabase.auth.getUser(token);
     if (authError || !authData?.user) {
@@ -102,16 +100,27 @@ Deno.serve(async (req) => {
     const { plan_key, terms_accepted } = parsed.data;
     const plan = prices[plan_key];
 
-    const { data: profile } = await supabase
-      .from("score_profiles")
-      .select("*")
-      .eq("user_id", userId)
-      .maybeSingle();
+    const { data: profile } = await supabase.from("score_profiles").select("*").eq("user_id", userId).maybeSingle();
     if (!profile) {
       return new Response(JSON.stringify({ error: "Perfil não encontrado." }), {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    let partnerId: string | null = profile.partner_id ?? null;
+    let partnerCode: string | null = profile.partner_code ?? null;
+    const requestedPartnerCode = parsed.data.partner_code?.trim();
+    if (requestedPartnerCode) {
+      const { data: partner } = await supabase
+        .from("partners")
+        .select("id, partner_code, status")
+        .eq("partner_code", requestedPartnerCode)
+        .maybeSingle();
+      if (partner?.status === "active") {
+        partnerId = partner.id;
+        partnerCode = partner.partner_code;
+      }
     }
 
     const missing: string[] = [];
@@ -158,9 +167,7 @@ Deno.serve(async (req) => {
           zip_code: cleanCep,
         },
       },
-      services: [
-        { name: plan.description, description: plan.description.slice(0, 100), amount: plan.amount },
-      ],
+      services: [{ name: plan.description, description: plan.description.slice(0, 100), amount: plan.amount }],
       payment_terms: { due_date: dueDateStr },
       payment_forms: ["PIX"],
     };
@@ -179,22 +186,29 @@ Deno.serve(async (req) => {
     const qrUrl = ((invoice.payment_options as any)?.bank_slip as any)?.url as string;
 
     const now = new Date().toISOString();
-    const planExpiresAt = plan_key === "semestral"
-      ? new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString()
-      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const planExpiresAt =
+      plan_key === "semestral"
+        ? new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString()
+        : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-    await supabase.from("score_profiles").update({
-      plan: plan_key,
-      payment_status: "pending",
-      plan_status: "pending",
-      cora_invoice_id: invoiceId,
-      cora_status: invoice.status as string,
-      cora_due_date: dueDateStr,
-      cora_emv: emv,
-      cora_qr_code_url: qrUrl,
-      plan_started_at: now,
-      plan_expires_at: planExpiresAt,
-    }).eq("user_id", userId);
+    await supabase
+      .from("score_profiles")
+      .update({
+        plan: plan_key,
+        payment_status: "pending",
+        plan_status: "pending",
+        cora_invoice_id: invoiceId,
+        cora_status: invoice.status as string,
+        cora_due_date: dueDateStr,
+        cora_emv: emv,
+        cora_qr_code_url: qrUrl,
+        cora_paid_amount: plan.amount,
+        partner_id: partnerId,
+        partner_code: partnerCode,
+        plan_started_at: now,
+        plan_expires_at: planExpiresAt,
+      })
+      .eq("user_id", userId);
 
     return new Response(
       JSON.stringify({
@@ -208,9 +222,9 @@ Deno.serve(async (req) => {
     );
   } catch (err) {
     console.error("cora-pix-checkout error", err);
-    return new Response(
-      JSON.stringify({ error: String((err as Error).message ?? err) }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: String((err as Error).message ?? err) }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
