@@ -32,7 +32,7 @@ type Session = { session_id: string; duration_seconds: number; started_at: strin
 
 const VALID_VIEWS: AdminView[] = [
   "overview", "mentees", "score", "conteudos", "partners", "emails", "prospect", "whatsapp",
-  "ritual", "botflow", "botconversa", "integrations", "leads", "visits", "clicks", "sessions", "blog",
+  "ritual", "botflow", "botconversa", "integrations", "leads", "visits", "clicks", "sessions", "blog", "settings",
 ];
 
 const getInitialView = (): AdminView => {
