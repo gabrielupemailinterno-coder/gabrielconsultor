@@ -1,6 +1,7 @@
 // Cron diário: dispara fluxo de check-in do BotConversa para quem optou e não registrou hoje.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendDailyCheckin } from "../_shared/botconversa.ts";
+import { requireAdminOrService } from "../_shared/require-admin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
