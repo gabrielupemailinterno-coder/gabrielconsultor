@@ -18,6 +18,21 @@ export type OverviewDelivery = {
   created_at: string;
 };
 
+export type OverviewMentee = {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  created_at: string;
+};
+
+export type OverviewPartner = {
+  id: string;
+  name: string;
+  partner_code: string;
+  status: string;
+  created_at: string;
+};
+
 export interface AdminOverview {
   loading: boolean;
   leadsTotal: number;
@@ -28,8 +43,13 @@ export interface AdminOverview {
   avgSessionSec: number;
   menteesActive: number;
   integrationsEnabled: number;
+  pendingCommissionsCount: number;
+  pendingCommissionsCents: number;
+  failedDeliveries7d: number;
   recentLeads: OverviewLead[];
   recentDeliveries: OverviewDelivery[];
+  recentMentees: OverviewMentee[];
+  recentPartners: OverviewPartner[];
   refresh: () => void;
 }
 
@@ -46,8 +66,13 @@ export function useAdminOverview(): AdminOverview {
     avgSessionSec: 0,
     menteesActive: 0,
     integrationsEnabled: 0,
+    pendingCommissionsCount: 0,
+    pendingCommissionsCents: 0,
+    failedDeliveries7d: 0,
     recentLeads: [],
     recentDeliveries: [],
+    recentMentees: [],
+    recentPartners: [],
   });
   const [nonce, setNonce] = useState(0);
 
