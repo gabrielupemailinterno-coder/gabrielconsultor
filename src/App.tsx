@@ -35,6 +35,11 @@ import Entrar from "./pages/Entrar";
 import EsqueciSenha from "./pages/EsqueciSenha";
 import RedefinirSenha from "./pages/RedefinirSenha";
 import AppHub from "./pages/AppHub";
+import EscolaIndex from "./pages/escola/EscolaIndex";
+import EscolaModulo from "./pages/escola/EscolaModulo";
+import EscolaAula from "./pages/escola/EscolaAula";
+import Configuracoes from "./pages/app/Configuracoes";
+import Notificacoes from "./pages/app/Notificacoes";
 import { usePartnerRefCapture } from "@/hooks/usePartnerRef";
 
 const queryClient = new QueryClient();
@@ -82,6 +87,15 @@ function AppRoutes() {
       <Route path="/app/score/conteudos/feedback/:trigger" element={<FeedbackDetalhe />} />
       <Route path="/app/score/conteudos/:slug" element={<ScoreModulo />} />
       <Route path="/app/score/perfil" element={<ScorePerfil />} />
+
+      {/* Escola Comercial */}
+      <Route path="/app/escola-comercial" element={<EscolaIndex />} />
+      <Route path="/app/escola-comercial/:moduloSlug" element={<EscolaModulo />} />
+      <Route path="/app/escola-comercial/:moduloSlug/:aulaSlug" element={<EscolaAula />} />
+
+      {/* Conta */}
+      <Route path="/app/configuracoes" element={<Configuracoes />} />
+      <Route path="/app/notificacoes" element={<Notificacoes />} />
 
       {/* Redirects de compatibilidade (URLs antigas) */}
       <Route path="/entrar" element={<Navigate to="/app/login" replace />} />
