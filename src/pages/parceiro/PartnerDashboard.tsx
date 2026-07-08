@@ -183,10 +183,6 @@ export default function PartnerDashboard() {
     if (partner) await reload(partner.id);
   };
 
-  const logout = async () => {
-    await supabase.auth.signOut();
-    navigate("/app/login", { replace: true });
-  };
 
   if (loading || !partner) {
     return (
