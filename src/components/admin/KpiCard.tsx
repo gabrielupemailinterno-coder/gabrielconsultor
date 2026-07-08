@@ -13,19 +13,21 @@ export default function KpiCard({ icon: Icon, label, value, sub, delta, accent }
   const positive = delta && delta.value >= 0;
   return (
     <div
-      className={`bg-card border rounded-lg p-4 transition hover:border-primary/40 ${accent ? "border-primary/40" : "border-border"}`}
+      className={`bg-card border rounded-xl p-4 transition-all hover:-translate-y-px hover:shadow-sm ${accent ? "border-primary/40 ring-1 ring-primary/10" : "border-border"}`}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+        <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold">
           {label}
         </span>
-        <Icon size={16} className="text-primary" />
+        <Icon size={14} className={accent ? "text-primary" : "text-muted-foreground"} />
       </div>
-      <div className="font-serif text-3xl leading-none tabular-nums">{value}</div>
-      <div className="mt-2 flex items-center gap-2 text-xs">
+      <div className={`font-mono-data text-2xl leading-none tabular-nums ${accent ? "text-primary" : "text-foreground"}`}>
+        {value}
+      </div>
+      <div className="mt-2 flex items-center gap-2 text-[11px]">
         {delta && (
           <span
-            className={`px-1.5 py-0.5 rounded font-mono ${positive ? "bg-primary/15 text-primary" : "bg-destructive/15 text-destructive"}`}
+            className={`px-1.5 py-0.5 rounded font-mono-data ${positive ? "bg-emerald-500/10 text-emerald-600" : "bg-destructive/10 text-destructive"}`}
           >
             {positive ? "+" : ""}
             {delta.value}
@@ -37,3 +39,4 @@ export default function KpiCard({ icon: Icon, label, value, sub, delta, accent }
     </div>
   );
 }
+
