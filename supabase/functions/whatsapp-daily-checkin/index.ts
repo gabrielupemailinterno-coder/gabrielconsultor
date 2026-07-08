@@ -26,6 +26,13 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const dispatchSecret = Deno.env.get("DISPATCH_SECRET");
+  const provided = req.headers.get("x-dispatch-secret");
+  const secretOk = !!dispatchSecret && provided === dispatchSecret;
+  if (!secretOk) {
+    const authCheck = await requireAdminOrService(req, corsHeaders);
+    if (authCheck instanceof Response) return authCheck;
+  }
   const admin = createClient(SUPABASE_URL, SERVICE_KEY);
   const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
   const testUserId: string | undefined = body?.testUserId;
