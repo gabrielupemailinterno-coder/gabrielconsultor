@@ -45,7 +45,7 @@ export default function ScoreDashboard() {
   const pctMeta = goals && goals.meta_mensal_valor > 0 ? Math.min(100, (conv.valor / goals.meta_mensal_valor) * 100) : 0;
   const today = todayBRT();
   const hasCheckinToday = logs.some((l) => l.date === today);
-  const mainDiagnostic = diag[0] ?? "Continue registrando para receber um diagnóstico.";
+  
 
   return (
     <ScoreLayout>
