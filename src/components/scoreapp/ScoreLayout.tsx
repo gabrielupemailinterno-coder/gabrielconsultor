@@ -22,6 +22,16 @@ export default function ScoreLayout({ children }: { children: ReactNode }) {
         navigate("/app/login", { replace: true });
         return;
       }
+      // Admin e Parceiro têm acesso total — não passam pelo gate de pagamento.
+      const { data: rolesData } = await (supabase as any)
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", sess.session.user.id);
+      const roles = ((rolesData as { role: string }[]) || []).map((r) => r.role);
+      if (roles.includes("admin") || roles.includes("partner")) {
+        setChecking(false);
+        return;
+      }
       const readProfile = async () => (await supabase
         .from("score_profiles")
         .select("payment_status, plan_status, plan_expires_at")
