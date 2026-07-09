@@ -97,17 +97,19 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
           ? crypto.randomUUID()
           : Math.random().toString(36).slice(2);
       const origin = buildLeadOrigin("contato");
+      const answers = result.data.profile ? { profile: result.data.profile } : null;
       const { error } = await supabase.from("leads").insert({
         id: leadId,
         name: result.data.name,
         phone: result.data.phone,
-        email: result.data.email,
+        email: result.data.email || "",
         company_name: result.data.companyName || null,
         revenue: result.data.revenue || null,
         main_pain: result.data.mainPain || null,
         source: window.location.pathname,
         form_type: "contato",
         partner_code: partnerCode,
+        answers,
         ...origin,
       });
       if (error) throw error;
@@ -132,7 +134,7 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
       setTimeout(() => {
         onClose();
         setStatus("idle");
-        setForm({ name: "", phone: "", email: "", companyName: "", revenue: "", mainPain: "" });
+        setForm({ name: "", phone: "", email: "", companyName: "", revenue: "", mainPain: "", profile: "" });
       }, 2500);
     } catch (err) {
       setStatus("idle");
