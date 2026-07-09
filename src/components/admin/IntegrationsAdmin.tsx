@@ -166,7 +166,7 @@ export default function IntegrationsAdmin() {
         ))}
       </div>
 
-      {tab === "api" && <ApiDocsPanel />}
+      {tab === "api" && <ApiDocsPanel onNavigate={(t) => setTab(t)} />}
 
 
       {tab === "webhooks" && (
