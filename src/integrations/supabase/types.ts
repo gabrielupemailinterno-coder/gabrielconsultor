@@ -1052,6 +1052,9 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          next_meeting_at: string | null
+          next_meeting_link: string | null
+          next_meeting_source: string | null
           partner_code: string | null
           partner_id: string | null
           password_changed_at: string | null
@@ -1083,6 +1086,9 @@ export type Database = {
           email: string
           full_name: string
           id?: string
+          next_meeting_at?: string | null
+          next_meeting_link?: string | null
+          next_meeting_source?: string | null
           partner_code?: string | null
           partner_id?: string | null
           password_changed_at?: string | null
@@ -1114,6 +1120,9 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          next_meeting_at?: string | null
+          next_meeting_link?: string | null
+          next_meeting_source?: string | null
           partner_code?: string | null
           partner_id?: string | null
           password_changed_at?: string | null
