@@ -9,13 +9,8 @@ import DashboardOverview from "@/components/admin/DashboardOverview";
 
 import BlogAdmin from "@/components/BlogAdmin";
 import MenteesAdmin from "@/components/admin/MenteesAdmin";
-import MenteeEmailComposer from "@/components/admin/MenteeEmailComposer";
 import ProspectingBulk from "@/components/admin/ProspectingBulk";
-import WhatsAppAdmin from "@/components/admin/whatsapp/WhatsAppAdmin";
-import WhatsAppRitualAdmin from "@/components/admin/WhatsAppRitualAdmin";
-import BotFlowsAdmin from "@/components/admin/BotFlowsAdmin";
 import ScoreAdmin from "@/components/admin/ScoreAdmin";
-import BotConversaAdmin from "@/components/admin/BotConversaAdmin";
 import IntegrationsAdmin from "@/components/admin/IntegrationsAdmin";
 import ContentsAdmin from "@/components/admin/ContentsAdmin";
 import PartnersAdmin from "@/components/admin/PartnersAdmin";
@@ -31,8 +26,8 @@ type Click = { id: string; session_id: string; element_type: string | null; elem
 type Session = { session_id: string; duration_seconds: number; started_at: string; referrer: string | null };
 
 const VALID_VIEWS: AdminView[] = [
-  "overview", "mentees", "score", "conteudos", "partners", "emails", "prospect", "whatsapp",
-  "ritual", "botflow", "botconversa", "integrations", "leads", "visits", "clicks", "sessions", "blog", "settings",
+  "overview", "mentees", "score", "conteudos", "partners", "prospect",
+  "integrations", "leads", "visits", "clicks", "sessions", "blog", "settings",
 ];
 
 const getInitialView = (): AdminView => {
