@@ -108,6 +108,27 @@ Deno.serve(async (req) => {
       } catch (e) {
         console.error("botconversa post-payment sync failed:", e);
       }
+
+      // Dispara evento `score.onboarding` para os webhooks configurados
+      try {
+        const payload = {
+          nome: profile.full_name || "",
+          telefone_normalizado: normalizePhoneBR(profile.phone),
+          produto: "score_comercial",
+          link_acesso: "https://gabrielconsultor.com/app/login",
+          data_pagamento: now,
+        };
+        await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/integrations-dispatch`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+          },
+          body: JSON.stringify({ event: "score.onboarding", data: payload }),
+        });
+      } catch (e) {
+        console.error("score.onboarding dispatch failed:", e);
+      }
     }
 
     return new Response(JSON.stringify({ received: true, eventId, eventType, resourceId }), {
