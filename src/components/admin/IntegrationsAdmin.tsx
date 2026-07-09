@@ -33,7 +33,7 @@ function isValidUrl(u: string) {
 }
 
 export default function IntegrationsAdmin() {
-  const [tab, setTab] = useState<"webhooks" | "events" | "logs">("webhooks");
+  const [tab, setTab] = useState<"api" | "webhooks" | "events" | "logs">("api");
   const [events, setEvents] = useState<EventRow[]>([]);
   const [webhooks, setWebhooks] = useState<Webhook[]>([]);
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
