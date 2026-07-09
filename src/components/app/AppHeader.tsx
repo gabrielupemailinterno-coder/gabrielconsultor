@@ -1,6 +1,7 @@
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { LogOut, Search, Bell } from "lucide-react";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DropdownMenu,
@@ -87,6 +88,8 @@ export function AppHeader({ hideSidebarTrigger = false }: { hideSidebarTrigger?:
         <span>Buscar</span>
         <kbd className="ml-2 text-[10px] font-mono opacity-60">⌘K</kbd>
       </button>
+
+      <LanguageSwitcher variant="inline" className="hidden sm:inline-flex" />
 
       <Link
         to="/app/notificacoes"
