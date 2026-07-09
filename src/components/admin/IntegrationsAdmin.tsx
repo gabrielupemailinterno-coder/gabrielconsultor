@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Copy, Plus, Play, Trash2, RefreshCw, ChevronRight, Loader2 } from "lucide-react";
+import ApiDocsPanel from "./integrations/ApiDocsPanel";
 
 type EventRow = { id: string; key: string; label: string; category: string; description: string | null; sample_payload: any };
 type Webhook = {
