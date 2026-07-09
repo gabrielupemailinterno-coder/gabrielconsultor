@@ -269,6 +269,8 @@ Deno.serve(async (req) => {
       console.warn("schedule-first-meeting send failed:", mailErr);
     }
 
+    await emitMenteeOnboarding(fullName, phone, new Date().toISOString());
+
     return new Response(JSON.stringify({ ok: true, mentee_id: menteeId }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
