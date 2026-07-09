@@ -280,20 +280,34 @@ export default function MenteesAdmin() {
         <div className="border border-border rounded-lg divide-y divide-border max-h-[700px] overflow-y-auto">
           {filteredMentees.length === 0 && <p className="p-4 text-sm text-muted-foreground">Nenhum mentorado.</p>}
           {filteredMentees.map((m) => (
-            <button
+            <div
               key={m.id}
-              onClick={() => setSelectedId(m.id)}
-              className={`w-full text-left p-3 transition hover:bg-secondary/50 ${selectedId === m.id ? "bg-secondary" : ""}`}
+              className={`group relative w-full transition ${selectedId === m.id ? "bg-secondary" : "hover:bg-secondary/50"}`}
             >
-              <p className="font-medium text-sm truncate">{m.full_name}</p>
-              <p className="text-xs text-muted-foreground truncate">{m.email}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {m.plan_name ?? "—"} · {meetingsDone[m.id] ?? 0}/6
-              </p>
-              <p className="text-[11px] text-muted-foreground/80 mt-0.5">
-                Acesso: {fmtRelative(presence[m.id]?.last_seen_at ?? null)}
-              </p>
-            </button>
+              <button
+                onClick={() => setSelectedId(m.id)}
+                className="w-full text-left p-3 pr-10"
+              >
+                <p className="font-medium text-sm truncate">{m.full_name}</p>
+                <p className="text-xs text-muted-foreground truncate">{m.email}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {m.plan_name ?? "—"} · {meetingsDone[m.id] ?? 0}/6
+                </p>
+                <p className="text-[11px] text-muted-foreground/80 mt-0.5">
+                  Acesso: {fmtRelative(presence[m.id]?.last_seen_at ?? null)}
+                </p>
+              </button>
+              {m.user_id && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); inspect(m); }}
+                  title="Inspecionar portal deste mentorado"
+                  className="absolute top-2 right-2 p-1.5 rounded border border-border bg-background/80 text-muted-foreground hover:text-primary hover:border-primary opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Eye size={13} />
+                </button>
+              )}
+            </div>
           ))}
         </div>
       </div>
