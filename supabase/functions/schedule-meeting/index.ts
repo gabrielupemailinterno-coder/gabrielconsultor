@@ -109,3 +109,18 @@ Deno.serve(async (req) => {
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 }
+
+async function emitMeetingScheduled(meetingId: string) {
+  try {
+    await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/emit-meeting-events`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+      },
+      body: JSON.stringify({ meeting_id: meetingId, kind: "scheduled" }),
+    });
+  } catch (e) {
+    console.warn("emit meeting scheduled failed:", e);
+  }
+}
