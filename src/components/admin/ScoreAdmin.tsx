@@ -225,6 +225,13 @@ export default function ScoreAdmin() {
                   <td className="p-3">
                     <div className="flex items-center justify-end gap-1">
                       <button
+                        onClick={() => inspect(r)}
+                        title="Inspecionar como este usuário"
+                        className="p-1.5 rounded border border-border text-muted-foreground hover:text-primary hover:border-primary"
+                      >
+                        <Eye size={14} />
+                      </button>
+                      <button
                         onClick={() => openEdit(r)}
                         title="Editar"
                         className="p-1.5 rounded border border-border text-muted-foreground hover:text-foreground hover:bg-secondary"
