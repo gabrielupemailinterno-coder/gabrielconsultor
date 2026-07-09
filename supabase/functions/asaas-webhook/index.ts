@@ -170,6 +170,8 @@ Deno.serve(async (req) => {
         );
       }
 
+      await emitMenteeOnboarding(fullName, phone, new Date().toISOString());
+
       return new Response(JSON.stringify({ already_active: true, payment_updated: true, mentee_id: existing.id }), {
         status: 200,
         headers: { "Content-Type": "application/json" },
