@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Copy, Plus, Play, Trash2, RefreshCw, ChevronRight, Loader2 } from "lucide-react";
+import ApiDocsPanel from "./integrations/ApiDocsPanel";
 
 type EventRow = { id: string; key: string; label: string; category: string; description: string | null; sample_payload: any };
 type Webhook = {
@@ -146,7 +147,7 @@ export default function IntegrationsAdmin() {
       <div className="bg-card border border-border rounded-lg p-5">
         <h2 className="font-serif text-xl mb-1">Integrações</h2>
         <p className="text-sm text-muted-foreground">
-          Conecte a plataforma Gabriel Consultor com qualquer sistema externo (BotConversa, GPT Maker, CRMs, ferramentas de e-mail e WhatsApp) usando API e Webhooks.
+          Conecte a plataforma Gabriel Consultor a qualquer sistema externo (CRMs, automações, WhatsApp) usando API e Webhooks.
           A plataforma não envia comunicação diretamente — ela apenas expõe dados e dispara eventos.
         </p>
       </div>
@@ -165,7 +166,7 @@ export default function IntegrationsAdmin() {
         ))}
       </div>
 
-      {tab === "api" && <ApiDocsPanel />}
+      {tab === "api" && <ApiDocsPanel onNavigate={(t) => setTab(t)} />}
 
 
       {tab === "webhooks" && (
@@ -403,78 +404,4 @@ export default function IntegrationsAdmin() {
   );
 }
 
-const API_RESOURCES = [
-  { name: "Leads", endpoints: ["POST /api/leads", "GET /api/leads/:id"] },
-  { name: "Score Comercial", endpoints: ["POST /api/score/checkins", "GET /api/score/users/:id"] },
-  { name: "Mentoria Comercial", endpoints: ["POST /api/mentees", "POST /api/mentees/:id/tasks"] },
-  { name: "Parceiros", endpoints: ["GET /api/partners/:id", "POST /api/partners/conversions"] },
-  { name: "Planos & Pagamentos", endpoints: ["GET /api/plans", "POST /api/payments/webhook"] },
-  { name: "Usuários", endpoints: ["POST /api/users", "GET /api/users/:id"] },
-  { name: "Eventos genéricos", endpoints: ["POST /api/events"] },
-];
-
-function ApiDocsPanel() {
-  const base = typeof window !== "undefined" ? `${window.location.origin}` : "https://app.gabrielconsultor.com";
-  const copy = (v: string) => { navigator.clipboard.writeText(v); toast.success("Copiado"); };
-  return (
-    <div className="space-y-6">
-      <div className="bg-card border border-border rounded-lg p-5">
-        <div className="flex items-center gap-2 mb-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <h3 className="font-medium">API disponível</h3>
-        </div>
-        <p className="text-sm text-muted-foreground mb-3">
-          Use a API para receber e consultar dados da plataforma. Autenticação por token; peça uma chave em Configurações caso ainda não tenha.
-        </p>
-        <div className="flex items-center gap-2 text-xs font-mono bg-secondary/40 px-3 py-2 rounded">
-          <span className="truncate flex-1">{base}/api</span>
-          <button onClick={() => copy(`${base}/api`)} className="text-muted-foreground hover:text-foreground shrink-0">
-            <Copy size={12} />
-          </button>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Recursos disponíveis</h3>
-        <div className="grid gap-2 md:grid-cols-2">
-          {API_RESOURCES.map((r) => (
-            <div key={r.name} className="bg-card border border-border rounded-md p-3">
-              <div className="font-medium text-sm mb-2">{r.name}</div>
-              <div className="space-y-1">
-                {r.endpoints.map((ep) => (
-                  <div key={ep} className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground">
-                    <code className="truncate flex-1">{ep}</code>
-                    <button onClick={() => copy(ep)} className="hover:text-foreground shrink-0">
-                      <Copy size={11} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="bg-card border border-border rounded-lg p-5">
-        <h3 className="font-medium text-sm mb-2">Exemplo de payload</h3>
-        <pre className="text-[11px] bg-secondary/40 p-3 rounded overflow-x-auto">
-{`POST ${base}/api/leads
-Authorization: Bearer <SEU_TOKEN>
-Content-Type: application/json
-
-{
-  "name": "Fulano",
-  "email": "fulano@empresa.com",
-  "phone": "+5511999999999",
-  "source": "site"
-}`}
-        </pre>
-      </div>
-
-      <p className="text-xs text-muted-foreground">
-        A plataforma é o núcleo de dados e gestão. Toda comunicação (WhatsApp, e-mail, chatbot) é feita por ferramentas externas conectadas via API e Webhooks.
-      </p>
-    </div>
-  );
-}
 
