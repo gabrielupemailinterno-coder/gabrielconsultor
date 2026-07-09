@@ -4,15 +4,11 @@ import {
   GraduationCap,
   Briefcase,
   Trophy,
-  ShieldCheck,
   Settings,
   Bell,
   CreditCard,
   User,
-  BarChart3,
-  Plug,
-  FileText,
-  Users,
+  ArrowLeft,
 } from "lucide-react";
 import {
   Sidebar,
@@ -28,12 +24,12 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useSessionRoles } from "@/hooks/useSessionRoles";
+import { ADMIN_GROUPS, type AdminView } from "@/components/admin/AdminSidebar";
 
-type Item = { title: string; url: string; icon: any; end?: boolean };
+type Item = { title: string; url: string; icon: any; end?: boolean; matchView?: AdminView };
 type Group = { label: string; items: Item[] };
 
-function buildGroups(roles: string[]): Group[] {
-  const isAdmin = roles.includes("admin");
+function buildUserGroups(roles: string[]): Group[] {
   const isMentee = roles.includes("mentee");
   const isPartner = roles.includes("partner");
   const isScore = roles.includes("scoreapp_user");
@@ -51,21 +47,6 @@ function buildGroups(roles: string[]): Group[] {
   if (isPartner) modules.push({ title: "Parceiro/Afiliado", url: "/app/parceiro", icon: Briefcase });
   if (modules.length) groups.push({ label: "Produtos", items: modules });
 
-  if (isAdmin) {
-    groups.push({
-      label: "Administração",
-      items: [
-        { title: "Cockpit", url: "/app/admin", icon: ShieldCheck, end: true },
-        { title: "Mentorados", url: "/app/admin?view=mentees", icon: Users },
-        { title: "Parceiros", url: "/app/admin?view=partners", icon: Briefcase },
-        { title: "Score", url: "/app/admin?view=score", icon: Trophy },
-        { title: "Conteúdos", url: "/app/admin?view=conteudos", icon: FileText },
-        { title: "Integrações", url: "/app/admin?view=integrations", icon: Plug },
-        { title: "Analytics", url: "/app/admin?view=leads", icon: BarChart3 },
-      ],
-    });
-  }
-
   groups.push({
     label: "Conta",
     items: [
@@ -78,17 +59,40 @@ function buildGroups(roles: string[]): Group[] {
   return groups;
 }
 
+function buildAdminGroups(): Group[] {
+  return ADMIN_GROUPS.map((g) => ({
+    label: g.label,
+    items: g.items.map((it) => ({
+      title: it.label,
+      url:
+        it.view === "overview"
+          ? "/app/admin"
+          : `/app/admin?view=${it.view}`,
+      icon: it.icon,
+      end: it.view === "overview",
+      matchView: it.view,
+    })),
+  }));
+}
+
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const { roles, session } = useSessionRoles();
 
-  const groups = buildGroups(roles);
+  const isAdminRoute = pathname.startsWith("/app/admin");
+  const isAdmin = roles.includes("admin");
+  const currentView = new URLSearchParams(search).get("view") || "overview";
 
-  const isActive = (url: string, end?: boolean) => {
-    const base = url.split("?")[0];
-    if (end) return pathname === base;
+  const groups = isAdminRoute && isAdmin ? buildAdminGroups() : buildUserGroups(roles);
+
+  const isActive = (it: Item) => {
+    if (isAdminRoute && it.matchView) {
+      return currentView === it.matchView;
+    }
+    const base = it.url.split("?")[0];
+    if (it.end) return pathname === base;
     return pathname === base || pathname.startsWith(base + "/");
   };
 
@@ -102,9 +106,11 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="min-w-0">
               <p className="text-[9px] uppercase tracking-widest text-muted-foreground leading-tight">
-                Gabriel Consultor
+                {isAdminRoute && isAdmin ? "Administração" : "Gabriel Consultor"}
               </p>
-              <p className="text-xs font-medium truncate">Plataforma</p>
+              <p className="text-xs font-medium truncate">
+                {isAdminRoute && isAdmin ? "Cockpit" : "Plataforma"}
+              </p>
             </div>
           )}
         </div>
@@ -122,7 +128,7 @@ export function AppSidebar() {
               <SidebarMenu>
                 {g.items.map((it) => (
                   <SidebarMenuItem key={it.url}>
-                    <SidebarMenuButton asChild isActive={isActive(it.url, it.end)} tooltip={it.title}>
+                    <SidebarMenuButton asChild isActive={isActive(it)} tooltip={it.title}>
                       <NavLink to={it.url} className="flex items-center gap-2">
                         <it.icon className="h-4 w-4 shrink-0" />
                         {!collapsed && <span className="truncate">{it.title}</span>}
@@ -134,6 +140,23 @@ export function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
         ))}
+
+        {isAdminRoute && isAdmin && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Voltar ao Hub">
+                    <NavLink to="/app" className="flex items-center gap-2 text-muted-foreground">
+                      <ArrowLeft className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span className="truncate">Voltar ao Hub</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       {!collapsed && session?.user?.email && (
