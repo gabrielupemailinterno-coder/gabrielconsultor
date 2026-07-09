@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { computeScore, computeTemperature } from "@/lib/scoreapp/calc";
 import type { DailyLog, ScoreGoals, ScoreProfile } from "@/lib/scoreapp/types";
-import { Flame, Snowflake, Zap, Users, Pencil, Power, PowerOff } from "lucide-react";
+import { Flame, Snowflake, Zap, Users, Pencil, Power, PowerOff, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { useImpersonation } from "@/hooks/useImpersonation";
 
 type Row = ScoreProfile & {
   goals: ScoreGoals | null;
@@ -33,6 +35,8 @@ const EDITABLE_FIELDS: { key: keyof ScoreProfile; label: string; type?: string }
 ];
 
 export default function ScoreAdmin() {
+  const navigate = useNavigate();
+  const { setImpersonation } = useImpersonation();
   const [rows, setRows] = useState<Row[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [showInactive, setShowInactive] = useState(false);
@@ -40,6 +44,15 @@ export default function ScoreAdmin() {
   const [editing, setEditing] = useState<Row | null>(null);
   const [form, setForm] = useState<Partial<ScoreProfile>>({});
   const [saving, setSaving] = useState(false);
+
+  const inspect = (r: Row) => {
+    if (!r.user_id) {
+      toast.error("Perfil sem usuário vinculado.");
+      return;
+    }
+    setImpersonation({ kind: "score", userId: r.user_id, name: r.full_name || r.email || "Usuário Score", email: r.email });
+    navigate("/app/score");
+  };
 
   async function load() {
     setLoading(true);
