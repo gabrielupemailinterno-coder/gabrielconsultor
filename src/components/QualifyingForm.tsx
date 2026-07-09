@@ -95,6 +95,8 @@ const QualifyingForm = ({ open, onClose, formType }: QualifyingFormProps) => {
         typeof crypto !== "undefined" && "randomUUID" in crypto
           ? crypto.randomUUID()
           : Math.random().toString(36).slice(2);
+      const { buildLeadOrigin } = await import("@/lib/leadOrigin");
+      const origin = buildLeadOrigin(formType);
       const { error } = await supabase.from("leads").insert({
         id: leadId,
         name: result.data.name,
@@ -106,6 +108,7 @@ const QualifyingForm = ({ open, onClose, formType }: QualifyingFormProps) => {
         form_type: formType,
         answers,
         partner_code: partnerCode,
+        ...origin,
       });
       if (error) throw error;
       if (partnerCode) {

@@ -85,6 +85,8 @@ const QuickContactDialog = ({ open, onClose, onSuccess }: QuickContactDialogProp
         typeof crypto !== "undefined" && "randomUUID" in crypto
           ? crypto.randomUUID()
           : Math.random().toString(36).slice(2);
+      const { buildLeadOrigin } = await import("@/lib/leadOrigin");
+      const origin = buildLeadOrigin("whatsapp");
       const { error } = await supabase.from("leads").insert({
         id: leadId,
         name: r.data.name,
@@ -93,6 +95,7 @@ const QuickContactDialog = ({ open, onClose, onSuccess }: QuickContactDialogProp
         source: window.location.pathname,
         form_type: "whatsapp",
         partner_code: partnerCode,
+        ...origin,
       });
       if (error) throw error;
       if (partnerCode) {

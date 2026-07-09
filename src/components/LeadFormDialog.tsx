@@ -8,6 +8,7 @@ import { useLocale } from "@/contexts/LocaleContext";
 import { leadFormCopy } from "@/locales/copy";
 import { sendBotConversaLead } from "@/lib/botconversa";
 import { getPartnerRef } from "@/lib/partnerRef";
+import { buildLeadOrigin } from "@/lib/leadOrigin";
 
 type LeadData = {
   name: string;
@@ -79,6 +80,7 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
         typeof crypto !== "undefined" && "randomUUID" in crypto
           ? crypto.randomUUID()
           : Math.random().toString(36).slice(2);
+      const origin = buildLeadOrigin("contato");
       const { error } = await supabase.from("leads").insert({
         id: leadId,
         name: result.data.name,
@@ -90,6 +92,7 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
         source: window.location.pathname,
         form_type: "contato",
         partner_code: partnerCode,
+        ...origin,
       });
       if (error) throw error;
       if (partnerCode) {
