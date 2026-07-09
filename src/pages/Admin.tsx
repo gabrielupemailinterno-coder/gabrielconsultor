@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
@@ -43,6 +43,7 @@ const getInitialView = (): AdminView => {
 
 const Admin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [checking, setChecking] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
@@ -77,8 +78,18 @@ const Admin = () => {
     const url = new URL(window.location.href);
     if (view === "overview") url.searchParams.delete("view");
     else url.searchParams.set("view", view);
-    window.history.replaceState({}, "", url.toString());
-  }, [view]);
+    const next = url.pathname + (url.search ? url.search : "");
+    if (next !== location.pathname + location.search) {
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [view, location.pathname, location.search]);
+
+  // Sync from URL changes (e.g. sidebar nav)
+  useEffect(() => {
+    const v = new URLSearchParams(location.search).get("view") as AdminView | null;
+    const next = v && VALID_VIEWS.includes(v) ? v : "overview";
+    setView((prev) => (prev === next ? prev : next));
+  }, [location.search]);
 
   const loadData = async () => {
     const [l, v, c, s, lc, vc, cc, sc] = await Promise.all([
