@@ -57,6 +57,7 @@ Deno.serve(async (req) => {
       // Connector not linked yet — save schedule without calendar event
       await supabase.from("meetings").update({ scheduled_at, status: "scheduled" }).eq("id", meeting_id);
       await sendConfirmation(null);
+      await emitMeetingScheduled(meeting_id);
       return json({ ok: true, calendar_skipped: true, reason: "google_calendar connector not linked" });
     }
 
