@@ -52,6 +52,9 @@ export default function AppHub() {
   }, [session]);
 
   const isAdmin = roles.includes("admin");
+  const isPartner = roles.includes("partner");
+  // Admin e Parceiro têm acesso completo à plataforma (sem pagar).
+  const fullAccess = isAdmin || isPartner;
 
   const cards: Card[] = useMemo(() => {
     const list: Card[] = [];
@@ -73,7 +76,7 @@ export default function AppHub() {
       });
     }
 
-    if (hasScore || isAdmin) {
+    if (hasScore || fullAccess) {
       list.push({
         key: "scoreapp",
         title: "Score Comercial",
@@ -81,7 +84,7 @@ export default function AppHub() {
         cta: "Acessar Score",
         route: "/app/score",
         icon: Trophy,
-        status: hasScore ? "Ativo" : "Admin",
+        status: hasScore ? "Ativo" : isAdmin ? "Admin" : "Parceiro",
         tone: hasScore ? "success" : "info",
       });
     }
