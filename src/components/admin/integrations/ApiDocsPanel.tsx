@@ -378,6 +378,8 @@ const WEBHOOK_EVENTS: EventDoc[] = [
   { key: "partner.commission.pending", when: "Comissão registrada em pendente.", status: "planned", payload: { conversion_id: "uuid" } },
   { key: "partner.commission.approved", when: "Comissão aprovada.", status: "planned", payload: { conversion_id: "uuid" } },
   { key: "partner.commission.paid", when: "Comissão paga.", status: "planned", payload: { conversion_id: "uuid" } },
+  { key: "user.password_create_link", when: "Nova conta criada (mentorado, score, parceiro) — link seguro de criação de primeira senha, entregue via WhatsApp pela automação externa.", status: "implemented", payload: { nome: "João Silva", telefone_normalizado: "+5532999999999", tipo: "criacao_senha", link: "https://gabrielconsultor.com/app/redefinir-senha#access_token=...", expira_em: "2026-07-09T20:00:00Z" } },
+  { key: "user.password_reset_link", when: "Usuário existente pediu redefinição de senha (Esqueci minha senha / Gerar link seguro) — link seguro entregue via WhatsApp pela automação externa.", status: "implemented", payload: { nome: "Maria Souza", telefone_normalizado: "+5532999999999", tipo: "redefinicao_senha", link: "https://gabrielconsultor.com/app/redefinir-senha#access_token=...", expira_em: "2026-07-09T20:00:00Z" } },
   { key: "payment.created", when: "Cobrança criada.", status: "planned", payload: { external_id: "asaas_xxx" } },
   { key: "payment.confirmed", when: "Pagamento confirmado.", status: "implemented", payload: { external_id: "asaas_xxx", amount_cents: 9700 } },
   { key: "payment.failed", when: "Pagamento com falha.", status: "planned", payload: { external_id: "asaas_xxx", reason: "card_declined" } },
