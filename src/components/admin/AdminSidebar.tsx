@@ -63,7 +63,8 @@ export const ADMIN_GROUPS: Group[] = [
     items: [
       { view: "leads", label: "Leads", icon: UserPlus },
       { view: "blog", label: "Blog", icon: FileText },
-      { view: "prospect", label: "Prospecção", icon: Send },
+      // "Prospecção" (envio por e-mail) removida da navegação — plataforma não envia comunicação;
+      // toda comunicação sai via webhooks/API para ferramentas externas de WhatsApp.
     ],
   },
   {
