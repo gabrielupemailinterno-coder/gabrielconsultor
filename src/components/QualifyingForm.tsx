@@ -124,6 +124,7 @@ const QualifyingForm = ({ open, onClose, formType }: QualifyingFormProps) => {
         });
       }
       void sendBotConversaLead(result.data.name, result.data.phone);
+      void import("@/lib/emitLeadEvents").then((m) => m.emitLeadEvents(leadId));
       trackClick("form_submit", `form_${formType}`);
       setStatus("success");
       setTimeout(() => {
