@@ -143,10 +143,19 @@ export default function IntegrationsAdmin() {
 
   return (
     <div className="space-y-6">
+      <div className="bg-card border border-border rounded-lg p-5">
+        <h2 className="font-serif text-xl mb-1">Integrações</h2>
+        <p className="text-sm text-muted-foreground">
+          Conecte a plataforma Gabriel Consultor com qualquer sistema externo (BotConversa, GPT Maker, CRMs, ferramentas de e-mail e WhatsApp) usando API e Webhooks.
+          A plataforma não envia comunicação diretamente — ela apenas expõe dados e dispara eventos.
+        </p>
+      </div>
+
       <div className="flex gap-2 border-b border-border">
         {[
-          { id: "webhooks", label: `Webhooks de Saída (${webhooks.length})` },
-          { id: "events", label: `Catálogo de Eventos (${events.length})` },
+          { id: "api", label: "API" },
+          { id: "webhooks", label: `Webhooks (${webhooks.length})` },
+          { id: "events", label: `Eventos (${events.length})` },
           { id: "logs", label: `Logs (${deliveries.length})` },
         ].map((t) => (
           <button key={t.id} onClick={() => setTab(t.id as any)}
@@ -155,6 +164,9 @@ export default function IntegrationsAdmin() {
           </button>
         ))}
       </div>
+
+      {tab === "api" && <ApiDocsPanel />}
+
 
       {tab === "webhooks" && (
         <div className="space-y-4">
