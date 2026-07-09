@@ -38,6 +38,7 @@ import AppHub from "./pages/AppHub";
 import Configuracoes from "./pages/app/Configuracoes";
 import Notificacoes from "./pages/app/Notificacoes";
 import { usePartnerRefCapture } from "@/hooks/usePartnerRef";
+import { ImpersonationProvider } from "@/hooks/useImpersonation";
 
 const queryClient = new QueryClient();
 
@@ -121,9 +122,11 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <LanguageSwitcher />
-          <WhatsAppFloatButton />
-          <AppRoutes />
+          <ImpersonationProvider>
+            <LanguageSwitcher />
+            <WhatsAppFloatButton />
+            <AppRoutes />
+          </ImpersonationProvider>
         </BrowserRouter>
       </LocaleProvider>
     </TooltipProvider>
