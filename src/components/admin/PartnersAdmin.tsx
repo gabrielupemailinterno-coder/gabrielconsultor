@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Copy, Check, Pencil, X, ChevronDown, ChevronRight, Trash2, UserPlus } from "lucide-react";
+import { Loader2, Plus, Copy, Check, Pencil, X, ChevronDown, ChevronRight, Trash2, UserPlus, Eye } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useImpersonation } from "@/hooks/useImpersonation";
 
 type Partner = {
   id: string;
