@@ -46,10 +46,21 @@ function fmtRelative(iso: string | null): string {
 }
 
 export default function MenteesAdmin() {
+  const navigate = useNavigate();
+  const { setImpersonation } = useImpersonation();
   const [mentees, setMentees] = useState<Mentee[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const inspect = (m: Mentee) => {
+    if (!m.user_id) {
+      toast.error("Mentorado sem usuário vinculado.");
+      return;
+    }
+    setImpersonation({ kind: "mentee", userId: m.user_id, name: m.full_name, email: m.email });
+    navigate("/app/mentorados");
+  };
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
