@@ -11,6 +11,7 @@ import AdminNotesCard from "./AdminNotesCard";
 import MenteePaymentCard from "./MenteePaymentCard";
 import InviteMenteeDialog from "./InviteMenteeDialog";
 import { useImpersonation } from "@/hooks/useImpersonation";
+import { emitMeetingEvent } from "@/lib/emitMeetingEvents";
 
 type Mentee = { id: string; user_id: string | null; full_name: string; email: string; status: string; plan_id: string; plan_name?: string };
 type PresenceStat = { last_seen_at: string | null; total_seconds: number; sessions: number };
@@ -161,6 +162,7 @@ export default function MenteesAdmin() {
       if (next && next.status === "blocked") {
         await supabase.from("meetings").update({ status: "available" }).eq("id", next.id);
       }
+      emitMeetingEvent(mt.id, "completed");
     }
     toast.success("Status atualizado");
     loadDetail(selectedId!);

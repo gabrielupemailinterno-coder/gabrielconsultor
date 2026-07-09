@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input";
 import { Loader2, Video, FileText, Link as LinkIcon, Lock, CheckCircle2, CalendarDays, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { emitMeetingEvent } from "@/lib/emitMeetingEvents";
 
 type Meeting = {
   id: string;
@@ -77,6 +78,7 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
     setConfirmFor(null);
     setConfirmAt("");
     setConfirmLink("");
+    emitMeetingEvent(confirmFor.id, "scheduled");
     await load();
     onChange();
   };
@@ -87,6 +89,7 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
     if (next && next.status === "blocked") {
       await supabase.from("meetings").update({ status: "available" }).eq("id", next.id);
     }
+    emitMeetingEvent(m.id, "completed");
     await load();
     onChange();
   };
