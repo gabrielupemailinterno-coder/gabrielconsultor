@@ -78,6 +78,7 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
     setConfirmFor(null);
     setConfirmAt("");
     setConfirmLink("");
+    emitMeetingEvent(confirmFor.id, "scheduled");
     await load();
     onChange();
   };
@@ -88,6 +89,7 @@ export default function CronogramaTab({ menteeId, menteeEmail, onChange }: { men
     if (next && next.status === "blocked") {
       await supabase.from("meetings").update({ status: "available" }).eq("id", next.id);
     }
+    emitMeetingEvent(m.id, "completed");
     await load();
     onChange();
   };
