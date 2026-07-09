@@ -776,13 +776,20 @@ export type Database = {
           email: string
           form_type: string
           id: string
+          landing_page: string | null
           main_pain: string | null
           name: string
           partner_code: string | null
           partner_id: string | null
           phone: string
+          product_interest: string | null
           revenue: string | null
           source: string | null
+          source_path: string | null
+          status: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
         }
         Insert: {
           answers?: Json | null
@@ -792,13 +799,20 @@ export type Database = {
           email: string
           form_type?: string
           id?: string
+          landing_page?: string | null
           main_pain?: string | null
           name: string
           partner_code?: string | null
           partner_id?: string | null
           phone: string
+          product_interest?: string | null
           revenue?: string | null
           source?: string | null
+          source_path?: string | null
+          status?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Update: {
           answers?: Json | null
@@ -808,13 +822,20 @@ export type Database = {
           email?: string
           form_type?: string
           id?: string
+          landing_page?: string | null
           main_pain?: string | null
           name?: string
           partner_code?: string | null
           partner_id?: string | null
           phone?: string
+          product_interest?: string | null
           revenue?: string | null
           source?: string | null
+          source_path?: string | null
+          status?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Relationships: [
           {
