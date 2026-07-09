@@ -515,14 +515,25 @@ export default function PartnersAdmin() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => copy(p.partner_code)}
-                        className="inline-flex items-center gap-1 text-xs bg-muted hover:bg-muted/70 px-2 py-1 rounded"
-                        title={linkFor(p.partner_code)}
-                      >
-                        {copied === p.partner_code ? <Check size={12} /> : <Copy size={12} />}
-                        Copiar link
-                      </button>
+                      <div className="inline-flex items-center gap-1">
+                        {p.user_id && (
+                          <button
+                            onClick={() => inspectPartner(p)}
+                            className="inline-flex items-center gap-1 text-xs border border-border hover:border-primary hover:text-primary px-2 py-1 rounded"
+                            title="Inspecionar portal deste parceiro"
+                          >
+                            <Eye size={12} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => copy(p.partner_code)}
+                          className="inline-flex items-center gap-1 text-xs bg-muted hover:bg-muted/70 px-2 py-1 rounded"
+                          title={linkFor(p.partner_code)}
+                        >
+                          {copied === p.partner_code ? <Check size={12} /> : <Copy size={12} />}
+                          Copiar link
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   {isOpen && (
