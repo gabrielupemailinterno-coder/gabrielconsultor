@@ -111,6 +111,7 @@ const QuickContactDialog = ({ open, onClose, onSuccess }: QuickContactDialogProp
         });
       }
       void sendBotConversaLead(r.data.name, r.data.phone);
+      void import("@/lib/emitLeadEvents").then((m) => m.emitLeadEvents(leadId));
       trackClick("form_submit", "quick_contact_submitted");
       setStatus("success");
       if (onSuccess) setTimeout(() => onSuccess(), 500);
