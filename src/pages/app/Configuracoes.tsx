@@ -22,18 +22,22 @@ export default function Configuracoes() {
   const generateAccessLink = async () => {
     if (!authEmail) return;
     setGenerating(true);
-    // Aciona a geração do link de acesso via provedor de autenticação.
-    // A comunicação com o cliente é feita externamente (WhatsApp/automação).
-    const { error } = await supabase.auth.resetPasswordForEmail(authEmail, {
-      redirectTo: `${window.location.origin}/app/redefinir-senha`,
+    // Gera link seguro real via admin API (edge fn) e dispara o evento
+    // `user.password_reset_link` para a automação externa entregar via WhatsApp.
+    const { data, error } = await supabase.functions.invoke("emit-password-link", {
+      body: {
+        email: authEmail,
+        kind: "reset",
+        origin: window.location.origin,
+        return_link: true,
+      },
     });
     setGenerating(false);
-    if (error) {
+    if (error || !data?.link) {
       toast.error("Não foi possível gerar o link agora.");
       return;
     }
-    // Não afirmamos que enviamos mensagem — a integração externa cuida disso.
-    setAccessLink(`${window.location.origin}/app/redefinir-senha`);
+    setAccessLink(data.link as string);
     toast.success("Link de acesso gerado. A automação externa entregará ao cliente.");
   };
 

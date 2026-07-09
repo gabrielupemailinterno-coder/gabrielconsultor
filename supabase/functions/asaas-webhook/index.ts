@@ -269,6 +269,20 @@ Deno.serve(async (req) => {
       console.warn("schedule-first-meeting send failed:", mailErr);
     }
 
+    // Dispara evento com link seguro de criação de senha (entrega via WhatsApp)
+    try {
+      await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/emit-password-link`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+        },
+        body: JSON.stringify({ email, kind: "create", name: fullName, phone: phone ?? undefined }),
+      });
+    } catch (e) {
+      console.warn("emit-password-link (create) failed:", e);
+    }
+
     await emitMenteeOnboarding(fullName, phone, new Date().toISOString());
 
     return new Response(JSON.stringify({ ok: true, mentee_id: menteeId }), {

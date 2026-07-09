@@ -136,6 +136,17 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Dispara evento `user.password_create_link` com link seguro para WhatsApp
+    if (isNewUser) {
+      try {
+        await admin.functions.invoke("emit-password-link", {
+          body: { email, kind: "create", name: full_name, phone: phone ?? undefined },
+        });
+      } catch (e) {
+        console.warn("emit-password-link (create) failed:", e);
+      }
+    }
+
     // Schedule-first-meeting nudge
     try {
       await admin.functions.invoke("send-app-email", {
