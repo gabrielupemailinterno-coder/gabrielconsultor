@@ -486,22 +486,33 @@ export const mentoriaCopy = {
 export const leadFormCopy = {
   pt: {
     title: "Agende seu Diagnóstico",
-    subtitle: "Preencha os dados abaixo e entraremos em contato.",
+    subtitle: "Deixe seu WhatsApp — vamos falar com você por lá.",
+    whatsappNote: "O WhatsApp é o nosso canal principal de comunicação.",
     successTitle: "Dados enviados com sucesso!",
-    successBody: "Entraremos em contato em breve.",
+    successBody: "Entraremos em contato pelo WhatsApp em breve.",
     closeAria: "Fechar formulário",
+    profileLabel: "Seu perfil",
+    profileOptions: {
+      vendedor: "Vendedor",
+      gestor: "Gestor comercial",
+      empresario: "Empresário",
+      autonomo: "Autônomo",
+      corretor: "Corretor",
+      parceiro: "Parceiro",
+      outro: "Outro",
+    },
     placeholders: {
       name: "Seu nome *",
-      phone: "Telefone *",
-      email: "Email *",
-      company: "Nome da Empresa",
+      phone: "WhatsApp com DDD *",
+      email: "E-mail (opcional — apenas para autenticação)",
+      company: "Nome da empresa",
       revenue: "Faturamento mensal aproximado",
       pain: "Qual sua maior dor atualmente?",
     },
     errors: {
       name: "Preencha seu nome",
-      phone: "Preencha seu telefone",
-      email: "Email inválido",
+      phone: "Preencha seu WhatsApp",
+      email: "E-mail inválido",
     },
     submit: "Solicitar Diagnóstico",
     submitting: "Enviando...",
@@ -509,21 +520,32 @@ export const leadFormCopy = {
   },
   en: {
     title: "Book your Diagnostic",
-    subtitle: "Fill in the details below and we'll get in touch.",
+    subtitle: "Leave your WhatsApp — we'll reach out there.",
+    whatsappNote: "WhatsApp is our main communication channel.",
     successTitle: "Submitted successfully!",
-    successBody: "We'll reach out to you shortly.",
+    successBody: "We'll reach out on WhatsApp shortly.",
     closeAria: "Close form",
+    profileLabel: "Your profile",
+    profileOptions: {
+      vendedor: "Salesperson",
+      gestor: "Sales manager",
+      empresario: "Business owner",
+      autonomo: "Self-employed",
+      corretor: "Broker",
+      parceiro: "Partner",
+      outro: "Other",
+    },
     placeholders: {
       name: "Your name *",
-      phone: "Phone *",
-      email: "Email *",
-      company: "Company Name",
+      phone: "WhatsApp with country code *",
+      email: "Email (optional — auth only)",
+      company: "Company name",
       revenue: "Approximate monthly revenue",
       pain: "What is your biggest pain right now?",
     },
     errors: {
       name: "Please enter your name",
-      phone: "Please enter your phone",
+      phone: "Please enter your WhatsApp",
       email: "Invalid email",
     },
     submit: "Request Diagnostic",
@@ -531,6 +553,7 @@ export const leadFormCopy = {
     submitError: "Submission failed. Please try again.",
   },
 } as const;
+
 
 export const notFoundCopy = {
   pt: {
