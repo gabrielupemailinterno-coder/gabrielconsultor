@@ -147,7 +147,7 @@ export default function IntegrationsAdmin() {
       <div className="bg-card border border-border rounded-lg p-5">
         <h2 className="font-serif text-xl mb-1">Integrações</h2>
         <p className="text-sm text-muted-foreground">
-          Conecte a plataforma Gabriel Consultor com qualquer sistema externo (BotConversa, GPT Maker, CRMs, ferramentas de e-mail e WhatsApp) usando API e Webhooks.
+          Conecte a plataforma Gabriel Consultor a qualquer sistema externo (CRMs, automações, WhatsApp) usando API e Webhooks.
           A plataforma não envia comunicação diretamente — ela apenas expõe dados e dispara eventos.
         </p>
       </div>
