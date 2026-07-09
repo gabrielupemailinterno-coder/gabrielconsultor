@@ -60,14 +60,15 @@ const GROUPS: Group[] = [
         method: "POST",
         path: "/api/leads",
         name: "Criar lead",
-        description: "Registra um novo lead com origem, produto de interesse e UTMs.",
+        description:
+          "Registra um novo lead com origem, produto de interesse e UTMs. Se product_interest = 'score_comercial' (ou landing/source do Score), a plataforma dispara automaticamente 'lead.created' e 'score.lead.created'.",
         status: "implemented",
         auth: "Bearer token",
         body: {
-          name: "João Silva",
+          name: "Maria Souza",
           phone: "5532999999999",
-          profile_type: "vendedor",
-          company: "Empresa X",
+          profile_type: "vendedora",
+          company: "Autônoma",
           product_interest: "score_comercial",
           landing_page: "score_comercial",
           source_path: "/scoreapp",
@@ -76,7 +77,11 @@ const GROUPS: Group[] = [
           utm_medium: "bio",
           utm_campaign: "score_lancamento",
         },
-        response: { id: "uuid", status: "created", event: "lead.created" },
+        response: {
+          id: "uuid",
+          status: "created",
+          events: ["lead.created", "score.lead.created"],
+        },
         errors: [
           { code: 400, description: "Payload inválido" },
           { code: 401, description: "Token ausente ou inválido" },
