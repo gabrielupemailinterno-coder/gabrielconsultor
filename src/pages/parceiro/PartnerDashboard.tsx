@@ -27,6 +27,7 @@ import { SectionCard } from "@/components/app/SectionCard";
 import { KpiTile } from "@/components/app/KpiTile";
 import { EmptyState } from "@/components/app/EmptyState";
 import { StatusBadge } from "@/components/app/StatusBadge";
+import { useImpersonation } from "@/hooks/useImpersonation";
 
 type Partner = {
   id: string;
@@ -207,6 +208,8 @@ export default function PartnerDashboard() {
     destination: "/mentoria-profissional",
   });
 
+  const { impersonation } = useImpersonation();
+
   useEffect(() => {
     (async () => {
       const { data: sessionRes } = await supabase.auth.getSession();
@@ -214,12 +217,17 @@ export default function PartnerDashboard() {
         navigate("/app/login", { replace: true });
         return;
       }
-      const uid = sessionRes.session.user.id;
+      const sessionUid = sessionRes.session.user.id;
+      const uid =
+        impersonation && impersonation.kind === "partner"
+          ? impersonation.userId
+          : sessionUid;
 
+      // Session user must be partner OR admin (admin can impersonate)
       const { data: role } = await (supabase as any)
         .from("user_roles")
         .select("role")
-        .eq("user_id", uid)
+        .eq("user_id", sessionUid)
         .in("role", ["partner", "admin"])
         .limit(1)
         .maybeSingle();
@@ -242,18 +250,24 @@ export default function PartnerDashboard() {
       if (!p) {
         toast({
           title: "Nenhum parceiro vinculado",
-          description: "Peça ao administrador para vincular sua conta.",
+          description: impersonation
+            ? "Este usuário não tem parceiro vinculado."
+            : "Peça ao administrador para vincular sua conta.",
           variant: "destructive",
         });
-        await supabase.auth.signOut();
-        navigate("/app/login", { replace: true });
+        if (!impersonation) {
+          await supabase.auth.signOut();
+          navigate("/app/login", { replace: true });
+        } else {
+          navigate("/app/admin", { replace: true });
+        }
         return;
       }
       setPartner(p as Partner);
       await reload(p.id);
       setLoading(false);
     })();
-  }, [navigate]);
+  }, [navigate, impersonation?.userId, impersonation?.kind]);
 
   const reload = async (partnerId: string) => {
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
