@@ -14,6 +14,16 @@ export default function ScoreLanding() {
         navigate("/conhecascoreapp", { replace: true });
         return;
       }
+      // Admin e Parceiro têm acesso total sem pagar.
+      const { data: rolesData } = await (supabase as any)
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", sess.session.user.id);
+      const roles = ((rolesData as { role: string }[]) || []).map((r) => r.role);
+      if (roles.includes("admin") || roles.includes("partner")) {
+        navigate("/app/score", { replace: true });
+        return;
+      }
       // Sync payment status with Cora before deciding where to send the user
       try { await supabase.functions.invoke("cora-check-invoice", { body: {} }); } catch {}
       const { data } = await supabase
