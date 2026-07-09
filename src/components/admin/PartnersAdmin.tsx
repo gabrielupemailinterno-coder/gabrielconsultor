@@ -119,6 +119,16 @@ const linkFor = (code: string) =>
   `${typeof window !== "undefined" ? window.location.origin : ""}/scoreapp?partner=${encodeURIComponent(code)}`;
 
 export default function PartnersAdmin() {
+  const navigate = useNavigate();
+  const { setImpersonation } = useImpersonation();
+  const inspectPartner = (p: Partner) => {
+    if (!p.user_id) {
+      toast({ title: "Parceiro sem usuário vinculado", description: "Vincule uma conta antes de inspecionar.", variant: "destructive" });
+      return;
+    }
+    setImpersonation({ kind: "partner", userId: p.user_id, name: p.name, email: p.email });
+    navigate("/app/parceiro");
+  };
   const [partners, setPartners] = useState<Partner[]>([]);
   const [trials, setTrials] = useState<Trial[]>([]);
   const [links, setLinks] = useState<PartnerLink[]>([]);
