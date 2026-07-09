@@ -68,15 +68,17 @@ Deno.serve(async (req) => {
   const payload: Record<string, unknown> = {
     nome: mentee.full_name || "",
     telefone_normalizado: normalizePhoneBR(mentee.phone),
-    link_meet: FIXED_MEET_LINK,
   };
   if (kind === "scheduled") {
+    // Agendamento agora acontece no BotConversa; mantido apenas para chamadas legadas.
+    payload.link_meet = FIXED_MEET_LINK;
     payload.meeting_id = meeting.id;
     payload.sequence = meeting.sequence;
     payload.title = meeting.title;
     payload.scheduled_at = meeting.scheduled_at;
   }
   if (kind === "completed") {
+    // Sem link_meet — o BotConversa gera um novo Meet a cada agendamento.
     payload.meeting_id = meeting.id;
     payload.sequence = meeting.sequence;
     payload.title = meeting.title;
