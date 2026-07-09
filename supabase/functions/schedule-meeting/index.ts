@@ -96,6 +96,7 @@ Deno.serve(async (req) => {
     }).eq("id", meeting_id);
 
     await sendConfirmation(meetLink);
+    await emitMeetingScheduled(meeting_id);
 
     return json({ ok: true, google_event_id: calData.id, meet_link: meetLink });
 
