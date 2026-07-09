@@ -116,7 +116,7 @@ export default function AppHub() {
     }
 
     return list;
-  }, [modules, isAdmin]);
+  }, [modules, isAdmin, fullAccess]);
 
   if (loading || !session) {
     return <AppLayout>{null}</AppLayout>;
