@@ -15,7 +15,7 @@ interface Props {
   themeClass?: string;
 }
 
-export function AppLayout({ children, requireAuth = true, themeClass }: Props) {
+export function AppLayout({ children, requireAuth = true, themeClass = "admin-theme" }: Props) {
   const { session, loading } = useSessionRoles();
   const navigate = useNavigate();
   const { pathname } = useLocation();
