@@ -176,12 +176,6 @@ export default function DashboardOverview({ onNavigate }: Props) {
             onClick={() => onNavigate("mentees")}
           />
           <QuickAction
-            icon={Mail}
-            label="Novo e-mail"
-            description="Comunicar mentorados"
-            onClick={() => onNavigate("emails")}
-          />
-          <QuickAction
             icon={Handshake}
             label="Parceiros"
             description="Links e comissões"
@@ -192,18 +186,6 @@ export default function DashboardOverview({ onNavigate }: Props) {
             label="Score Comercial"
             description="Diagnósticos & check-ins"
             onClick={() => onNavigate("score")}
-          />
-          <QuickAction
-            icon={MessageCircle}
-            label="Campanha WhatsApp"
-            description="Disparar mensagens"
-            onClick={() => onNavigate("whatsapp")}
-          />
-          <QuickAction
-            icon={Bot}
-            label="Testar BotConversa"
-            description="Validar gatilhos"
-            onClick={() => onNavigate("botconversa")}
           />
           <QuickAction
             icon={FileText}
