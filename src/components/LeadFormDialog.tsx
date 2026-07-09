@@ -10,13 +10,23 @@ import { sendBotConversaLead } from "@/lib/botconversa";
 import { getPartnerRef } from "@/lib/partnerRef";
 import { buildLeadOrigin } from "@/lib/leadOrigin";
 
+type ProfileKey =
+  | "vendedor"
+  | "gestor"
+  | "empresario"
+  | "autonomo"
+  | "corretor"
+  | "parceiro"
+  | "outro";
+
 type LeadData = {
   name: string;
   phone: string;
-  email: string;
+  email?: string;
   companyName?: string;
   revenue?: string;
   mainPain?: string;
+  profile?: ProfileKey | "";
 };
 
 interface LeadFormDialogProps {
@@ -36,10 +46,16 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
       z.object({
         name: z.string().trim().min(1, c.errors.name).max(100),
         phone: z.string().trim().min(1, c.errors.phone).max(30),
-        email: z.string().trim().email(c.errors.email).max(255),
+        email: z
+          .string()
+          .trim()
+          .max(255)
+          .optional()
+          .refine((v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), { message: c.errors.email }),
         companyName: z.string().trim().max(100).optional(),
         revenue: z.string().trim().max(100).optional(),
         mainPain: z.string().trim().max(1000).optional(),
+        profile: z.string().trim().max(30).optional(),
       }),
     [c],
   );
