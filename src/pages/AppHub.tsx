@@ -119,11 +119,11 @@ export default function AppHub() {
   }, [modules, isAdmin, fullAccess]);
 
   if (loading || !session) {
-    return <AppLayout>{null}</AppLayout>;
+    return <AppLayout hideSidebar>{null}</AppLayout>;
   }
 
   return (
-    <AppLayout>
+    <AppLayout hideSidebar>
       <div className="max-w-6xl mx-auto p-6">
         <PageHeader
           eyebrow="Hub"
