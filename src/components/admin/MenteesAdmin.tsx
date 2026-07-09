@@ -162,6 +162,7 @@ export default function MenteesAdmin() {
       if (next && next.status === "blocked") {
         await supabase.from("meetings").update({ status: "available" }).eq("id", next.id);
       }
+      emitMeetingEvent(mt.id, "completed");
     }
     toast.success("Status atualizado");
     loadDetail(selectedId!);
