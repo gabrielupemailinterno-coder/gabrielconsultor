@@ -35,7 +35,7 @@ function humanize(seg: string) {
   return CRUMB_LABELS[seg] || seg.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function AppHeader() {
+export function AppHeader({ hideSidebarTrigger = false }: { hideSidebarTrigger?: boolean } = {}) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { session } = useSessionRoles();
@@ -56,7 +56,7 @@ export function AppHeader() {
 
   return (
     <header className="h-14 border-b border-border/60 bg-background/70 backdrop-blur-md sticky top-0 z-30 flex items-center gap-2 px-3">
-      <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
+      {!hideSidebarTrigger && <SidebarTrigger className="text-muted-foreground hover:text-foreground" />}
 
       <nav aria-label="Breadcrumb" className="hidden md:flex items-center text-xs text-muted-foreground min-w-0">
         {crumbs.map((c, i) => (
