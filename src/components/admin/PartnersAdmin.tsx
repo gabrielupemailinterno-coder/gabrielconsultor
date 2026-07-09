@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Plus, Copy, Check, Pencil, X, ChevronDown, ChevronRight, Trash2, UserPlus } from "lucide-react";
+import { Loader2, Plus, Copy, Check, Pencil, X, ChevronDown, ChevronRight, Trash2, UserPlus, Eye } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useImpersonation } from "@/hooks/useImpersonation";
 
 type Partner = {
   id: string;
@@ -117,6 +119,16 @@ const linkFor = (code: string) =>
   `${typeof window !== "undefined" ? window.location.origin : ""}/scoreapp?partner=${encodeURIComponent(code)}`;
 
 export default function PartnersAdmin() {
+  const navigate = useNavigate();
+  const { setImpersonation } = useImpersonation();
+  const inspectPartner = (p: Partner) => {
+    if (!p.user_id) {
+      toast({ title: "Parceiro sem usuário vinculado", description: "Vincule uma conta antes de inspecionar.", variant: "destructive" });
+      return;
+    }
+    setImpersonation({ kind: "partner", userId: p.user_id, name: p.name, email: p.email });
+    navigate("/app/parceiro");
+  };
   const [partners, setPartners] = useState<Partner[]>([]);
   const [trials, setTrials] = useState<Trial[]>([]);
   const [links, setLinks] = useState<PartnerLink[]>([]);
@@ -513,14 +525,25 @@ export default function PartnersAdmin() {
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => copy(p.partner_code)}
-                        className="inline-flex items-center gap-1 text-xs bg-muted hover:bg-muted/70 px-2 py-1 rounded"
-                        title={linkFor(p.partner_code)}
-                      >
-                        {copied === p.partner_code ? <Check size={12} /> : <Copy size={12} />}
-                        Copiar link
-                      </button>
+                      <div className="inline-flex items-center gap-1">
+                        {p.user_id && (
+                          <button
+                            onClick={() => inspectPartner(p)}
+                            className="inline-flex items-center gap-1 text-xs border border-border hover:border-primary hover:text-primary px-2 py-1 rounded"
+                            title="Inspecionar portal deste parceiro"
+                          >
+                            <Eye size={12} />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => copy(p.partner_code)}
+                          className="inline-flex items-center gap-1 text-xs bg-muted hover:bg-muted/70 px-2 py-1 rounded"
+                          title={linkFor(p.partner_code)}
+                        >
+                          {copied === p.partner_code ? <Check size={12} /> : <Copy size={12} />}
+                          Copiar link
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   {isOpen && (

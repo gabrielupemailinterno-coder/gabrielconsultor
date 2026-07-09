@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useImpersonation } from "./useImpersonation";
 
 export type Mentee = {
   id: string;
@@ -21,16 +22,21 @@ export function useMentee() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
+  const { impersonation } = useImpersonation();
 
   useEffect(() => {
     let active = true;
     const load = async () => {
       const { data: session } = await supabase.auth.getSession();
       if (!session.session) { if (active) { setLoading(false); setError("unauth"); } return; }
+      const targetUserId =
+        impersonation && impersonation.kind === "mentee"
+          ? impersonation.userId
+          : session.session.user.id;
       const { data, error } = await supabase
         .from("mentees")
         .select("id,user_id,full_name,email,phone,cpf,status,started_at,access_mode,payment_status,password_changed_at,plan:mentorship_plans(id,name,total_meetings,duration_months)")
-        .eq("user_id", session.session.user.id)
+        .eq("user_id", targetUserId)
         .maybeSingle();
       if (!active) return;
       if (error) setError(error.message);
@@ -39,7 +45,7 @@ export function useMentee() {
     };
     load();
     return () => { active = false; };
-  }, [tick]);
+  }, [tick, impersonation?.userId, impersonation?.kind]);
 
   return { mentee, loading, error, reload: () => setTick((t) => t + 1) };
 }

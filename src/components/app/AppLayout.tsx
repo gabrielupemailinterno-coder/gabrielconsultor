@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { AppHeader } from "./AppHeader";
+import { ImpersonationBanner } from "./ImpersonationBanner";
 import { useSessionRoles } from "@/hooks/useSessionRoles";
 import { Loader2 } from "lucide-react";
 
@@ -40,6 +41,7 @@ export function AppLayout({ children, requireAuth = true, themeClass }: Props) {
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <AppHeader />
+          <ImpersonationBanner />
           <main className="flex-1 overflow-x-hidden">{children}</main>
         </div>
       </div>
