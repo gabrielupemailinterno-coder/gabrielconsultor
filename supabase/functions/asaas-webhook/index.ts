@@ -8,6 +8,37 @@ function partnerCodeFromReference(ref: unknown): string | null {
   return match?.[1] ?? null;
 }
 
+function normalizePhoneBR(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const digits = String(raw).replace(/\D/g, "");
+  if (!digits) return null;
+  if (digits.startsWith("55") && (digits.length === 12 || digits.length === 13)) return `+${digits}`;
+  if (digits.length === 10 || digits.length === 11) return `+55${digits}`;
+  return `+${digits}`;
+}
+
+async function emitMenteeOnboarding(fullName: string, phone: string | null | undefined, paidAt: string) {
+  try {
+    const payload = {
+      nome: fullName || "",
+      telefone_normalizado: normalizePhoneBR(phone),
+      produto: "mentoria_comercial",
+      link_acesso: "https://gabrielconsultor.com/app/login",
+      data_pagamento: paidAt,
+    };
+    await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/integrations-dispatch`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+      },
+      body: JSON.stringify({ event: "mentee.onboarding", data: payload }),
+    });
+  } catch (e) {
+    console.error("mentee.onboarding dispatch failed:", e);
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("method not allowed", { status: 405 });
 
