@@ -1,30 +1,47 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AppLayout } from "@/components/app/AppLayout";
 import { PageHeader } from "@/components/app/PageHeader";
 import { SectionCard } from "@/components/app/SectionCard";
 import { StatusBadge } from "@/components/app/StatusBadge";
 import { useSessionRoles } from "@/hooks/useSessionRoles";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Mail, ShieldCheck } from "lucide-react";
+import { LogOut, ShieldCheck, KeyRound, Copy, Check, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
 export default function Configuracoes() {
   const { session, roles } = useSessionRoles();
   const navigate = useNavigate();
-  const [sending, setSending] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [accessLink, setAccessLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  const email = session?.user?.email || "";
+  const authEmail = session?.user?.email || "";
+  const phone = (session?.user?.user_metadata?.phone as string) || (session?.user?.phone as string) || "";
 
-  const sendReset = async () => {
-    if (!email) return;
-    setSending(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  const generateAccessLink = async () => {
+    if (!authEmail) return;
+    setGenerating(true);
+    // Aciona a geração do link de acesso via provedor de autenticação.
+    // A comunicação com o cliente é feita externamente (WhatsApp/automação).
+    const { error } = await supabase.auth.resetPasswordForEmail(authEmail, {
       redirectTo: `${window.location.origin}/app/redefinir-senha`,
     });
-    setSending(false);
-    if (error) return toast.error("Não foi possível enviar o link.");
-    toast.success("Link de redefinição enviado para " + email);
+    setGenerating(false);
+    if (error) {
+      toast.error("Não foi possível gerar o link agora.");
+      return;
+    }
+    // Não afirmamos que enviamos mensagem — a integração externa cuida disso.
+    setAccessLink(`${window.location.origin}/app/redefinir-senha`);
+    toast.success("Link de acesso gerado. A automação externa entregará ao cliente.");
+  };
+
+  const copyLink = async () => {
+    if (!accessLink) return;
+    await navigator.clipboard.writeText(accessLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
   };
 
   const logout = async () => {
@@ -45,11 +62,18 @@ export default function Configuracoes() {
           <SectionCard title="Identificação">
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               <div>
-                <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">E-mail</dt>
+                <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                  WhatsApp / Telefone
+                </dt>
                 <dd className="mt-1 flex items-center gap-2">
-                  <Mail className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="truncate">{email}</span>
+                  <Phone className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="truncate">
+                    {phone || <span className="text-muted-foreground">não informado</span>}
+                  </span>
                 </dd>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Canal principal de comunicação. Toda mensagem é enviada por integração externa.
+                </p>
               </div>
               <div>
                 <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">Papéis</dt>
@@ -65,21 +89,55 @@ export default function Configuracoes() {
                   )}
                 </dd>
               </div>
+              {authEmail && (
+                <div className="sm:col-span-2">
+                  <dt className="text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Contato de autenticação
+                  </dt>
+                  <dd className="mt-1 text-xs font-mono text-muted-foreground truncate">
+                    {authEmail}
+                  </dd>
+                  <p className="text-[11px] text-muted-foreground mt-1">
+                    Dado técnico usado apenas para acesso à plataforma. A comunicação com o cliente
+                    é sempre pelo WhatsApp via automação externa.
+                  </p>
+                </div>
+              )}
             </dl>
           </SectionCard>
 
-          <SectionCard title="Segurança" description="Redefinir sua senha por e-mail.">
-            <div className="flex items-center justify-between gap-3">
+          <SectionCard
+            title="Segurança"
+            description="Gere um link de acesso seguro para redefinição ou entrada."
+          >
+            <div className="space-y-3">
               <p className="text-sm text-muted-foreground">
-                Enviaremos um link único para <span className="text-foreground">{email}</span>.
+                O link poderá ser copiado ou disparado pela sua integração externa de WhatsApp.
               </p>
-              <button
-                onClick={sendReset}
-                disabled={sending}
-                className="text-xs bg-primary text-primary-foreground px-3 py-2 rounded-md disabled:opacity-60"
-              >
-                {sending ? "Enviando…" : "Enviar link"}
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={generateAccessLink}
+                  disabled={generating}
+                  className="text-xs inline-flex items-center gap-1.5 bg-primary text-primary-foreground px-3 py-2 rounded-md disabled:opacity-60"
+                >
+                  <KeyRound className="h-3.5 w-3.5" />
+                  {generating ? "Gerando…" : "Gerar link seguro"}
+                </button>
+                {accessLink && (
+                  <button
+                    onClick={copyLink}
+                    className="text-xs inline-flex items-center gap-1.5 bg-muted hover:bg-muted/70 px-3 py-2 rounded-md"
+                  >
+                    {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                    {copied ? "Copiado" : "Copiar link"}
+                  </button>
+                )}
+              </div>
+              {accessLink && (
+                <div className="text-[11px] font-mono bg-muted/50 border border-border rounded-md p-2 break-all">
+                  {accessLink}
+                </div>
+              )}
             </div>
           </SectionCard>
 
@@ -99,3 +157,4 @@ export default function Configuracoes() {
     </AppLayout>
   );
 }
+

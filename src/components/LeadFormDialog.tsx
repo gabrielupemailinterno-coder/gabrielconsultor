@@ -10,13 +10,23 @@ import { sendBotConversaLead } from "@/lib/botconversa";
 import { getPartnerRef } from "@/lib/partnerRef";
 import { buildLeadOrigin } from "@/lib/leadOrigin";
 
+type ProfileKey =
+  | "vendedor"
+  | "gestor"
+  | "empresario"
+  | "autonomo"
+  | "corretor"
+  | "parceiro"
+  | "outro";
+
 type LeadData = {
   name: string;
   phone: string;
-  email: string;
+  email?: string;
   companyName?: string;
   revenue?: string;
   mainPain?: string;
+  profile?: ProfileKey | "";
 };
 
 interface LeadFormDialogProps {
@@ -36,10 +46,16 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
       z.object({
         name: z.string().trim().min(1, c.errors.name).max(100),
         phone: z.string().trim().min(1, c.errors.phone).max(30),
-        email: z.string().trim().email(c.errors.email).max(255),
+        email: z
+          .string()
+          .trim()
+          .max(255)
+          .optional()
+          .refine((v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), { message: c.errors.email }),
         companyName: z.string().trim().max(100).optional(),
         revenue: z.string().trim().max(100).optional(),
         mainPain: z.string().trim().max(1000).optional(),
+        profile: z.string().trim().max(30).optional(),
       }),
     [c],
   );
@@ -81,17 +97,19 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
           ? crypto.randomUUID()
           : Math.random().toString(36).slice(2);
       const origin = buildLeadOrigin("contato");
+      const answers = result.data.profile ? { profile: result.data.profile } : null;
       const { error } = await supabase.from("leads").insert({
         id: leadId,
         name: result.data.name,
         phone: result.data.phone,
-        email: result.data.email,
+        email: result.data.email || "",
         company_name: result.data.companyName || null,
         revenue: result.data.revenue || null,
         main_pain: result.data.mainPain || null,
         source: window.location.pathname,
         form_type: "contato",
         partner_code: partnerCode,
+        answers,
         ...origin,
       });
       if (error) throw error;
@@ -116,7 +134,7 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
       setTimeout(() => {
         onClose();
         setStatus("idle");
-        setForm({ name: "", phone: "", email: "", companyName: "", revenue: "", mainPain: "" });
+        setForm({ name: "", phone: "", email: "", companyName: "", revenue: "", mainPain: "", profile: "" });
       }, 2500);
     } catch (err) {
       setStatus("idle");
@@ -161,7 +179,10 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
             ) : (
               <>
                 <h3 className="font-serif text-xl md:text-2xl mb-1">{c.title}</h3>
-                <p className="text-muted-foreground text-sm mb-6">{c.subtitle}</p>
+                <p className="text-muted-foreground text-sm mb-2">{c.subtitle}</p>
+                <p className="text-[11px] text-primary/80 mb-5 flex items-center gap-1.5">
+                  <span aria-hidden>•</span> {c.whatsappNote}
+                </p>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label htmlFor="lead-name" className="sr-only">
@@ -194,19 +215,23 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
                     {errors.phone && <p className="text-destructive text-xs mt-1">{errors.phone}</p>}
                   </div>
                   <div>
-                    <label htmlFor="lead-email" className="sr-only">
-                      {c.placeholders.email}
+                    <label htmlFor="lead-profile" className="sr-only">
+                      {c.profileLabel}
                     </label>
-                    <input
-                      id="lead-email"
-                      type="email"
-                      placeholder={c.placeholders.email}
-                      aria-label={c.placeholders.email}
-                      value={form.email}
-                      onChange={(e) => handleChange("email", e.target.value)}
+                    <select
+                      id="lead-profile"
+                      aria-label={c.profileLabel}
+                      value={form.profile}
+                      onChange={(e) => handleChange("profile", e.target.value)}
                       className={inputClass}
-                    />
-                    {errors.email && <p className="text-destructive text-xs mt-1">{errors.email}</p>}
+                    >
+                      <option value="">{c.profileLabel}</option>
+                      {Object.entries(c.profileOptions).map(([k, label]) => (
+                        <option key={k} value={k}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label htmlFor="lead-company" className="sr-only">
@@ -222,20 +247,44 @@ const LeadFormDialog = ({ open, onClose, onSuccess, successTitle, successBody }:
                       className={inputClass}
                     />
                   </div>
-                  <div>
-                    <label htmlFor="lead-revenue" className="sr-only">
-                      {c.placeholders.revenue}
-                    </label>
-                    <input
-                      id="lead-revenue"
-                      type="text"
-                      placeholder={c.placeholders.revenue}
-                      aria-label={c.placeholders.revenue}
-                      value={form.revenue}
-                      onChange={(e) => handleChange("revenue", e.target.value)}
-                      className={inputClass}
-                    />
-                  </div>
+                  <details className="text-xs text-muted-foreground">
+                    <summary className="cursor-pointer select-none py-1 hover:text-foreground">
+                      Dados adicionais (opcional)
+                    </summary>
+                    <div className="space-y-3 pt-3">
+                      <div>
+                        <label htmlFor="lead-email" className="sr-only">
+                          {c.placeholders.email}
+                        </label>
+                        <input
+                          id="lead-email"
+                          type="email"
+                          placeholder={c.placeholders.email}
+                          aria-label={c.placeholders.email}
+                          value={form.email}
+                          onChange={(e) => handleChange("email", e.target.value)}
+                          className={inputClass}
+                        />
+                        {errors.email && (
+                          <p className="text-destructive text-xs mt-1">{errors.email}</p>
+                        )}
+                      </div>
+                      <div>
+                        <label htmlFor="lead-revenue" className="sr-only">
+                          {c.placeholders.revenue}
+                        </label>
+                        <input
+                          id="lead-revenue"
+                          type="text"
+                          placeholder={c.placeholders.revenue}
+                          aria-label={c.placeholders.revenue}
+                          value={form.revenue}
+                          onChange={(e) => handleChange("revenue", e.target.value)}
+                          className={inputClass}
+                        />
+                      </div>
+                    </div>
+                  </details>
                   <div>
                     <label htmlFor="lead-pain" className="sr-only">
                       {c.placeholders.pain}
