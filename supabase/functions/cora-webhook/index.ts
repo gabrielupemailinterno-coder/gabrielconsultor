@@ -2,6 +2,15 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { syncScoreUser, sendOnboarding } from "../_shared/botconversa.ts";
 
+function normalizePhoneBR(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const digits = String(raw).replace(/\D/g, "");
+  if (!digits) return null;
+  if (digits.startsWith("55") && (digits.length === 12 || digits.length === 13)) return `+${digits}`;
+  if (digits.length === 10 || digits.length === 11) return `+55${digits}`;
+  return `+${digits}`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -107,6 +116,27 @@ Deno.serve(async (req) => {
         await sendOnboarding(profile.user_id);
       } catch (e) {
         console.error("botconversa post-payment sync failed:", e);
+      }
+
+      // Dispara evento `score.onboarding` para os webhooks configurados
+      try {
+        const payload = {
+          nome: profile.full_name || "",
+          telefone_normalizado: normalizePhoneBR(profile.phone),
+          produto: "score_comercial",
+          link_acesso: "https://gabrielconsultor.com/app/login",
+          data_pagamento: now,
+        };
+        await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/integrations-dispatch`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+          },
+          body: JSON.stringify({ event: "score.onboarding", data: payload }),
+        });
+      } catch (e) {
+        console.error("score.onboarding dispatch failed:", e);
       }
     }
 
