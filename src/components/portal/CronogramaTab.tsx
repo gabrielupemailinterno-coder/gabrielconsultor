@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input";
 import { Loader2, Video, FileText, Link as LinkIcon, Lock, CheckCircle2, CalendarDays, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { emitMeetingEvent } from "@/lib/emitMeetingEvents";
 
 type Meeting = {
   id: string;
