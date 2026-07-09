@@ -3,12 +3,7 @@ import {
   Users,
   Trophy,
   BookOpen,
-  Mail,
   Send,
-  MessageCircle,
-  CalendarClock,
-  Workflow,
-  Bot,
   Plug,
   UserPlus,
   Eye,
@@ -24,12 +19,6 @@ export type AdminView =
   | "mentees"
   | "score"
   | "conteudos"
-  | "emails"
-  | "prospect"
-  | "whatsapp"
-  | "ritual"
-  | "botflow"
-  | "botconversa"
   | "integrations"
   | "partners"
   | "leads"
@@ -37,6 +26,7 @@ export type AdminView =
   | "clicks"
   | "sessions"
   | "blog"
+  | "prospect"
   | "settings";
 
 type Group = {
@@ -54,7 +44,6 @@ export const ADMIN_GROUPS: Group[] = [
     items: [
       { view: "mentees", label: "Mentorados", icon: Users, hint: "cadastros, tarefas e métricas" },
       { view: "conteudos", label: "Materiais", icon: BookOpen },
-      { view: "emails", label: "Convites & E-mails", icon: Mail },
     ],
   },
   {
@@ -78,13 +67,9 @@ export const ADMIN_GROUPS: Group[] = [
     ],
   },
   {
-    label: "Automações & Integrações",
+    label: "Integrações",
     items: [
-      { view: "whatsapp", label: "WhatsApp", icon: MessageCircle },
-      { view: "ritual", label: "Ritual diário", icon: CalendarClock },
-      { view: "botflow", label: "Fluxos do bot", icon: Workflow },
-      { view: "botconversa", label: "BotConversa", icon: Bot },
-      { view: "integrations", label: "Webhooks & API", icon: Plug },
+      { view: "integrations", label: "API & Webhooks", icon: Plug, hint: "API, webhooks e logs" },
     ],
   },
   {
@@ -100,6 +85,7 @@ export const ADMIN_GROUPS: Group[] = [
     items: [{ view: "settings", label: "Sistema", icon: Settings }],
   },
 ];
+
 
 export const ADMIN_LABELS: Record<AdminView, string> = ADMIN_GROUPS.reduce(
   (acc, g) => {
