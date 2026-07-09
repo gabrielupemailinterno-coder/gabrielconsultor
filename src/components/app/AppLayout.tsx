@@ -13,9 +13,16 @@ interface Props {
   requireAuth?: boolean;
   /** Classe de tema aplicada ao contêiner (ex: "admin-theme", "portal-theme"). */
   themeClass?: string;
+  /** Oculta a sidebar principal — usado no Hub /app. */
+  hideSidebar?: boolean;
 }
 
-export function AppLayout({ children, requireAuth = true, themeClass = "admin-theme" }: Props) {
+export function AppLayout({
+  children,
+  requireAuth = true,
+  themeClass = "admin-theme",
+  hideSidebar = false,
+}: Props) {
   const { session, loading } = useSessionRoles();
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -38,9 +45,9 @@ export function AppLayout({ children, requireAuth = true, themeClass = "admin-th
   return (
     <SidebarProvider>
       <div className={`min-h-screen flex w-full bg-background text-foreground ${themeClass ?? ""}`}>
-        <AppSidebar />
+        {!hideSidebar && <AppSidebar />}
         <div className="flex-1 flex flex-col min-w-0">
-          <AppHeader />
+          <AppHeader hideSidebarTrigger={hideSidebar} />
           <ImpersonationBanner />
           <main className="flex-1 overflow-x-hidden">{children}</main>
         </div>
