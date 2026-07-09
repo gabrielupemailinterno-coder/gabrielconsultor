@@ -357,8 +357,11 @@ const GROUPS: Group[] = [
 ];
 
 const WEBHOOK_EVENTS: EventDoc[] = [
-  { key: "lead.created", when: "Lead capturado em qualquer landing.", status: "implemented", payload: { id: "uuid", name: "João", phone: "5532999999999", landing_page: "score_comercial" } },
+  { key: "lead.created", when: "Lead capturado em qualquer landing.", status: "implemented", payload: { event_name: "lead.created", lead_id: "uuid", name: "João Silva", phone: "5532999999999", phone_normalized: "5532999999999", product_interest: "score_comercial", landing_page: "score_comercial", source_path: "/scoreapp" } },
   { key: "lead.updated", when: "Status ou dados do lead atualizados.", status: "planned", payload: { id: "uuid", status: "qualified" } },
+  { key: "score.lead.created", when: "Lead do Score Comercial: dispara junto com lead.created quando product_interest = 'score_comercial' ou landing = /scoreapp.", status: "implemented", payload: { event_name: "score.lead.created", lead_id: "uuid", name: "Maria Souza", phone: "5532999999999", phone_normalized: "5532999999999", profile_type: "vendedora", company: "Autônoma", product_interest: "score_comercial", landing_page: "score_comercial", source_path: "/scoreapp", partner_code: "ABC123", utm_source: "instagram", utm_medium: "bio", utm_campaign: "score_lancamento", created_at: "2026-07-09T12:00:00Z" } },
+  { key: "score.purchase.started", when: "Checkout do Score iniciado.", status: "planned", payload: { phone: "5532999999999", plan: "score_mensal" } },
+  { key: "score.purchase.confirmed", when: "Pagamento do Score confirmado.", status: "planned", payload: { phone: "5532999999999", amount_cents: 9700 } },
   { key: "score.user.created", when: "Novo usuário no Score Comercial.", status: "implemented", payload: { user_id: "uuid", phone: "5532999999999" } },
   { key: "score.checkin.completed", when: "Check-in diário finalizado.", status: "implemented", payload: { user_id: "uuid", answers: { prospeccao: 8 } } },
   { key: "score.diagnosis.completed", when: "Diagnóstico do Score finalizado.", status: "planned", payload: { user_id: "uuid", score: 720 } },
