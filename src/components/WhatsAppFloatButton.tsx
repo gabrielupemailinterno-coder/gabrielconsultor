@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 
-const WHATSAPP_NUMBER = "5532920005961";
+const WHATSAPP_NUMBER = "5532998316501";
 const DEFAULT_MESSAGE = "Olá Gabriel, vim pelo site e gostaria de conversar.";
 
 const WhatsAppFloatButton = () => {
