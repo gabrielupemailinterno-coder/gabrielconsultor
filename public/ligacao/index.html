@@ -691,6 +691,20 @@
     var el = _sfx('sfx-ding'); if (!el) return;
     try { el.currentTime = 0; el.volume = 0.9; var p = el.play(); if (p && p.catch) p.catch(function(){}); } catch(e){}
   }
+  // Tom de linha caída (busy tone brasileiro: 425Hz, 250ms on / 250ms off)
+  var _busyTimer = null;
+  function playBusyTone(cycles){
+    var ctx = getAudioCtx(); if (!ctx) return;
+    stopBusyTone();
+    var n = cycles || 6;
+    var t0 = ctx.currentTime + 0.05;
+    for (var i = 0; i < n; i++){
+      tone(ctx, 425, t0 + i*0.5, 0.25, 'sine', 0.18);
+    }
+  }
+  function stopBusyTone(){
+    if (_busyTimer){ clearTimeout(_busyTimer); _busyTimer = null; }
+  }
 
   function buildCheckoutUrl(base){
     var qs = window.location.search;
@@ -1110,8 +1124,11 @@
     stopRingtone();
     track('ligacao_recusada');
     show('status');
-    setStatus('chamada recusada', false);
-    setTimeout(function(){ goToLock('💬','Tudo bem, vou te explicar por aqui'); }, 900);
+    setStatus('ligação falhou', false);
+    // toque característico de linha caída (pi pi pi…)
+    getAudioCtx();
+    playBusyTone(6); // ~3s de busy tone
+    setTimeout(function(){ goToLock('💬','Tudo bem, vou te explicar por aqui'); }, 3400);
   });
 
   function setStatus(text, pulsing){
@@ -1180,12 +1197,26 @@
           el, Math.round(item.seconds*1000) + 4000, formatDuration(item.seconds),
           function(){
             track('audio_'+n+'_iniciado');
+            // Score push: dispara ANTES do áudio 03b terminar,
+            // sincronizado com a fala "vou te mandar agora".
+            if (index === 3){
+              var pushFired = false;
+              var onTU = function(){
+                var d = el.duration && isFinite(el.duration) ? el.duration : item.seconds;
+                if (!pushFired && el.currentTime >= d - 0.6){
+                  pushFired = true;
+                  el.removeEventListener('timeupdate', onTU);
+                  resumeIndex = index + 1;
+                  showScorePush();
+                }
+              };
+              el.addEventListener('timeupdate', onTU);
+            }
           },
           function(){
             track('audio_'+n+'_concluido');
-            // Ao terminar o áudio 3 completo (03b, index=3),
-            // dispara a notificação permanente do Score.
             if (index === 3){
+              // O push já apareceu perto do fim; se por algum motivo não caiu, garante:
               resumeIndex = index + 1;
               showScorePush();
               return;
