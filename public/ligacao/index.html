@@ -1037,107 +1037,90 @@
   function returnToChat(){
     track('score_push_voltou_conversa');
     show('chat');
-  }
-
-
-
-  function showDiagnostic(){
-    addTextBubble('Qual dessas situações mais acontece com você?');
-    addQuickReplies([
-      { key:'esforco_sem_visibilidade', label:'Trabalho muito, mas não sei onde estou errando.',
-        reply:'Isso é clássico — esforço sem visibilidade. O Score separa exatamente isso: mostra se o problema é quantidade de atividade ou qualidade da conversão.' },
-      { key:'rotina', label:'Tenho dificuldade em manter uma rotina.',
-        reply:'Faz sentido. Por isso o registro é de 2 minutos por dia — pouco atrito, e o app monta a rotina por você.' },
-      { key:'conversao', label:'Faço oportunidades, mas converto pouco.',
-        reply:'Aí o gargalo normalmente está entre reunião e proposta, ou proposta e fechamento. O Score aponta exatamente onde.' },
-      { key:'so_conhecer', label:'Só quero conhecer o Score Comercial.',
-        reply:'Sem problema, vou direto ao ponto então.' }
-    ].map(function(opt){
-      return {
-        label: opt.label,
-        onClick: function(){
-          track('dor_selecionada', {dor: opt.key});
-          typingThenRun(800, function(){
-            addTextBubble(opt.reply);
-            typingThenRun(1000, showBranchQuestion);
-          });
-        }
-      };
-    }));
-  }
-
-  function showBranchQuestion(){
-    addTextBubble('Quer ver como funciona ou já ir direto pros planos?');
-    addQuickReplies([
-      { label:'Quero ver como funciona', onClick: function(){
-          track('demonstracao_iniciada');
-          typingThenRun(700, function(){
-            addTextBubble('Show, vamos simular rapidinho — 3 perguntas.');
-            typingThenRun(900, runSimulation);
-          });
-        }
-      },
-      { label:'Quero ir direto aos planos', onClick: function(){
-          typingThenRun(700, function(){
-            addTextBubble('Fechado, aqui estão os planos:');
-            typingThenRun(500, function(){ addPriceCard(); });
-          });
-        }
-      }
-    ]);
-  }
-
-  function runSimulation(){
-    addTextBubble('Qual sua meta de vendas por mês?');
-    addQuickReplies([
-      {label:'Até R$ 20 mil', onClick:function(){ askOportunidades(); }},
-      {label:'R$ 20 mil – 50 mil', onClick:function(){ askOportunidades(); }},
-      {label:'R$ 50 mil – 100 mil', onClick:function(){ askOportunidades(); }},
-      {label:'Acima de R$ 100 mil', onClick:function(){ askOportunidades(); }}
-    ]);
-  }
-
-  function askOportunidades(){
-    typingThenRun(700, function(){
-      addTextBubble('Quantas oportunidades você gera por semana?');
-      addQuickReplies([
-        {label:'1 a 3', onClick:function(){ askFollowup(-15); }},
-        {label:'4 a 8', onClick:function(){ askFollowup(0); }},
-        {label:'9 a 15', onClick:function(){ askFollowup(10); }},
-        {label:'Mais de 15', onClick:function(){ askFollowup(15); }}
-      ]);
-    });
-  }
-
-  function askFollowup(oportunidadesPeso){
-    typingThenRun(700, function(){
-      addTextBubble('Você registra seus follow-ups?');
-      addQuickReplies([
-        {label:'Sempre', onClick:function(){ finishSimulation(oportunidadesPeso, 20, 'sempre'); }},
-        {label:'Às vezes', onClick:function(){ finishSimulation(oportunidadesPeso, 0, 'as_vezes'); }},
-        {label:'Nunca', onClick:function(){ finishSimulation(oportunidadesPeso, -20, 'nunca'); }}
-      ]);
-    });
-  }
-
-  function finishSimulation(oportunidadesPeso, followupPeso, followupKey){
-    var score = Math.min(100, Math.max(0, 50 + oportunidadesPeso + followupPeso));
-    var risco;
-    if (followupKey === 'nunca'){
-      risco = 'seu principal risco parece estar na falta de acompanhamento dos follow-ups.';
-    } else if (oportunidadesPeso < 0){
-      risco = 'seu principal risco parece estar na geração de oportunidades.';
-    } else {
-      risco = 'seu principal risco parece estar na constância da rotina de registro.';
+    // Retoma a sequência de áudios do ponto onde parou (após áudio 03b)
+    if (resumeIndex !== null){
+      var idx = resumeIndex; resumeIndex = null;
+      playAudioSequence(idx);
     }
+  }
+
+  // ---------- Fechamento: CTA + dúvidas ----------
+  function showClosingMenu(){
+    addTextBubble('resumindo: o score comercial mede seu dia em 2 minutos e mostra exatamente onde ajustar. sem planilha, sem mistério.');
+    typingThenRun(1000, function(){
+      addTextBubble('bora fechar agora ou tem alguma dúvida antes?');
+      addQuickReplies([
+        { label:'quero fechar agora', onClick:function(){
+            track('cta_fechar_direto');
+            typingThenRun(700, function(){
+              addTextBubble('perfeito. dá uma olhada nos planos:');
+              typingThenRun(500, function(){ addPriceCard(); });
+            });
+          }
+        },
+        { label:'tenho uma dúvida', onClick:function(){
+            track('cta_tirar_duvida');
+            askQuestions();
+          }
+        }
+      ]);
+    });
+  }
+
+  function askQuestions(){
+    typingThenRun(800, function(){
+      addTextBubble('claro, qual dessas é a sua dúvida?');
+      addQuickReplies([
+        { label:'como funciona o registro do dia?', onClick:function(){
+            track('duvida', {q:'registro'});
+            answerAndOffer('é bem simples: você abre o app 1x por dia (leva 1 a 2 min) e informa suas ligações, whatsapps, reuniões, propostas e vendas do dia. o score é calculado automaticamente e o app já te mostra qual etapa do funil tá te travando.');
+          }
+        },
+        { label:'preciso instalar algum programa?', onClick:function(){
+            track('duvida', {q:'instalacao'});
+            answerAndOffer('não precisa instalar nada. o score comercial roda no navegador do celular e do computador. você entra com email e senha, igual whatsapp web. também dá pra salvar o atalho na tela inicial do celular pra abrir mais rápido.');
+          }
+        },
+        { label:'e se eu não gostar depois?', onClick:function(){
+            track('duvida', {q:'garantia'});
+            answerAndOffer('sem fidelidade. no plano mensal você cancela a qualquer momento com 1 clique. no semestral, se em 15 dias não fizer sentido, eu devolvo o valor integral, sem burocracia.');
+          }
+        },
+        { label:'já tenho planilha, consigo importar?', onClick:function(){
+            track('duvida', {q:'importar'});
+            answerAndOffer('consegue sim. o app tem importação de excel/csv — você sobe sua planilha atual e ele mapeia as colunas automaticamente. também dá pra baixar um modelo pronto pra preencher.');
+          }
+        }
+      ]);
+    });
+  }
+
+  function answerAndOffer(text){
     typingThenRun(900, function(){
-      addTextBubble('Score preliminar: '+score+'/100. '+risco);
-      addTextBubble('⚠️ isso é uma simulação simplificada — no app completo o cálculo considera toda a sua rotina.');
-      typingThenRun(900, function(){ addPriceCard(score, 'score preliminar da simulação'); });
+      addTextBubble(text);
+      typingThenRun(1000, function(){
+        addTextBubble('resolveu? quer fechar agora ou tem mais alguma dúvida?');
+        addQuickReplies([
+          { label:'agora sim, quero fechar', onClick:function(){
+              track('cta_fechar_pos_duvida');
+              typingThenRun(600, function(){
+                addTextBubble('boa. escolhe seu plano:');
+                typingThenRun(400, function(){ addPriceCard(); });
+              });
+            }
+          },
+          { label:'tenho outra dúvida', onClick:function(){
+              track('duvida_extra');
+              askQuestions();
+            }
+          }
+        ]);
+      });
     });
   }
 
 })();
+
 </script>
 </body>
 </html>
