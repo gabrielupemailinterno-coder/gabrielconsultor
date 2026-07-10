@@ -114,9 +114,29 @@ Deno.serve(async (req) => {
       accessMode = (mentee.access_mode as any) ?? "full";
     }
 
-    // Pricing rules
+    // Pricing rules — prefer DB-defined plan (server-side), fallback to legacy BASE_PRICE
     let installments = 3;
     let chargeValue = BASE_PRICE;
+    let planName: string | null = null;
+    let planDurationMonths: number | null = null;
+    let planTotalMeetings: number | null = null;
+    try {
+      const { data: planRow } = await supabase
+        .from("mentorship_plans")
+        .select("name, price_cents, installments, duration_months, total_meetings")
+        .eq("slug", resolvedOfferSlug)
+        .eq("active", true)
+        .maybeSingle();
+      if (planRow?.price_cents && planRow?.installments) {
+        chargeValue = +(Number(planRow.price_cents) / 100 / Number(planRow.installments)).toFixed(2);
+        installments = Number(planRow.installments);
+        planName = planRow.name ?? null;
+        planDurationMonths = Number(planRow.duration_months ?? 0) || null;
+        planTotalMeetings = Number(planRow.total_meetings ?? 0) || null;
+      }
+    } catch (e) {
+      console.warn("plan lookup failed, using legacy pricing", e);
+    }
     if (accessMode === "trial_then_paid") {
       installments = 2;
       chargeValue = BASE_PRICE;
