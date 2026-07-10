@@ -247,6 +247,12 @@
   .wave-fill{position:absolute;top:0;left:0;bottom:0;width:0%;overflow:hidden;transition:width .12s linear;}
   .wave-fill .wave span{background:#53bdeb;}
   .audio-duration{font-size:10.5px;color:rgba(233,237,239,.55);flex-shrink:0;font-variant-numeric:tabular-nums;}
+  .audio-speed{background:rgba(255,255,255,.08);border:none;color:rgba(233,237,239,.75);
+    font-size:10.5px;font-weight:700;font-family:var(--font-ui);
+    padding:3px 7px;border-radius:10px;cursor:pointer;flex-shrink:0;line-height:1;
+    transition:background .15s ease,color .15s ease;}
+  .audio-speed:hover{background:rgba(255,255,255,.14);}
+  .audio-speed.active{background:rgba(83,189,235,.22);color:#53bdeb;}
 
   /* quick replies (mantido) */
   .quick-replies{display:flex;flex-direction:column;gap:8px;margin-top:6px;width:100%;}
@@ -919,6 +925,7 @@
           '<div class="wave">'+bars+'</div>' +
           '<div class="wave-fill"><div class="wave">'+bars+'</div></div>' +
         '</div>' +
+        '<button class="audio-speed" aria-label="Velocidade">1x</button>' +
         '<span class="audio-duration">'+durationLabel+'</span>' +
       '</div>';
     chatBody.appendChild(row);
@@ -928,10 +935,22 @@
 
     var bubble = row.querySelector('.audio-bubble');
     var playBtn = row.querySelector('.play-btn');
+    var speedBtn = row.querySelector('.audio-speed');
     var fill = row.querySelector('.wave-fill');
     var durEl = row.querySelector('.audio-duration');
     var totalSec = Math.max(1, Math.round(fallbackMs/1000));
     var played = false, rafId = null;
+
+    var SPEEDS = [1, 1.5, 2];
+    var spIdx = 0;
+    speedBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      spIdx = (spIdx + 1) % SPEEDS.length;
+      var v = SPEEDS[spIdx];
+      try { audioEl.playbackRate = v; } catch(err){}
+      speedBtn.textContent = (v === 1 ? '1x' : (v === 1.5 ? '1.5x' : '2x'));
+      speedBtn.classList.toggle('active', v !== 1);
+    });
 
     attachLongPress(bubble, function(){ return '[áudio]'; });
 
@@ -1102,22 +1121,30 @@
   document.getElementById('btnAnswer').addEventListener('click', function(){
     stopRingtone();
     track('ligacao_atendida');
-    // Pré-carrega áudios e vai direto pro chat, iniciando o áudio 1 automaticamente
+    // Pré-carrega áudios (gesto do usuário destrava o playback)
     AUDIO_FILES.forEach(function(item){
       var el = document.getElementById(item.id);
       if (!el.src) el.src = item.src;
     });
-    // Tenta destravar o playback com um "kick" no primeiro áudio (gesto do usuário)
     try {
       var oi = document.getElementById('audio-oi');
       oi.load();
       var pk = oi.play();
       if (pk && pk.then) pk.then(function(){ oi.pause(); oi.currentTime = 0; }).catch(function(){});
     } catch(e){}
-    show('chat');
-    chatBody.innerHTML = '';
-    dateSepInserted = false; lastAuthor = null;
-    playAudioSequence(0);
+
+    // UX de "não conectou": conectando… → falha → busy tone → cai pro lock com notificação
+    getAudioCtx();
+    show('status');
+    setStatus('conectando…', true);
+    setTimeout(function(){
+      setStatus('chamada não conectou', false);
+      track('ligacao_nao_conectou');
+      playBusyTone(6); // ~3s pi-pi-pi
+      setTimeout(function(){
+        goToLock('🎤','mensagem de voz');
+      }, 3200);
+    }, 1600);
   });
 
   document.getElementById('btnDecline').addEventListener('click', function(){
