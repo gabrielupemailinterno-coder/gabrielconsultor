@@ -742,7 +742,7 @@
     });
   }
 
-  // Score-app: steppers, salvar, voltar
+  // Score-app: steppers +/− em todos os campos numéricos
   document.querySelectorAll('.screen-scoreapp .sa-stepper').forEach(function(st){
     var span = st.querySelector('span');
     st.querySelectorAll('button').forEach(function(b){
@@ -750,21 +750,43 @@
         var v = parseInt(span.textContent, 10) || 0;
         v = b.dataset.op === '+' ? v + 1 : Math.max(0, v - 1);
         span.textContent = v;
+        updateScorePreview();
       });
     });
   });
 
-  document.getElementById('btnScoreSave').addEventListener('click', function(){
+  function readScoreVals(){
     var vals = {};
     document.querySelectorAll('.screen-scoreapp .sa-stepper').forEach(function(st){
       vals[st.dataset.key] = parseInt(st.querySelector('span').textContent, 10) || 0;
     });
-    var total = (vals.lig||0) + (vals.reu||0)*3 + (vals.prop||0)*4 + (vals.fup||0)*2;
-    var score = Math.min(100, Math.max(0, 30 + total * 3));
+    return vals;
+  }
+  function computeSimScore(vals){
+    // pesos aproximados do cálculo real (calc.ts computeDayScore)
+    var ativ = (vals.lig||0) + (vals.wpp||0);
+    var vol = Math.min(1, ativ/40) * 30;
+    var prosp = Math.min(1, (vals.pros||0)/5) * 15;
+    var reun = Math.min(1, (vals.reu||0)/2) * 20;
+    var fech = (vals.ven||0) > 0 ? 35 : (vals.prop||0) > 0 ? 15 : (vals.apres||0) > 0 ? 8 : 0;
+    return Math.round(vol + prosp + reun + fech);
+  }
+  function updateScorePreview(){
+    var s = computeSimScore(readScoreVals());
+    var el = document.getElementById('saScorePreview');
+    if (el) el.textContent = s;
+    var lb = document.getElementById('saScoreLabel');
+    if (lb) lb.textContent = s < 30 ? 'Fraco' : s < 55 ? 'Regular' : s < 75 ? 'Bom' : s < 90 ? 'Ótimo' : 'Excelente';
+    var bar = document.getElementById('saScoreBar');
+    if (bar) bar.style.width = Math.min(100, s) + '%';
+  }
+
+  document.getElementById('btnScoreSave').addEventListener('click', function(){
+    var score = computeSimScore(readScoreVals());
     track('score_simulado_registrado', {score: score});
     var toast = document.getElementById('scoreToast');
-    toast.innerHTML = '<div class="sa-toast">✓ registro salvo. seu score de hoje: <strong>'+score+'/100</strong>.</div>';
-    setTimeout(function(){ returnToChat(); }, 1600);
+    toast.innerHTML = '<div class="sa-toast">✓ dia registrado. score de hoje: <strong>'+score+'/100</strong>. voltando pra conversa…</div>';
+    setTimeout(function(){ returnToChat(); }, 1800);
   });
 
   document.getElementById('btnScoreBack').addEventListener('click', returnToChat);
@@ -772,11 +794,8 @@
   function returnToChat(){
     track('score_push_voltou_conversa');
     show('chat');
-    if (pausedAudio){
-      try { pausedAudio.play(); } catch(e){}
-      pausedAudio = null;
-    }
   }
+
 
 
   function showDiagnostic(){
