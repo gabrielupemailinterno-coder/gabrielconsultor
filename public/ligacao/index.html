@@ -390,7 +390,8 @@
 
 <audio id="audio-oi" preload="none"></audio>
 <audio id="audio-02" preload="none"></audio>
-<audio id="audio-03" preload="none"></audio>
+<audio id="audio-03a" preload="none"></audio>
+<audio id="audio-03b" preload="none"></audio>
 <audio id="audio-04" preload="none"></audio>
 
 <script>
@@ -399,11 +400,14 @@
 
   // ===== CONFIGURÁVEIS =========================================
   var AUDIO_FILES = [
-    { id:'audio-oi', src:'/ligacao/audio/a1.m4a', seconds:16.4 },
-    { id:'audio-02', src:'/ligacao/audio/a2.m4a', seconds:31.8 },
-    { id:'audio-03', src:'/ligacao/audio/a3.m4a', seconds:35.3 },
-    { id:'audio-04', src:'/ligacao/audio/a4.m4a', seconds:26.2 }
+    { id:'audio-oi',  src:'/ligacao/audio/audio-oi.m4a',  seconds:16.5 },
+    { id:'audio-02',  src:'/ligacao/audio/audio-02.m4a',  seconds:31.8 },
+    { id:'audio-03a', src:'/ligacao/audio/audio-03a.m4a', seconds:25.9 },
+    { id:'audio-03b', src:'/ligacao/audio/audio-03b.m4a', seconds:7.1  },
+    { id:'audio-04',  src:'/ligacao/audio/audio-04.m4a',  seconds:26.2 }
   ];
+  // Índice do áudio que dispara a notificação do Score (0-based). audio-03a.
+  var SCORE_PUSH_AT = 2;
   var CHECKOUT_URL_MENSAL    = "https://gabrielconsultor.com/conhecascoreapp";
   var CHECKOUT_URL_SEMESTRAL = "https://gabrielconsultor.com/conhecascoreapp";
 
