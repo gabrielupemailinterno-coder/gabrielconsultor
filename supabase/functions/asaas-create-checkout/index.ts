@@ -25,10 +25,13 @@ Deno.serve(async (req) => {
       state,
       mentee_id,
       plan_slug = "mentoria-comercial-3m",
+      offer_slug,
+      onboarding,
       terms_accepted,
       terms_version,
       partner_code,
     } = await req.json();
+    const resolvedOfferSlug: string = String(offer_slug || plan_slug || "mentoria-comercial-3m");
 
     const missing: string[] = [];
     if (!name) missing.push("nome");
