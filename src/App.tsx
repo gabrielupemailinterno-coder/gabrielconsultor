@@ -65,6 +65,7 @@ function AppRoutes() {
       {/* Landing pública */}
       <Route path="/" element={<Index />} />
       <Route path="/mentoria-profissional" element={<MentoriaProfissional />} />
+      <Route path="/checkout/mentoria" element={<CheckoutMentoria />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/escola" element={<EscolaLanding />} />
