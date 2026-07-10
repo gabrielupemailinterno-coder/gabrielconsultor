@@ -547,6 +547,42 @@ export type Database = {
         }
         Relationships: []
       }
+      escola_profiles: {
+        Row: {
+          accepted_terms_at: string | null
+          created_at: string
+          email: string
+          full_name: string
+          lead_origin: string | null
+          phone: string | null
+          phone_normalized: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accepted_terms_at?: string | null
+          created_at?: string
+          email: string
+          full_name?: string
+          lead_origin?: string | null
+          phone?: string | null
+          phone_normalized?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accepted_terms_at?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          lead_origin?: string | null
+          phone?: string | null
+          phone_normalized?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       homework_tasks: {
         Row: {
           completed: boolean
@@ -2331,7 +2367,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user" | "mentee" | "scoreapp_user" | "partner"
+      app_role:
+        | "admin"
+        | "user"
+        | "mentee"
+        | "scoreapp_user"
+        | "partner"
+        | "escola_user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2459,7 +2501,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user", "mentee", "scoreapp_user", "partner"],
+      app_role: [
+        "admin",
+        "user",
+        "mentee",
+        "scoreapp_user",
+        "partner",
+        "escola_user",
+      ],
     },
   },
 } as const

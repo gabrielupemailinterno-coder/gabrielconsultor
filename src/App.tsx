@@ -12,6 +12,12 @@ import Admin from "./pages/Admin";
 import MentoriaProfissional from "./pages/MentoriaProfissional";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import EscolaLanding from "./pages/escola/Landing";
+import EscolaSignup from "./pages/escola/Signup";
+import EscolaLogin from "./pages/escola/Login";
+import EscolaConteudos from "./pages/escola/Conteudos";
+import EscolaConteudoDetalhe from "./pages/escola/ConteudoDetalhe";
+import { EscolaGuard } from "./pages/escola/EscolaGuard";
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import Parceiros from "./pages/Parceiros";
 import SimuladorUP from "./pages/SimuladorUP";
@@ -59,6 +65,11 @@ function AppRoutes() {
       <Route path="/mentoria-profissional" element={<MentoriaProfissional />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
+      <Route path="/escola" element={<EscolaLanding />} />
+      <Route path="/escola/cadastro" element={<EscolaSignup />} />
+      <Route path="/escola/login" element={<EscolaLogin />} />
+      <Route path="/escola/conteudos" element={<EscolaGuard><EscolaConteudos /></EscolaGuard>} />
+      <Route path="/escola/conteudos/:slug" element={<EscolaGuard><EscolaConteudoDetalhe /></EscolaGuard>} />
       <Route path="/associadoacidel" element={<Parceiros />} />
       <Route path="/parceiros" element={<Navigate to="/associadoacidel" replace />} />
       <Route path="/simulador-up" element={<SimuladorUP />} />
