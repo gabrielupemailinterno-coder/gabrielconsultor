@@ -694,7 +694,7 @@
         el, Math.round(item.seconds*1000) + 4000, formatDuration(item.seconds),
         function(){
           track('audio_'+n+'_iniciado');
-          if (n === 3) scheduleScorePush(el);
+          if (index === SCORE_PUSH_AT) scheduleScorePush(el);
         },
         function(){
           track('audio_'+n+'_concluido');
@@ -704,13 +704,12 @@
     });
   }
 
-  // ---------- Push notification "Score Comercial" durante áudio 3 ----------
+  // ---------- Push notification "Score Comercial" durante áudio 3a ----------
   var scorePushShown = false;
-  var pausedAudio = null;
 
   function scheduleScorePush(audioEl){
     if (scorePushShown) return;
-    // dispara ~9s depois do áudio 3 começar (meio do áudio)
+    // dispara ~9s depois do áudio começar
     setTimeout(function(){ showScorePush(audioEl); }, 9000);
   }
 
@@ -738,8 +737,7 @@
       clearTimeout(autoHide);
       notif.remove();
       track('score_push_aberto');
-      // pausa o áudio da conversa
-      try { audioEl.pause(); pausedAudio = audioEl; } catch(e){}
+      // NÃO pausa o áudio — continua tocando enquanto a pessoa vê o app
       show('scoreapp');
     });
   }
