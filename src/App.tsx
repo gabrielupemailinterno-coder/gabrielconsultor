@@ -35,6 +35,7 @@ import ScorePerfil from "./pages/scoreapp/Perfil";
 import ScorePlanos from "./pages/scoreapp/Planos";
 import ScoreCheckoutPix from "./pages/scoreapp/CheckoutPix";
 import ScoreSignup from "./pages/scoreapp/Signup";
+import ScoreBemVindo from "./pages/scoreapp/BemVindo";
 import RedirectPartnerLink from "./pages/RedirectPartnerLink";
 import PartnerDashboard from "./pages/parceiro/PartnerDashboard";
 import Entrar from "./pages/Entrar";
