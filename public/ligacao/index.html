@@ -832,6 +832,7 @@
   });
 
   document.getElementById('btnDecline').addEventListener('click', function(){
+    stopRingtone();
     track('ligacao_recusada');
     show('status');
     setStatus('chamada recusada', false);
