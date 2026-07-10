@@ -322,76 +322,101 @@
   .push-title span:last-child{font-size:10.5px;color:var(--ink-faint);font-weight:500;}
   .push-msg{font-size:13.5px;line-height:1.35;color:var(--ink);}
 
-  /* ---------- Score app mock (fiel à plataforma real) ---------- */
-  .screen-scoreapp{background:#0b0d12;z-index:15;}
+  /* ---------- Score app mock (visual do app real /app/score) ---------- */
+  .screen-scoreapp{
+    --sim-primary:#e07a3d;         /* hsl(20 78% 58%) — terracota do app */
+    --sim-primary-strong:#c4632d;
+    --sim-bg:#241a15;              /* hsl(12 35% 11%) */
+    --sim-card:#2e211b;            /* hsl(12 30% 15%) */
+    --sim-input:#3a2a22;           /* hsl(12 25% 20%) */
+    --sim-border:rgba(224,122,61,.22);
+    --sim-border-soft:rgba(255,255,255,.06);
+    --sim-ink:#f8ede3;             /* hsl(30 30% 96%) */
+    --sim-ink-dim:#c7b8ac;         /* hsl(25 15% 72%) */
+    background:var(--sim-bg);z-index:15;color:var(--sim-ink);
+    font-family:'Inter',var(--font-ui);
+  }
   .screen-scoreapp .content{padding:0;}
   .sa-header{display:flex;align-items:center;gap:12px;padding:14px 16px 12px;
-    border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;background:#0f1218;}
-  .sa-back{background:rgba(255,255,255,.06);border:none;color:var(--ink);width:32px;height:32px;
+    border-bottom:1px solid var(--sim-border-soft);flex-shrink:0;background:rgba(0,0,0,.18);}
+  .sa-back{background:rgba(255,255,255,.06);border:none;color:var(--sim-ink);width:32px;height:32px;
     border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
   .sa-back svg{width:16px;height:16px;}
   .sa-brand{flex:1;display:flex;align-items:center;gap:10px;min-width:0;}
-  .sa-logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#c99433);
-    color:var(--gold-ink);display:flex;align-items:center;justify-content:center;
+  .sa-logo{width:32px;height:32px;border-radius:9px;
+    background:linear-gradient(135deg,var(--sim-primary),var(--sim-primary-strong));
+    color:#fff;display:flex;align-items:center;justify-content:center;
     font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.02em;}
   .sa-brand-txt{display:flex;flex-direction:column;line-height:1.15;min-width:0;}
-  .sa-brand-txt strong{font-family:var(--font-display);font-size:14px;font-weight:600;}
-  .sa-brand-txt small{font-size:11px;color:var(--ink-dim);}
-  .sa-avatar{width:30px;height:30px;border-radius:50%;background:#232936;color:var(--ink);
+  .sa-brand-txt strong{font-family:'Libre Baskerville',Georgia,serif;font-size:14px;font-weight:600;}
+  .sa-brand-txt small{font-size:11px;color:var(--sim-ink-dim);}
+  .sa-avatar{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.08);color:var(--sim-ink);
     display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;}
 
-  .sa-body{flex:1;overflow-y:auto;padding:16px 14px 26px;display:flex;flex-direction:column;gap:14px;
+  .sa-body{flex:1;overflow-y:auto;padding:20px 16px 32px;display:flex;flex-direction:column;gap:14px;
     scrollbar-width:none;}
   .sa-body::-webkit-scrollbar{display:none;}
 
-  .sa-hero{background:linear-gradient(135deg,rgba(231,184,78,.18) 0%,rgba(231,184,78,.04) 100%);
-    border:1px solid rgba(231,184,78,.28);border-radius:18px;padding:16px;display:flex;gap:14px;align-items:stretch;}
-  .sa-hero-left{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;min-width:88px;}
-  .sa-eyebrow{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);font-weight:600;}
-  .sa-hero-num{font-family:var(--font-display);font-size:44px;font-weight:700;color:var(--gold);
-    line-height:1;letter-spacing:-.02em;margin-top:4px;}
-  .sa-hero-num small{font-size:14px;color:var(--ink-dim);font-weight:500;margin-left:2px;}
-  .sa-hero-label{margin-top:4px;font-size:12px;color:var(--gold);font-weight:600;text-transform:lowercase;}
-  .sa-hero-right{flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0;}
-  .sa-bar-track{width:100%;height:8px;background:rgba(255,255,255,.08);border-radius:6px;overflow:hidden;}
-  .sa-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),#f5cf7e);border-radius:6px;
-    transition:width .4s cubic-bezier(.2,.8,.2,1);}
-  .sa-hero-hint{font-size:11.5px;color:var(--ink-dim);line-height:1.4;}
+  /* Etapa 1 — Simule seu Check-in (padrão Registrar o dia) */
+  .sim-header{margin-bottom:6px;}
+  .sim-eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--sim-ink-dim);font-weight:600;}
+  .sim-title{margin:4px 0 0;font-family:'Libre Baskerville',Georgia,serif;font-weight:400;
+    font-size:26px;line-height:1.2;color:var(--sim-ink);}
+  .sim-card{background:var(--sim-card);border:1px solid var(--sim-border);border-radius:10px;
+    padding:20px 16px;display:flex;flex-direction:column;gap:16px;}
+  .sim-field{display:flex;flex-direction:column;gap:8px;}
+  .sim-field > label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--sim-ink-dim);font-weight:500;}
+  .sim-chip-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+  .sim-chip-row.triple{grid-template-columns:repeat(3,1fr);}
+  .sim-chip{background:var(--sim-input);border:1px solid transparent;color:var(--sim-ink);
+    border-radius:8px;padding:11px 8px;font-size:13px;font-weight:500;cursor:pointer;
+    font-family:inherit;transition:all .15s ease;line-height:1.2;text-align:center;}
+  .sim-chip:hover{background:rgba(224,122,61,.08);}
+  .sim-chip.active{background:rgba(224,122,61,.16);border-color:var(--sim-primary);
+    color:var(--sim-primary);font-weight:600;}
+  .sim-stepper{display:flex;align-items:center;background:var(--sim-input);
+    border:1px solid transparent;border-radius:8px;padding:6px 8px;}
+  .sim-stepper button{width:34px;height:34px;border-radius:6px;border:none;
+    background:transparent;color:var(--sim-primary);font-size:20px;font-weight:600;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;}
+  .sim-stepper button:active{background:rgba(224,122,61,.15);}
+  .sim-stepper .sim-num{flex:1;text-align:center;font-family:'IBM Plex Mono','Courier New',monospace;
+    font-size:22px;font-weight:500;color:var(--sim-ink);}
+  .sim-cta{background:var(--sim-primary);color:#fff;border:none;padding:16px;border-radius:6px;
+    font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;
+    font-family:inherit;width:100%;transition:background .15s ease;}
+  .sim-cta:hover{background:var(--sim-primary-strong);}
+  .sim-cta:active{transform:scale(.99);}
+  .sim-foot{margin:2px 0 0;font-size:11px;color:var(--sim-ink-dim);text-align:center;
+    line-height:1.5;}
 
-  .sa-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .sa-kpi{background:#131822;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:12px 14px;
-    display:flex;flex-direction:column;gap:6px;}
-  .sa-kpi span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);font-weight:600;}
-  .sa-kpi strong{font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--ink);}
-  .sa-kpi strong em{font-style:normal;font-size:11px;color:var(--ink-dim);font-weight:500;margin-left:2px;}
-  .sa-mini-bar{height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-top:2px;}
-  .sa-mini-bar div{height:100%;background:var(--gold);border-radius:4px;}
-  .sa-mini-hint{font-size:10.5px;color:var(--ink-dim);}
+  /* Etapa 2 — Revelação (padrão Recomendação da Semana) */
+  .sim-reveal{background:linear-gradient(135deg,rgba(224,122,61,.15) 0%,rgba(224,122,61,.05) 100%);
+    border:1px solid rgba(224,122,61,.3);border-radius:10px;padding:24px 20px;
+    display:flex;flex-direction:column;gap:14px;
+    animation:simRevealIn .5s cubic-bezier(.2,.9,.3,1.1) both;}
+  @keyframes simRevealIn{
+    from{opacity:0;transform:translateY(8px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  .sim-reveal-eyebrow{font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--sim-primary);font-weight:600;display:flex;align-items:center;gap:6px;}
+  .sim-reveal-eyebrow svg{width:12px;height:12px;}
+  .sim-score-num{font-family:'IBM Plex Mono','Courier New',monospace;font-weight:500;
+    font-size:64px;line-height:1;color:var(--sim-primary);letter-spacing:-.02em;margin:0;}
+  .sim-score-num small{font-size:20px;color:var(--sim-ink-dim);font-weight:400;margin-left:2px;}
+  .sim-diag{margin:0;font-family:'Libre Baskerville',Georgia,serif;font-weight:400;
+    font-size:20px;line-height:1.3;color:var(--sim-ink);}
+  .sim-mission{display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.45;
+    color:var(--sim-ink);}
+  .sim-mission svg{width:14px;height:14px;color:var(--sim-primary);flex-shrink:0;margin-top:3px;}
+  .sim-mission .sim-mission-lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--sim-primary);font-weight:600;margin-right:4px;}
+  .sim-disclaimer{font-size:11px;color:var(--sim-ink-dim);line-height:1.5;
+    padding:10px 12px;background:rgba(0,0,0,.15);border-radius:6px;}
 
-  .sa-card{background:#131822;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px 14px;}
-  .sa-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
-  .sa-card-head h3{margin:0;font-size:14px;font-weight:600;color:var(--ink);}
-  .sa-badge{background:rgba(231,184,78,.18);color:var(--gold);font-size:10px;font-weight:600;
-    padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.05em;}
-  .sa-hint{margin:0 0 12px;font-size:11.5px;color:var(--ink-dim);}
-  .sa-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .sa-field{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:12px;
-    padding:10px 10px 8px;display:flex;flex-direction:column;gap:6px;}
-  .sa-field label{font-size:11px;color:var(--ink-dim);font-weight:500;}
-  .sa-stepper{display:flex;align-items:center;justify-content:space-between;gap:6px;}
-  .sa-stepper button{width:26px;height:26px;border-radius:8px;border:1px solid rgba(231,184,78,.4);
-    background:transparent;color:var(--gold);font-size:15px;font-weight:600;cursor:pointer;line-height:1;
-    display:flex;align-items:center;justify-content:center;padding:0;}
-  .sa-stepper button:active{transform:scale(.92);background:rgba(231,184,78,.15);}
-  .sa-stepper span{font-family:var(--font-display);font-weight:600;font-size:16px;min-width:22px;
-    text-align:center;color:var(--ink);}
-  .sa-cta{background:var(--gold);color:var(--gold-ink);border:none;padding:15px;border-radius:14px;
-    font-size:14.5px;font-weight:700;cursor:pointer;font-family:var(--font-ui);width:100%;
-    box-shadow:0 8px 20px rgba(231,184,78,.25);}
-  .sa-cta:active{transform:scale(.985);}
-  .sa-toast{margin-top:2px;background:rgba(50,215,75,.14);border:1px solid rgba(50,215,75,.35);color:#8fd0a9;
-    border-radius:12px;padding:12px 14px;font-size:12.5px;text-align:center;animation:fadeIn .3s ease;}
-  .sa-foot{margin:2px 0 0;font-size:10.5px;color:var(--ink-faint);text-align:center;line-height:1.4;}
 
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important;}}
@@ -524,72 +549,63 @@
       </header>
 
       <div class="sa-body">
-        <!-- Hero: score do dia -->
-        <div class="sa-hero">
-          <div class="sa-hero-left">
-            <span class="sa-eyebrow">seu score de hoje</span>
-            <div class="sa-hero-num"><span id="saScorePreview">0</span><small>/100</small></div>
-            <span class="sa-hero-label" id="saScoreLabel">Fraco</span>
+        <!-- Etapa 1: mini check-in -->
+        <div id="simForm">
+          <div class="sim-header">
+            <span class="sim-eyebrow">Check-in de hoje</span>
+            <h1 class="sim-title">Simule seu Check-in</h1>
           </div>
-          <div class="sa-hero-right">
-            <div class="sa-bar-track"><div class="sa-bar-fill" id="saScoreBar" style="width:0%"></div></div>
-            <span class="sa-hero-hint">preencha os números do seu dia — o score atualiza em tempo real</span>
+          <div class="sim-card" style="margin-top:14px;">
+            <div class="sim-field">
+              <label>Meta de vendas por mês</label>
+              <div class="sim-chip-row" data-sim="meta">
+                <button type="button" class="sim-chip" data-val="1">até R$ 20k</button>
+                <button type="button" class="sim-chip active" data-val="2">R$ 20–50k</button>
+                <button type="button" class="sim-chip" data-val="3">R$ 50–100k</button>
+                <button type="button" class="sim-chip" data-val="4">R$ 100k+</button>
+              </div>
+            </div>
+
+            <div class="sim-field">
+              <label>Oportunidades geradas por semana</label>
+              <div class="sim-stepper" data-sim="opps">
+                <button type="button" data-op="-" aria-label="menos">−</button>
+                <span class="sim-num" id="simOpps">8</span>
+                <button type="button" data-op="+" aria-label="mais">+</button>
+              </div>
+            </div>
+
+            <div class="sim-field">
+              <label>Follow-up com quem não fechou</label>
+              <div class="sim-chip-row triple" data-sim="follow">
+                <button type="button" class="sim-chip" data-val="3">Sempre</button>
+                <button type="button" class="sim-chip active" data-val="2">Às vezes</button>
+                <button type="button" class="sim-chip" data-val="1">Quase nunca</button>
+              </div>
+            </div>
+
+            <button class="sim-cta" id="btnSimReveal">Ver meu score</button>
           </div>
+          <p class="sim-foot">simulação simplificada — o app real usa 8 indicadores e histórico dos últimos 30 dias.</p>
         </div>
 
-        <!-- KPIs do topo (mockados, dão contexto) -->
-        <div class="sa-kpi-grid">
-          <div class="sa-kpi"><span>meta do mês</span><strong>R$ 32.400 <em>/ 60.000</em></strong><div class="sa-mini-bar"><div style="width:54%"></div></div></div>
-          <div class="sa-kpi"><span>streak</span><strong>7 <em>dias</em></strong><div class="sa-mini-hint">🔥 não perca hoje</div></div>
-        </div>
-
-        <!-- Registro do dia -->
-        <div class="sa-card">
-          <div class="sa-card-head">
-            <h3>registro do dia</h3>
-            <span class="sa-badge">hoje</span>
-          </div>
-          <p class="sa-hint">toque nos + e − para preencher cada indicador</p>
-
-          <div class="sa-grid">
-            <div class="sa-field">
-              <label>Ligações</label>
-              <div class="sa-stepper" data-key="lig"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>WhatsApps</label>
-              <div class="sa-stepper" data-key="wpp"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>Novos leads</label>
-              <div class="sa-stepper" data-key="pros"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>Contatos efetivos</label>
-              <div class="sa-stepper" data-key="cont"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>Reuniões</label>
-              <div class="sa-stepper" data-key="reu"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>Apresentações</label>
-              <div class="sa-stepper" data-key="apres"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>Propostas</label>
-              <div class="sa-stepper" data-key="prop"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>Vendas</label>
-              <div class="sa-stepper" data-key="ven"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
+        <!-- Etapa 2: revelação -->
+        <div id="simReveal" hidden>
+          <div class="sim-reveal">
+            <span class="sim-reveal-eyebrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>
+              Seu score preliminar
+            </span>
+            <p class="sim-score-num"><span id="simScoreNum">0</span><small>/100</small></p>
+            <h2 class="sim-diag" id="simDiag">Seu gargalo é volume de prospecção</h2>
+            <p class="sim-mission">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              <span><span class="sim-mission-lbl">Missão:</span><span id="simMissao">dobrar as oportunidades geradas por semana nos próximos 14 dias.</span></span>
+            </p>
+            <p class="sim-disclaimer">Simulação simplificada. No Score Comercial real, o cálculo cruza 8 indicadores diários com sua meta e mostra o funil de conversão completo.</p>
+            <button class="sim-cta" id="btnSimPlanos">Ver planos</button>
           </div>
         </div>
-
-        <button class="sa-cta" id="btnScoreSave">salvar check-in de hoje</button>
-        <div id="scoreToast"></div>
-        <p class="sa-foot">no app completo você também importa planilha, vê funil de conversão e recebe diagnóstico automático.</p>
       </div>
     </div>
   </section>
@@ -1246,54 +1262,108 @@
   }
 
 
-  // Score-app: steppers +/− em todos os campos numéricos
-  document.querySelectorAll('.screen-scoreapp .sa-stepper').forEach(function(st){
-    var span = st.querySelector('span');
-    st.querySelectorAll('button').forEach(function(b){
-      b.addEventListener('click', function(){
-        var v = parseInt(span.textContent, 10) || 0;
-        v = b.dataset.op === '+' ? v + 1 : Math.max(0, v - 1);
-        span.textContent = v;
-        updateScorePreview();
+  // ---------- Simulação do Score (mini check-in + reveal) ----------
+  var simState = { meta: 2, opps: 8, follow: 2 };
+
+  // chips (meta + follow)
+  document.querySelectorAll('.screen-scoreapp .sim-chip-row').forEach(function(row){
+    var key = row.dataset.sim;
+    row.querySelectorAll('.sim-chip').forEach(function(chip){
+      chip.addEventListener('click', function(){
+        row.querySelectorAll('.sim-chip').forEach(function(c){ c.classList.remove('active'); });
+        chip.classList.add('active');
+        simState[key] = parseInt(chip.dataset.val, 10) || 0;
       });
     });
   });
 
-  function readScoreVals(){
-    var vals = {};
-    document.querySelectorAll('.screen-scoreapp .sa-stepper').forEach(function(st){
-      vals[st.dataset.key] = parseInt(st.querySelector('span').textContent, 10) || 0;
+  // stepper (opps)
+  (function(){
+    var stepper = document.querySelector('.screen-scoreapp .sim-stepper[data-sim="opps"]');
+    if (!stepper) return;
+    var span = document.getElementById('simOpps');
+    stepper.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        var v = parseInt(span.textContent, 10) || 0;
+        v = b.dataset.op === '+' ? Math.min(99, v + 1) : Math.max(0, v - 1);
+        span.textContent = v;
+        simState.opps = v;
+      });
     });
-    return vals;
-  }
-  function computeSimScore(vals){
-    // pesos aproximados do cálculo real (calc.ts computeDayScore)
-    var ativ = (vals.lig||0) + (vals.wpp||0);
-    var vol = Math.min(1, ativ/40) * 30;
-    var prosp = Math.min(1, (vals.pros||0)/5) * 15;
-    var reun = Math.min(1, (vals.reu||0)/2) * 20;
-    var fech = (vals.ven||0) > 0 ? 35 : (vals.prop||0) > 0 ? 15 : (vals.apres||0) > 0 ? 8 : 0;
-    return Math.round(vol + prosp + reun + fech);
-  }
-  function updateScorePreview(){
-    var s = computeSimScore(readScoreVals());
-    var el = document.getElementById('saScorePreview');
-    if (el) el.textContent = s;
-    var lb = document.getElementById('saScoreLabel');
-    if (lb) lb.textContent = s < 30 ? 'Fraco' : s < 55 ? 'Regular' : s < 75 ? 'Bom' : s < 90 ? 'Ótimo' : 'Excelente';
-    var bar = document.getElementById('saScoreBar');
-    if (bar) bar.style.width = Math.min(100, s) + '%';
+  })();
+
+  function computeSimScore(s){
+    // opps 0-50 (satura em 30/sem), follow 0-30, alinhamento meta×opps 0-20
+    var oppsPart = Math.min(1, s.opps / 30) * 50;
+    var followPart = ((s.follow - 1) / 2) * 30;    // 1→0, 2→15, 3→30
+    // meta agressiva sem opps suficiente = penaliza alinhamento
+    var oppsNeededByMeta = [0, 5, 12, 22, 35][s.meta] || 12;
+    var alignRatio = Math.min(1, s.opps / oppsNeededByMeta);
+    var alignPart = alignRatio * 20;
+    return Math.max(0, Math.round(oppsPart + followPart + alignPart));
   }
 
-  document.getElementById('btnScoreSave').addEventListener('click', function(){
-    var score = computeSimScore(readScoreVals());
-    track('score_simulado_registrado', {score: score});
-    var toast = document.getElementById('scoreToast');
-    toast.innerHTML = '<div class="sa-toast">✓ dia registrado. score de hoje: <strong>'+score+'/100</strong>. voltando pra conversa…</div>';
-    setTimeout(function(){ returnToChat(); }, 1800);
+  function diagnose(s){
+    var oppsNeededByMeta = [0, 5, 12, 22, 35][s.meta] || 12;
+    if (s.follow <= 1) return {
+      gargalo: 'Seu gargalo é follow-up',
+      missao: 'nos próximos 7 dias, retomar contato com todos os leads que não responderam nos últimos 30 dias.'
+    };
+    if (s.opps < oppsNeededByMeta * 0.6) return {
+      gargalo: 'Seu gargalo é volume de prospecção',
+      missao: 'dobrar as oportunidades geradas por semana nos próximos 14 dias — sua meta pede mais topo de funil.'
+    };
+    if (s.opps < oppsNeededByMeta) return {
+      gargalo: 'Seu gargalo é meta agressiva pro ritmo atual',
+      missao: 'ajustar a meta do mês ou aumentar em 40% as oportunidades semanais.'
+    };
+    return {
+      gargalo: 'Seu gargalo é conversão de proposta em venda',
+      missao: 'revisar o script de fechamento e agendar follow-up estruturado para toda proposta enviada.'
+    };
+  }
+
+  function animateScore(target){
+    var el = document.getElementById('simScoreNum');
+    if (!el) return;
+    var n = 0;
+    var step = Math.max(1, Math.round(target / 24));
+    var t = setInterval(function(){
+      n += step;
+      if (n >= target){ n = target; clearInterval(t); }
+      el.textContent = n;
+    }, 32);
+  }
+
+  document.getElementById('btnSimReveal').addEventListener('click', function(){
+    var score = computeSimScore(simState);
+    var diag = diagnose(simState);
+    track('score_simulado_registrado', { score: score, meta: simState.meta, opps: simState.opps, follow: simState.follow });
+    track('simulacao_gargalo', { gargalo: diag.gargalo });
+    document.getElementById('simDiag').textContent = diag.gargalo;
+    document.getElementById('simMissao').textContent = diag.missao;
+    document.getElementById('simForm').hidden = true;
+    var reveal = document.getElementById('simReveal');
+    reveal.hidden = false;
+    document.querySelector('.screen-scoreapp .sa-body').scrollTop = 0;
+    animateScore(score);
+    // guarda pra usar no price card
+    window.__simScore = score;
+    window.__simLabel = diag.gargalo.toLowerCase();
+  });
+
+  document.getElementById('btnSimPlanos').addEventListener('click', function(){
+    track('sim_ver_planos', { score: window.__simScore });
+    resumeIndex = null; // pula áudios restantes, vai direto pros planos
+    show('chat');
+    typingThenRun(400, function(){
+      addTextBubble('com base no seu perfil, esse é o ponto de partida ideal 👇');
+      typingThenRun(500, function(){ addPriceCard(window.__simScore, window.__simLabel || 'score preliminar da simulação'); });
+    });
   });
 
   document.getElementById('btnScoreBack').addEventListener('click', returnToChat);
+
 
   function returnToChat(){
     track('score_push_voltou_conversa');
