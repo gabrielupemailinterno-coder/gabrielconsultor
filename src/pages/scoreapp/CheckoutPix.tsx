@@ -50,7 +50,7 @@ export default function ScoreCheckoutPix() {
         if (status !== "paid") toast.success("Pagamento confirmado!");
         setStatus("paid");
         stopped = true;
-        setTimeout(() => navigate("/app/score", { replace: true }), 1500);
+        setTimeout(() => navigate("/app/score/bem-vindo", { replace: true }), 1500);
       } else if (fnResult?.reason === "no_invoice") {
         setStatus("not_found");
       } else if (fnResult?.error) {

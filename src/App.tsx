@@ -35,6 +35,7 @@ import ScorePerfil from "./pages/scoreapp/Perfil";
 import ScorePlanos from "./pages/scoreapp/Planos";
 import ScoreCheckoutPix from "./pages/scoreapp/CheckoutPix";
 import ScoreSignup from "./pages/scoreapp/Signup";
+import ScoreBemVindo from "./pages/scoreapp/BemVindo";
 import RedirectPartnerLink from "./pages/RedirectPartnerLink";
 import PartnerDashboard from "./pages/parceiro/PartnerDashboard";
 import Entrar from "./pages/Entrar";
@@ -89,6 +90,7 @@ function AppRoutes() {
       <Route path="/app/planos" element={<ScorePlanos />} />
       <Route path="/app/checkout-pix" element={<ScoreCheckoutPix />} />
       <Route path="/app/score" element={<ScoreDashboard />} />
+      <Route path="/app/score/bem-vindo" element={<ScoreBemVindo />} />
       <Route path="/app/score/onboarding" element={<ScoreOnboarding />} />
       <Route path="/app/score/registrar" element={<ScoreRegistrar />} />
       <Route path="/app/score/conteudos" element={<ScoreConteudos />} />
