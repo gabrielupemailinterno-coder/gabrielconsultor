@@ -65,8 +65,6 @@ function AppRoutes() {
       <Route path="/mentoria-profissional" element={<MentoriaProfissional />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
-      <Route path="/blog" element={<Blog />} />
-      <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/escola" element={<EscolaLanding />} />
       <Route path="/escola/cadastro" element={<EscolaSignup />} />
       <Route path="/escola/login" element={<EscolaLogin />} />
