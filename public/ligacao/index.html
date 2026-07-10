@@ -549,72 +549,63 @@
       </header>
 
       <div class="sa-body">
-        <!-- Hero: score do dia -->
-        <div class="sa-hero">
-          <div class="sa-hero-left">
-            <span class="sa-eyebrow">seu score de hoje</span>
-            <div class="sa-hero-num"><span id="saScorePreview">0</span><small>/100</small></div>
-            <span class="sa-hero-label" id="saScoreLabel">Fraco</span>
+        <!-- Etapa 1: mini check-in -->
+        <div id="simForm">
+          <div class="sim-header">
+            <span class="sim-eyebrow">Check-in de hoje</span>
+            <h1 class="sim-title">Simule seu Check-in</h1>
           </div>
-          <div class="sa-hero-right">
-            <div class="sa-bar-track"><div class="sa-bar-fill" id="saScoreBar" style="width:0%"></div></div>
-            <span class="sa-hero-hint">preencha os números do seu dia — o score atualiza em tempo real</span>
+          <div class="sim-card" style="margin-top:14px;">
+            <div class="sim-field">
+              <label>Meta de vendas por mês</label>
+              <div class="sim-chip-row" data-sim="meta">
+                <button type="button" class="sim-chip" data-val="1">até R$ 20k</button>
+                <button type="button" class="sim-chip active" data-val="2">R$ 20–50k</button>
+                <button type="button" class="sim-chip" data-val="3">R$ 50–100k</button>
+                <button type="button" class="sim-chip" data-val="4">R$ 100k+</button>
+              </div>
+            </div>
+
+            <div class="sim-field">
+              <label>Oportunidades geradas por semana</label>
+              <div class="sim-stepper" data-sim="opps">
+                <button type="button" data-op="-" aria-label="menos">−</button>
+                <span class="sim-num" id="simOpps">8</span>
+                <button type="button" data-op="+" aria-label="mais">+</button>
+              </div>
+            </div>
+
+            <div class="sim-field">
+              <label>Follow-up com quem não fechou</label>
+              <div class="sim-chip-row triple" data-sim="follow">
+                <button type="button" class="sim-chip" data-val="3">Sempre</button>
+                <button type="button" class="sim-chip active" data-val="2">Às vezes</button>
+                <button type="button" class="sim-chip" data-val="1">Quase nunca</button>
+              </div>
+            </div>
+
+            <button class="sim-cta" id="btnSimReveal">Ver meu score</button>
           </div>
+          <p class="sim-foot">simulação simplificada — o app real usa 8 indicadores e histórico dos últimos 30 dias.</p>
         </div>
 
-        <!-- KPIs do topo (mockados, dão contexto) -->
-        <div class="sa-kpi-grid">
-          <div class="sa-kpi"><span>meta do mês</span><strong>R$ 32.400 <em>/ 60.000</em></strong><div class="sa-mini-bar"><div style="width:54%"></div></div></div>
-          <div class="sa-kpi"><span>streak</span><strong>7 <em>dias</em></strong><div class="sa-mini-hint">🔥 não perca hoje</div></div>
-        </div>
-
-        <!-- Registro do dia -->
-        <div class="sa-card">
-          <div class="sa-card-head">
-            <h3>registro do dia</h3>
-            <span class="sa-badge">hoje</span>
-          </div>
-          <p class="sa-hint">toque nos + e − para preencher cada indicador</p>
-
-          <div class="sa-grid">
-            <div class="sa-field">
-              <label>Ligações</label>
-              <div class="sa-stepper" data-key="lig"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>WhatsApps</label>
-              <div class="sa-stepper" data-key="wpp"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>Novos leads</label>
-              <div class="sa-stepper" data-key="pros"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>Contatos efetivos</label>
-              <div class="sa-stepper" data-key="cont"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>Reuniões</label>
-              <div class="sa-stepper" data-key="reu"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>Apresentações</label>
-              <div class="sa-stepper" data-key="apres"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>Propostas</label>
-              <div class="sa-stepper" data-key="prop"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
-            <div class="sa-field">
-              <label>Vendas</label>
-              <div class="sa-stepper" data-key="ven"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
-            </div>
+        <!-- Etapa 2: revelação -->
+        <div id="simReveal" hidden>
+          <div class="sim-reveal">
+            <span class="sim-reveal-eyebrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>
+              Seu score preliminar
+            </span>
+            <p class="sim-score-num"><span id="simScoreNum">0</span><small>/100</small></p>
+            <h2 class="sim-diag" id="simDiag">Seu gargalo é volume de prospecção</h2>
+            <p class="sim-mission">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              <span><span class="sim-mission-lbl">Missão:</span><span id="simMissao">dobrar as oportunidades geradas por semana nos próximos 14 dias.</span></span>
+            </p>
+            <p class="sim-disclaimer">Simulação simplificada. No Score Comercial real, o cálculo cruza 8 indicadores diários com sua meta e mostra o funil de conversão completo.</p>
+            <button class="sim-cta" id="btnSimPlanos">Ver planos</button>
           </div>
         </div>
-
-        <button class="sa-cta" id="btnScoreSave">salvar check-in de hoje</button>
-        <div id="scoreToast"></div>
-        <p class="sa-foot">no app completo você também importa planilha, vê funil de conversão e recebe diagnóstico automático.</p>
       </div>
     </div>
   </section>
