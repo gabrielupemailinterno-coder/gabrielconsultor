@@ -219,15 +219,14 @@ Deno.serve(async (req) => {
     });
     if (provErr) throw new Error("provision: " + provErr.message);
 
-    const { error: paidErr } = await supabase
-      .from("mentees")
-      .update({
-        payment_status: "paid",
-        payment_updated_at: new Date().toISOString(),
-        partner_id: partnerId,
-        partner_code: partnerCode,
-      })
-      .eq("id", menteeId);
+    const paidUpdate: Record<string, unknown> = {
+      payment_status: "paid",
+      payment_updated_at: new Date().toISOString(),
+      partner_id: partnerId,
+      partner_code: partnerCode,
+    };
+    if (onboardingJson) paidUpdate.onboarding_json = onboardingJson;
+    const { error: paidErr } = await supabase.from("mentees").update(paidUpdate).eq("id", menteeId);
     if (paidErr) throw new Error("mark paid: " + paidErr.message);
 
     const { error: unlockErr } = await supabase
