@@ -83,6 +83,15 @@ Deno.serve(async (req) => {
     const email = customer.email?.toLowerCase().trim();
     const fullName = customer.name ?? "Mentorado";
     const phone = customer.mobilePhone ?? customer.phone ?? null;
+    let onboardingJson: Record<string, unknown> | null = null;
+    if (customer.observations && typeof customer.observations === "string") {
+      try {
+        const parsed = JSON.parse(customer.observations);
+        if (parsed && typeof parsed === "object" && parsed.mentoria_onboarding) {
+          onboardingJson = parsed.mentoria_onboarding as Record<string, unknown>;
+        }
+      } catch { /* ignore */ }
+    }
     if (!email) throw new Error("customer email missing");
 
     let partnerId: string | null = null;
