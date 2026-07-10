@@ -850,6 +850,7 @@
       String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
     document.getElementById('notifPreviewText').textContent = icon+' '+text;
     show('lock');
+    playNotificationChime();
   }
 
   document.getElementById('btnOpenChat').addEventListener('click', function(){
