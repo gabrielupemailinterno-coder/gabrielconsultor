@@ -90,6 +90,7 @@ function AppRoutes() {
       <Route path="/app/planos" element={<ScorePlanos />} />
       <Route path="/app/checkout-pix" element={<ScoreCheckoutPix />} />
       <Route path="/app/score" element={<ScoreDashboard />} />
+      <Route path="/app/score/bem-vindo" element={<ScoreBemVindo />} />
       <Route path="/app/score/onboarding" element={<ScoreOnboarding />} />
       <Route path="/app/score/registrar" element={<ScoreRegistrar />} />
       <Route path="/app/score/conteudos" element={<ScoreConteudos />} />
