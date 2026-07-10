@@ -55,7 +55,7 @@ const SiteHeader = () => {
         { href: sectionAnchor("pacotes"), label: "Pacotes" },
         { href: "/mentoria-profissional", label: "Mentoria" },
         { href: "/conhecascoreapp", label: "Score Comercial" },
-        { href: "/blog", label: "Escola de Vendedores Grátis" },
+        { href: "/escola", label: "Escola de Vendedores Grátis" },
       ]
     : [
         { href: sectionAnchor("sobre"), label: "About" },
@@ -65,7 +65,7 @@ const SiteHeader = () => {
         { href: sectionAnchor("pacotes"), label: "Packages" },
         { href: "/mentoria-profissional", label: "Mentoring" },
         { href: "/conhecascoreapp", label: "Sales Score" },
-        { href: "/blog", label: "Free Sales School" },
+        { href: "/escola", label: "Free Sales School" },
       ];
 
   const ctaLabel = locale === "pt" ? "Agendar diagnóstico" : "Book a diagnostic";
