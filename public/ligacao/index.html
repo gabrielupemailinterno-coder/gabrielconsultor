@@ -818,6 +818,7 @@
   }, {once:true});
 
   document.getElementById('btnAnswer').addEventListener('click', function(){
+    stopRingtone();
     track('ligacao_atendida');
     show('status');
     setStatus('conectando…', true);
