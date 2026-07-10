@@ -80,6 +80,8 @@ function AppRoutes() {
       <Route path="/scoreapp" element={<ScoreLanding />} />
       <Route path="/conhecascoreapp" element={<ConhecaScoreApp />} />
       <Route path="/r/:slug" element={<RedirectPartnerLink />} />
+      <Route path="/ligacao" element={<LigacaoRedirect />} />
+      <Route path="/ligacao/*" element={<LigacaoRedirect />} />
 
       {/* Plataforma (autenticada) — tudo sob /app */}
       <Route path="/app" element={<AppHub />} />
