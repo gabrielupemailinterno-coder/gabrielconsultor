@@ -875,14 +875,22 @@
   var INTER_MSGS = [
     null,
     'só um segundo, deixa eu te explicar melhor 👇',
-    'olha esse ponto aqui, é importante:',
+    null, // antes do 03a entra a confirmação (askConfirmations)
     'espera, só mais uma coisa rápida…',
     'e pra fechar, o que muda pra você:'
   ];
 
+  var confirmationDone = false;
+  var resumeIndex = null; // pra retomar o fluxo depois do score push
+
   function playAudioSequence(index){
     if (index >= AUDIO_FILES.length){
-      typingThenRun(700, showDiagnostic);
+      typingThenRun(900, showClosingMenu);
+      return;
+    }
+    // Confirmação entre áudio 2 e áudio 3
+    if (index === 2 && !confirmationDone){
+      typingThenRun(900, askConfirmations);
       return;
     }
     var item = AUDIO_FILES[index];
@@ -896,10 +904,16 @@
           el, Math.round(item.seconds*1000) + 4000, formatDuration(item.seconds),
           function(){
             track('audio_'+n+'_iniciado');
-            if (index === SCORE_PUSH_AT) scheduleScorePush(el);
           },
           function(){
             track('audio_'+n+'_concluido');
+            // Ao terminar o áudio 3 completo (03b, index=3),
+            // dispara a notificação permanente do Score.
+            if (index === 3){
+              resumeIndex = index + 1;
+              showScorePush();
+              return;
+            }
             playAudioSequence(index + 1);
           }
         );
@@ -916,17 +930,37 @@
     }
   }
 
-
-  // ---------- Push notification "Score Comercial" durante áudio 3a ----------
-  var scorePushShown = false;
-
-  function scheduleScorePush(audioEl){
-    if (scorePushShown) return;
-    // dispara ~9s depois do áudio começar
-    setTimeout(function(){ showScorePush(audioEl); }, 9000);
+  // ---------- Confirmação entre áudios 2 e 3 ----------
+  function askConfirmations(){
+    addTextBubble('rápido antes de continuar: isso que eu tô descrevendo acontece com você?');
+    addQuickReplies([
+      { label:'sim, muito', onClick:function(){ track('confirma_acontece', {r:'sim'}); askMetaProblem(); } },
+      { label:'às vezes', onClick:function(){ track('confirma_acontece', {r:'as_vezes'}); askMetaProblem(); } },
+      { label:'não é meu caso', onClick:function(){ track('confirma_acontece', {r:'nao'}); askMetaProblem(); } }
+    ]);
+  }
+  function askMetaProblem(){
+    typingThenRun(900, function(){
+      addTextBubble('e a meta desse mês — hoje ela é um problema real pra você?');
+      addQuickReplies([
+        { label:'sim, tô longe', onClick:function(){ track('confirma_meta', {r:'sim'}); resumeAfterConfirmations(); } },
+        { label:'mais ou menos', onClick:function(){ track('confirma_meta', {r:'meio'}); resumeAfterConfirmations(); } },
+        { label:'não, tô no caminho', onClick:function(){ track('confirma_meta', {r:'nao'}); resumeAfterConfirmations(); } }
+      ]);
+    });
+  }
+  function resumeAfterConfirmations(){
+    typingThenRun(800, function(){
+      addTextBubble('entendi. escuta esse próximo aqui, é a parte mais importante 👇');
+      confirmationDone = true;
+      playAudioSequence(2);
+    });
   }
 
-  function showScorePush(audioEl){
+  // ---------- Push notification permanente ao fim do áudio 3 ----------
+  var scorePushShown = false;
+
+  function showScorePush(){
     if (scorePushShown) return;
     scorePushShown = true;
     track('score_push_exibido');
@@ -941,19 +975,15 @@
         '<div class="push-msg">hora de fechar seu dia — 2 min pra registrar suas atividades e ver seu score.</div>' +
       '</div>';
     stage.appendChild(notif);
-
-    var autoHide = setTimeout(function(){
-      if (notif.parentNode) { notif.classList.add('leaving'); setTimeout(function(){ notif.remove(); }, 300); }
-    }, 8000);
+    playNotificationChime();
 
     notif.addEventListener('click', function(){
-      clearTimeout(autoHide);
       notif.remove();
       track('score_push_aberto');
-      // NÃO pausa o áudio — continua tocando enquanto a pessoa vê o app
       show('scoreapp');
     });
   }
+
 
   // Score-app: steppers +/− em todos os campos numéricos
   document.querySelectorAll('.screen-scoreapp .sa-stepper').forEach(function(st){
