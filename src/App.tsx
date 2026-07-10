@@ -43,6 +43,7 @@ import Entrar from "./pages/Entrar";
 import EsqueciSenha from "./pages/EsqueciSenha";
 import RedefinirSenha from "./pages/RedefinirSenha";
 import AppHub from "./pages/AppHub";
+import LigacaoRedirect from "./pages/LigacaoRedirect";
 import Configuracoes from "./pages/app/Configuracoes";
 import Notificacoes from "./pages/app/Notificacoes";
 import { usePartnerRefCapture } from "@/hooks/usePartnerRef";
@@ -79,6 +80,8 @@ function AppRoutes() {
       <Route path="/scoreapp" element={<ScoreLanding />} />
       <Route path="/conhecascoreapp" element={<ConhecaScoreApp />} />
       <Route path="/r/:slug" element={<RedirectPartnerLink />} />
+      <Route path="/ligacao" element={<LigacaoRedirect />} />
+      <Route path="/ligacao/*" element={<LigacaoRedirect />} />
 
       {/* Plataforma (autenticada) — tudo sob /app */}
       <Route path="/app" element={<AppHub />} />
