@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import SiteHeader from "@/components/SiteHeader";
 import {
   Trophy, TrendingUp, Target, LineChart, Check, Zap, BarChart3,
   Calendar, ArrowRight, Star, Clock, ShieldCheck,
