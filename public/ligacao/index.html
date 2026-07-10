@@ -1124,8 +1124,11 @@
     stopRingtone();
     track('ligacao_recusada');
     show('status');
-    setStatus('chamada recusada', false);
-    setTimeout(function(){ goToLock('💬','Tudo bem, vou te explicar por aqui'); }, 900);
+    setStatus('ligação falhou', false);
+    // toque característico de linha caída (pi pi pi…)
+    getAudioCtx();
+    playBusyTone(6); // ~3s de busy tone
+    setTimeout(function(){ goToLock('💬','Tudo bem, vou te explicar por aqui'); }, 3400);
   });
 
   function setStatus(text, pulsing){
