@@ -919,6 +919,7 @@
           '<div class="wave">'+bars+'</div>' +
           '<div class="wave-fill"><div class="wave">'+bars+'</div></div>' +
         '</div>' +
+        '<button class="audio-speed" aria-label="Velocidade">1x</button>' +
         '<span class="audio-duration">'+durationLabel+'</span>' +
       '</div>';
     chatBody.appendChild(row);
@@ -928,10 +929,22 @@
 
     var bubble = row.querySelector('.audio-bubble');
     var playBtn = row.querySelector('.play-btn');
+    var speedBtn = row.querySelector('.audio-speed');
     var fill = row.querySelector('.wave-fill');
     var durEl = row.querySelector('.audio-duration');
     var totalSec = Math.max(1, Math.round(fallbackMs/1000));
     var played = false, rafId = null;
+
+    var SPEEDS = [1, 1.5, 2];
+    var spIdx = 0;
+    speedBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      spIdx = (spIdx + 1) % SPEEDS.length;
+      var v = SPEEDS[spIdx];
+      try { audioEl.playbackRate = v; } catch(err){}
+      speedBtn.textContent = (v === 1 ? '1x' : (v === 1.5 ? '1.5x' : '2x'));
+      speedBtn.classList.toggle('active', v !== 1);
+    });
 
     attachLongPress(bubble, function(){ return '[áudio]'; });
 
