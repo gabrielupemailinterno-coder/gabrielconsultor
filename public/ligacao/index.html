@@ -152,15 +152,31 @@
   .notif-text span{font-size:13px;color:var(--ink-dim);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .notif-meta{font-size:11px;color:var(--ink-faint);flex-shrink:0;}
 
-  /* ---------- Chat (estilo mensagens) ---------- */
+  /* ---------- Chat (WhatsApp look) ---------- */
   .screen-chat .content{background:var(--wa-bg);}
-  .chat-header{display:flex;align-items:center;gap:10px;padding:16px 16px 14px;
-    border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;background:#111b21;}
-  .chat-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;}
-  .chat-header strong{display:block;font-size:15px;}
-  .chat-status{font-size:12px;color:#8fd0a9;}
-  .chat-body{flex:1;overflow-y:auto;padding:18px 12px 24px;display:flex;flex-direction:column;gap:9px;scrollbar-width:none;}
+  .chat-header{display:flex;align-items:center;gap:10px;padding:12px 12px 10px;
+    border-bottom:1px solid rgba(255,255,255,.04);flex-shrink:0;background:#1f2c34;}
+  .chat-back{background:none;border:none;color:var(--ink);padding:4px;cursor:pointer;display:flex;align-items:center;}
+  .chat-back svg{width:20px;height:20px;}
+  .chat-avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;}
+  .chat-header-txt{flex:1;min-width:0;line-height:1.15;}
+  .chat-header-txt strong{display:block;font-size:15.5px;font-weight:600;}
+  .chat-status{font-size:12px;color:#8fd0a9;display:flex;align-items:center;gap:4px;}
+  .chat-status::before{content:"";width:5px;height:5px;border-radius:50%;background:#25d366;
+    box-shadow:0 0 6px #25d366;animation:blink 1.4s ease-in-out infinite;}
+  .chat-icons{display:flex;gap:16px;color:var(--ink-dim);}
+  .chat-icons svg{width:20px;height:20px;}
+  .chat-body{flex:1;overflow-y:auto;padding:14px 10px 20px;display:flex;flex-direction:column;gap:8px;
+    scrollbar-width:none;
+    background-color:#0b141a;
+    background-image:
+      radial-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
+      radial-gradient(rgba(255,255,255,.015) 1px, transparent 1px);
+    background-size:22px 22px, 22px 22px;
+    background-position:0 0, 11px 11px;
+  }
   .chat-body::-webkit-scrollbar{display:none;}
+
 
   .bubble-row{display:flex;animation:riseIn .3s ease both;}
   .bubble-row.sent{justify-content:flex-end;}
@@ -240,37 +256,80 @@
   .push-title span:last-child{font-size:10.5px;color:var(--ink-faint);font-weight:500;}
   .push-msg{font-size:13.5px;line-height:1.35;color:var(--ink);}
 
-  /* ---------- Score app mock (fullscreen overlay) ---------- */
+  /* ---------- Score app mock (fiel à plataforma real) ---------- */
   .screen-scoreapp{background:#0b0d12;z-index:15;}
   .screen-scoreapp .content{padding:0;}
-  .sa-header{display:flex;align-items:center;gap:10px;padding:16px 16px 12px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;}
-  .sa-back{background:none;border:none;color:var(--gold);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-ui);
-    display:flex;align-items:center;gap:4px;padding:4px 6px;margin-left:-6px;}
+  .sa-header{display:flex;align-items:center;gap:12px;padding:14px 16px 12px;
+    border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;background:#0f1218;}
+  .sa-back{background:rgba(255,255,255,.06);border:none;color:var(--ink);width:32px;height:32px;
+    border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
   .sa-back svg{width:16px;height:16px;}
-  .sa-brand{font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:.01em;flex:1;text-align:center;margin-right:38px;}
-  .sa-body{flex:1;overflow-y:auto;padding:22px 20px 30px;display:flex;flex-direction:column;gap:16px;}
-  .sa-greeting{font-family:var(--font-display);font-size:22px;font-weight:600;line-height:1.25;}
-  .sa-greeting span{color:var(--gold);}
-  .sa-sub{color:var(--ink-dim);font-size:13.5px;line-height:1.45;margin-top:-8px;}
-  .sa-card{background:#131822;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:18px;}
-  .sa-card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--ink);}
-  .sa-card p.sa-hint{margin:0 0 14px;font-size:12px;color:var(--ink-dim);}
-  .sa-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);}
-  .sa-row:last-child{border-bottom:none;}
-  .sa-row label{font-size:13.5px;color:var(--ink);}
-  .sa-stepper{display:flex;align-items:center;gap:10px;}
-  .sa-stepper button{width:28px;height:28px;border-radius:50%;border:1px solid rgba(231,184,78,.4);
-    background:transparent;color:var(--gold);font-size:16px;font-weight:600;cursor:pointer;line-height:1;}
-  .sa-stepper button:active{transform:scale(.92);}
-  .sa-stepper span{font-family:var(--font-display);font-weight:600;min-width:22px;text-align:center;color:var(--ink);}
-  .sa-cta{background:var(--gold);color:var(--gold-ink);border:none;padding:14px;border-radius:14px;
-    font-size:14.5px;font-weight:700;cursor:pointer;font-family:var(--font-ui);width:100%;}
+  .sa-brand{flex:1;display:flex;align-items:center;gap:10px;min-width:0;}
+  .sa-logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#c99433);
+    color:var(--gold-ink);display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);font-weight:700;font-size:13px;letter-spacing:.02em;}
+  .sa-brand-txt{display:flex;flex-direction:column;line-height:1.15;min-width:0;}
+  .sa-brand-txt strong{font-family:var(--font-display);font-size:14px;font-weight:600;}
+  .sa-brand-txt small{font-size:11px;color:var(--ink-dim);}
+  .sa-avatar{width:30px;height:30px;border-radius:50%;background:#232936;color:var(--ink);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;}
+
+  .sa-body{flex:1;overflow-y:auto;padding:16px 14px 26px;display:flex;flex-direction:column;gap:14px;
+    scrollbar-width:none;}
+  .sa-body::-webkit-scrollbar{display:none;}
+
+  .sa-hero{background:linear-gradient(135deg,rgba(231,184,78,.18) 0%,rgba(231,184,78,.04) 100%);
+    border:1px solid rgba(231,184,78,.28);border-radius:18px;padding:16px;display:flex;gap:14px;align-items:stretch;}
+  .sa-hero-left{flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;min-width:88px;}
+  .sa-eyebrow{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);font-weight:600;}
+  .sa-hero-num{font-family:var(--font-display);font-size:44px;font-weight:700;color:var(--gold);
+    line-height:1;letter-spacing:-.02em;margin-top:4px;}
+  .sa-hero-num small{font-size:14px;color:var(--ink-dim);font-weight:500;margin-left:2px;}
+  .sa-hero-label{margin-top:4px;font-size:12px;color:var(--gold);font-weight:600;text-transform:lowercase;}
+  .sa-hero-right{flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0;}
+  .sa-bar-track{width:100%;height:8px;background:rgba(255,255,255,.08);border-radius:6px;overflow:hidden;}
+  .sa-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),#f5cf7e);border-radius:6px;
+    transition:width .4s cubic-bezier(.2,.8,.2,1);}
+  .sa-hero-hint{font-size:11.5px;color:var(--ink-dim);line-height:1.4;}
+
+  .sa-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .sa-kpi{background:#131822;border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:12px 14px;
+    display:flex;flex-direction:column;gap:6px;}
+  .sa-kpi span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);font-weight:600;}
+  .sa-kpi strong{font-family:var(--font-display);font-size:16px;font-weight:600;color:var(--ink);}
+  .sa-kpi strong em{font-style:normal;font-size:11px;color:var(--ink-dim);font-weight:500;margin-left:2px;}
+  .sa-mini-bar{height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-top:2px;}
+  .sa-mini-bar div{height:100%;background:var(--gold);border-radius:4px;}
+  .sa-mini-hint{font-size:10.5px;color:var(--ink-dim);}
+
+  .sa-card{background:#131822;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px 14px;}
+  .sa-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
+  .sa-card-head h3{margin:0;font-size:14px;font-weight:600;color:var(--ink);}
+  .sa-badge{background:rgba(231,184,78,.18);color:var(--gold);font-size:10px;font-weight:600;
+    padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.05em;}
+  .sa-hint{margin:0 0 12px;font-size:11.5px;color:var(--ink-dim);}
+  .sa-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .sa-field{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:12px;
+    padding:10px 10px 8px;display:flex;flex-direction:column;gap:6px;}
+  .sa-field label{font-size:11px;color:var(--ink-dim);font-weight:500;}
+  .sa-stepper{display:flex;align-items:center;justify-content:space-between;gap:6px;}
+  .sa-stepper button{width:26px;height:26px;border-radius:8px;border:1px solid rgba(231,184,78,.4);
+    background:transparent;color:var(--gold);font-size:15px;font-weight:600;cursor:pointer;line-height:1;
+    display:flex;align-items:center;justify-content:center;padding:0;}
+  .sa-stepper button:active{transform:scale(.92);background:rgba(231,184,78,.15);}
+  .sa-stepper span{font-family:var(--font-display);font-weight:600;font-size:16px;min-width:22px;
+    text-align:center;color:var(--ink);}
+  .sa-cta{background:var(--gold);color:var(--gold-ink);border:none;padding:15px;border-radius:14px;
+    font-size:14.5px;font-weight:700;cursor:pointer;font-family:var(--font-ui);width:100%;
+    box-shadow:0 8px 20px rgba(231,184,78,.25);}
   .sa-cta:active{transform:scale(.985);}
-  .sa-toast{margin-top:6px;background:rgba(50,215,75,.14);border:1px solid rgba(50,215,75,.35);color:#8fd0a9;
-    border-radius:12px;padding:12px 14px;font-size:13px;text-align:center;animation:fadeIn .3s ease;}
+  .sa-toast{margin-top:2px;background:rgba(50,215,75,.14);border:1px solid rgba(50,215,75,.35);color:#8fd0a9;
+    border-radius:12px;padding:12px 14px;font-size:12.5px;text-align:center;animation:fadeIn .3s ease;}
+  .sa-foot{margin:2px 0 0;font-size:10.5px;color:var(--ink-faint);text-align:center;line-height:1.4;}
 
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important;}}
+
 </style>
 </head>
 <body>
@@ -346,51 +405,118 @@
   <section class="screen screen-chat" data-screen="chat" hidden>
     <div class="content">
       <header class="chat-header">
+        <button class="chat-back" aria-label="voltar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
         <img class="chat-avatar" src="https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN" alt="Gabriel">
-        <div>
+        <div class="chat-header-txt">
           <strong>Gabriel</strong>
           <span class="chat-status">online</span>
         </div>
+        <div class="chat-icons" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
       </header>
+
       <div class="chat-body" id="chatBody"></div>
     </div>
   </section>
 
-  <!-- 5. Score App (simulação) -->
+  <!-- 5. Score App (simulação fiel à plataforma real) -->
   <section class="screen screen-scoreapp" data-screen="scoreapp" hidden>
     <div class="content">
       <header class="sa-header">
         <button class="sa-back" id="btnScoreBack" aria-label="Voltar para a conversa">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          voltar
         </button>
-        <div class="sa-brand">Score Comercial</div>
-      </header>
-      <div class="sa-body">
-        <div class="sa-greeting">boa noite — <span>2 min</span> pra fechar seu dia.</div>
-        <p class="sa-sub">registre rapidinho o que aconteceu hoje. o app calcula seu Score e mostra onde ajustar amanhã.</p>
-        <div class="sa-card">
-          <h3>registro de hoje</h3>
-          <p class="sa-hint">toque nos + e − pra preencher</p>
-          <div class="sa-row"><label>ligações feitas</label>
-            <div class="sa-stepper" data-key="lig"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div></div>
-          <div class="sa-row"><label>reuniões realizadas</label>
-            <div class="sa-stepper" data-key="reu"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div></div>
-          <div class="sa-row"><label>propostas enviadas</label>
-            <div class="sa-stepper" data-key="prop"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div></div>
-          <div class="sa-row"><label>follow-ups feitos</label>
-            <div class="sa-stepper" data-key="fup"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div></div>
+        <div class="sa-brand">
+          <span class="sa-logo">SC</span>
+          <div class="sa-brand-txt">
+            <strong>Score Comercial</strong>
+            <small>check-in de hoje</small>
+          </div>
         </div>
-        <button class="sa-cta" id="btnScoreSave">calcular meu score de hoje</button>
+        <div class="sa-avatar">V</div>
+      </header>
+
+      <div class="sa-body">
+        <!-- Hero: score do dia -->
+        <div class="sa-hero">
+          <div class="sa-hero-left">
+            <span class="sa-eyebrow">seu score de hoje</span>
+            <div class="sa-hero-num"><span id="saScorePreview">0</span><small>/100</small></div>
+            <span class="sa-hero-label" id="saScoreLabel">Fraco</span>
+          </div>
+          <div class="sa-hero-right">
+            <div class="sa-bar-track"><div class="sa-bar-fill" id="saScoreBar" style="width:0%"></div></div>
+            <span class="sa-hero-hint">preencha os números do seu dia — o score atualiza em tempo real</span>
+          </div>
+        </div>
+
+        <!-- KPIs do topo (mockados, dão contexto) -->
+        <div class="sa-kpi-grid">
+          <div class="sa-kpi"><span>meta do mês</span><strong>R$ 32.400 <em>/ 60.000</em></strong><div class="sa-mini-bar"><div style="width:54%"></div></div></div>
+          <div class="sa-kpi"><span>streak</span><strong>7 <em>dias</em></strong><div class="sa-mini-hint">🔥 não perca hoje</div></div>
+        </div>
+
+        <!-- Registro do dia -->
+        <div class="sa-card">
+          <div class="sa-card-head">
+            <h3>registro do dia</h3>
+            <span class="sa-badge">hoje</span>
+          </div>
+          <p class="sa-hint">toque nos + e − para preencher cada indicador</p>
+
+          <div class="sa-grid">
+            <div class="sa-field">
+              <label>Ligações</label>
+              <div class="sa-stepper" data-key="lig"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
+            </div>
+            <div class="sa-field">
+              <label>WhatsApps</label>
+              <div class="sa-stepper" data-key="wpp"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
+            </div>
+            <div class="sa-field">
+              <label>Novos leads</label>
+              <div class="sa-stepper" data-key="pros"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
+            </div>
+            <div class="sa-field">
+              <label>Contatos efetivos</label>
+              <div class="sa-stepper" data-key="cont"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
+            </div>
+            <div class="sa-field">
+              <label>Reuniões</label>
+              <div class="sa-stepper" data-key="reu"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
+            </div>
+            <div class="sa-field">
+              <label>Apresentações</label>
+              <div class="sa-stepper" data-key="apres"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
+            </div>
+            <div class="sa-field">
+              <label>Propostas</label>
+              <div class="sa-stepper" data-key="prop"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
+            </div>
+            <div class="sa-field">
+              <label>Vendas</label>
+              <div class="sa-stepper" data-key="ven"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div>
+            </div>
+          </div>
+        </div>
+
+        <button class="sa-cta" id="btnScoreSave">salvar check-in de hoje</button>
         <div id="scoreToast"></div>
+        <p class="sa-foot">no app completo você também importa planilha, vê funil de conversão e recebe diagnóstico automático.</p>
       </div>
     </div>
   </section>
 </div>
 
+
 <audio id="audio-oi" preload="none"></audio>
 <audio id="audio-02" preload="none"></audio>
-<audio id="audio-03" preload="none"></audio>
+<audio id="audio-03a" preload="none"></audio>
+<audio id="audio-03b" preload="none"></audio>
 <audio id="audio-04" preload="none"></audio>
 
 <script>
@@ -399,11 +525,14 @@
 
   // ===== CONFIGURÁVEIS =========================================
   var AUDIO_FILES = [
-    { id:'audio-oi', src:'/ligacao/audio/a1.m4a', seconds:16.4 },
-    { id:'audio-02', src:'/ligacao/audio/a2.m4a', seconds:31.8 },
-    { id:'audio-03', src:'/ligacao/audio/a3.m4a', seconds:35.3 },
-    { id:'audio-04', src:'/ligacao/audio/a4.m4a', seconds:26.2 }
+    { id:'audio-oi',  src:'/ligacao/audio/audio-oi.m4a',  seconds:16.5 },
+    { id:'audio-02',  src:'/ligacao/audio/audio-02.m4a',  seconds:31.8 },
+    { id:'audio-03a', src:'/ligacao/audio/audio-03a.m4a', seconds:25.9 },
+    { id:'audio-03b', src:'/ligacao/audio/audio-03b.m4a', seconds:7.1  },
+    { id:'audio-04',  src:'/ligacao/audio/audio-04.m4a',  seconds:26.2 }
   ];
+  // Índice do áudio que dispara a notificação do Score (0-based). audio-03a.
+  var SCORE_PUSH_AT = 2;
   var CHECKOUT_URL_MENSAL    = "https://gabrielconsultor.com/conhecascoreapp";
   var CHECKOUT_URL_SEMESTRAL = "https://gabrielconsultor.com/conhecascoreapp";
 
@@ -690,7 +819,7 @@
         el, Math.round(item.seconds*1000) + 4000, formatDuration(item.seconds),
         function(){
           track('audio_'+n+'_iniciado');
-          if (n === 3) scheduleScorePush(el);
+          if (index === SCORE_PUSH_AT) scheduleScorePush(el);
         },
         function(){
           track('audio_'+n+'_concluido');
@@ -700,13 +829,12 @@
     });
   }
 
-  // ---------- Push notification "Score Comercial" durante áudio 3 ----------
+  // ---------- Push notification "Score Comercial" durante áudio 3a ----------
   var scorePushShown = false;
-  var pausedAudio = null;
 
   function scheduleScorePush(audioEl){
     if (scorePushShown) return;
-    // dispara ~9s depois do áudio 3 começar (meio do áudio)
+    // dispara ~9s depois do áudio começar
     setTimeout(function(){ showScorePush(audioEl); }, 9000);
   }
 
@@ -734,13 +862,12 @@
       clearTimeout(autoHide);
       notif.remove();
       track('score_push_aberto');
-      // pausa o áudio da conversa
-      try { audioEl.pause(); pausedAudio = audioEl; } catch(e){}
+      // NÃO pausa o áudio — continua tocando enquanto a pessoa vê o app
       show('scoreapp');
     });
   }
 
-  // Score-app: steppers, salvar, voltar
+  // Score-app: steppers +/− em todos os campos numéricos
   document.querySelectorAll('.screen-scoreapp .sa-stepper').forEach(function(st){
     var span = st.querySelector('span');
     st.querySelectorAll('button').forEach(function(b){
@@ -748,21 +875,43 @@
         var v = parseInt(span.textContent, 10) || 0;
         v = b.dataset.op === '+' ? v + 1 : Math.max(0, v - 1);
         span.textContent = v;
+        updateScorePreview();
       });
     });
   });
 
-  document.getElementById('btnScoreSave').addEventListener('click', function(){
+  function readScoreVals(){
     var vals = {};
     document.querySelectorAll('.screen-scoreapp .sa-stepper').forEach(function(st){
       vals[st.dataset.key] = parseInt(st.querySelector('span').textContent, 10) || 0;
     });
-    var total = (vals.lig||0) + (vals.reu||0)*3 + (vals.prop||0)*4 + (vals.fup||0)*2;
-    var score = Math.min(100, Math.max(0, 30 + total * 3));
+    return vals;
+  }
+  function computeSimScore(vals){
+    // pesos aproximados do cálculo real (calc.ts computeDayScore)
+    var ativ = (vals.lig||0) + (vals.wpp||0);
+    var vol = Math.min(1, ativ/40) * 30;
+    var prosp = Math.min(1, (vals.pros||0)/5) * 15;
+    var reun = Math.min(1, (vals.reu||0)/2) * 20;
+    var fech = (vals.ven||0) > 0 ? 35 : (vals.prop||0) > 0 ? 15 : (vals.apres||0) > 0 ? 8 : 0;
+    return Math.round(vol + prosp + reun + fech);
+  }
+  function updateScorePreview(){
+    var s = computeSimScore(readScoreVals());
+    var el = document.getElementById('saScorePreview');
+    if (el) el.textContent = s;
+    var lb = document.getElementById('saScoreLabel');
+    if (lb) lb.textContent = s < 30 ? 'Fraco' : s < 55 ? 'Regular' : s < 75 ? 'Bom' : s < 90 ? 'Ótimo' : 'Excelente';
+    var bar = document.getElementById('saScoreBar');
+    if (bar) bar.style.width = Math.min(100, s) + '%';
+  }
+
+  document.getElementById('btnScoreSave').addEventListener('click', function(){
+    var score = computeSimScore(readScoreVals());
     track('score_simulado_registrado', {score: score});
     var toast = document.getElementById('scoreToast');
-    toast.innerHTML = '<div class="sa-toast">✓ registro salvo. seu score de hoje: <strong>'+score+'/100</strong>.</div>';
-    setTimeout(function(){ returnToChat(); }, 1600);
+    toast.innerHTML = '<div class="sa-toast">✓ dia registrado. score de hoje: <strong>'+score+'/100</strong>. voltando pra conversa…</div>';
+    setTimeout(function(){ returnToChat(); }, 1800);
   });
 
   document.getElementById('btnScoreBack').addEventListener('click', returnToChat);
@@ -770,11 +919,8 @@
   function returnToChat(){
     track('score_push_voltou_conversa');
     show('chat');
-    if (pausedAudio){
-      try { pausedAudio.play(); } catch(e){}
-      pausedAudio = null;
-    }
   }
+
 
 
   function showDiagnostic(){
