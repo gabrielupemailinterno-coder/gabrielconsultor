@@ -43,6 +43,7 @@ import Entrar from "./pages/Entrar";
 import EsqueciSenha from "./pages/EsqueciSenha";
 import RedefinirSenha from "./pages/RedefinirSenha";
 import AppHub from "./pages/AppHub";
+import LigacaoRedirect from "./pages/LigacaoRedirect";
 import Configuracoes from "./pages/app/Configuracoes";
 import Notificacoes from "./pages/app/Notificacoes";
 import { usePartnerRefCapture } from "@/hooks/usePartnerRef";
