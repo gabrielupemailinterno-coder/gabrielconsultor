@@ -1262,54 +1262,108 @@
   }
 
 
-  // Score-app: steppers +/− em todos os campos numéricos
-  document.querySelectorAll('.screen-scoreapp .sa-stepper').forEach(function(st){
-    var span = st.querySelector('span');
-    st.querySelectorAll('button').forEach(function(b){
-      b.addEventListener('click', function(){
-        var v = parseInt(span.textContent, 10) || 0;
-        v = b.dataset.op === '+' ? v + 1 : Math.max(0, v - 1);
-        span.textContent = v;
-        updateScorePreview();
+  // ---------- Simulação do Score (mini check-in + reveal) ----------
+  var simState = { meta: 2, opps: 8, follow: 2 };
+
+  // chips (meta + follow)
+  document.querySelectorAll('.screen-scoreapp .sim-chip-row').forEach(function(row){
+    var key = row.dataset.sim;
+    row.querySelectorAll('.sim-chip').forEach(function(chip){
+      chip.addEventListener('click', function(){
+        row.querySelectorAll('.sim-chip').forEach(function(c){ c.classList.remove('active'); });
+        chip.classList.add('active');
+        simState[key] = parseInt(chip.dataset.val, 10) || 0;
       });
     });
   });
 
-  function readScoreVals(){
-    var vals = {};
-    document.querySelectorAll('.screen-scoreapp .sa-stepper').forEach(function(st){
-      vals[st.dataset.key] = parseInt(st.querySelector('span').textContent, 10) || 0;
+  // stepper (opps)
+  (function(){
+    var stepper = document.querySelector('.screen-scoreapp .sim-stepper[data-sim="opps"]');
+    if (!stepper) return;
+    var span = document.getElementById('simOpps');
+    stepper.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        var v = parseInt(span.textContent, 10) || 0;
+        v = b.dataset.op === '+' ? Math.min(99, v + 1) : Math.max(0, v - 1);
+        span.textContent = v;
+        simState.opps = v;
+      });
     });
-    return vals;
-  }
-  function computeSimScore(vals){
-    // pesos aproximados do cálculo real (calc.ts computeDayScore)
-    var ativ = (vals.lig||0) + (vals.wpp||0);
-    var vol = Math.min(1, ativ/40) * 30;
-    var prosp = Math.min(1, (vals.pros||0)/5) * 15;
-    var reun = Math.min(1, (vals.reu||0)/2) * 20;
-    var fech = (vals.ven||0) > 0 ? 35 : (vals.prop||0) > 0 ? 15 : (vals.apres||0) > 0 ? 8 : 0;
-    return Math.round(vol + prosp + reun + fech);
-  }
-  function updateScorePreview(){
-    var s = computeSimScore(readScoreVals());
-    var el = document.getElementById('saScorePreview');
-    if (el) el.textContent = s;
-    var lb = document.getElementById('saScoreLabel');
-    if (lb) lb.textContent = s < 30 ? 'Fraco' : s < 55 ? 'Regular' : s < 75 ? 'Bom' : s < 90 ? 'Ótimo' : 'Excelente';
-    var bar = document.getElementById('saScoreBar');
-    if (bar) bar.style.width = Math.min(100, s) + '%';
+  })();
+
+  function computeSimScore(s){
+    // opps 0-50 (satura em 30/sem), follow 0-30, alinhamento meta×opps 0-20
+    var oppsPart = Math.min(1, s.opps / 30) * 50;
+    var followPart = ((s.follow - 1) / 2) * 30;    // 1→0, 2→15, 3→30
+    // meta agressiva sem opps suficiente = penaliza alinhamento
+    var oppsNeededByMeta = [0, 5, 12, 22, 35][s.meta] || 12;
+    var alignRatio = Math.min(1, s.opps / oppsNeededByMeta);
+    var alignPart = alignRatio * 20;
+    return Math.max(0, Math.round(oppsPart + followPart + alignPart));
   }
 
-  document.getElementById('btnScoreSave').addEventListener('click', function(){
-    var score = computeSimScore(readScoreVals());
-    track('score_simulado_registrado', {score: score});
-    var toast = document.getElementById('scoreToast');
-    toast.innerHTML = '<div class="sa-toast">✓ dia registrado. score de hoje: <strong>'+score+'/100</strong>. voltando pra conversa…</div>';
-    setTimeout(function(){ returnToChat(); }, 1800);
+  function diagnose(s){
+    var oppsNeededByMeta = [0, 5, 12, 22, 35][s.meta] || 12;
+    if (s.follow <= 1) return {
+      gargalo: 'Seu gargalo é follow-up',
+      missao: 'nos próximos 7 dias, retomar contato com todos os leads que não responderam nos últimos 30 dias.'
+    };
+    if (s.opps < oppsNeededByMeta * 0.6) return {
+      gargalo: 'Seu gargalo é volume de prospecção',
+      missao: 'dobrar as oportunidades geradas por semana nos próximos 14 dias — sua meta pede mais topo de funil.'
+    };
+    if (s.opps < oppsNeededByMeta) return {
+      gargalo: 'Seu gargalo é meta agressiva pro ritmo atual',
+      missao: 'ajustar a meta do mês ou aumentar em 40% as oportunidades semanais.'
+    };
+    return {
+      gargalo: 'Seu gargalo é conversão de proposta em venda',
+      missao: 'revisar o script de fechamento e agendar follow-up estruturado para toda proposta enviada.'
+    };
+  }
+
+  function animateScore(target){
+    var el = document.getElementById('simScoreNum');
+    if (!el) return;
+    var n = 0;
+    var step = Math.max(1, Math.round(target / 24));
+    var t = setInterval(function(){
+      n += step;
+      if (n >= target){ n = target; clearInterval(t); }
+      el.textContent = n;
+    }, 32);
+  }
+
+  document.getElementById('btnSimReveal').addEventListener('click', function(){
+    var score = computeSimScore(simState);
+    var diag = diagnose(simState);
+    track('score_simulado_registrado', { score: score, meta: simState.meta, opps: simState.opps, follow: simState.follow });
+    track('simulacao_gargalo', { gargalo: diag.gargalo });
+    document.getElementById('simDiag').textContent = diag.gargalo;
+    document.getElementById('simMissao').textContent = diag.missao;
+    document.getElementById('simForm').hidden = true;
+    var reveal = document.getElementById('simReveal');
+    reveal.hidden = false;
+    document.querySelector('.screen-scoreapp .sa-body').scrollTop = 0;
+    animateScore(score);
+    // guarda pra usar no price card
+    window.__simScore = score;
+    window.__simLabel = diag.gargalo.toLowerCase();
+  });
+
+  document.getElementById('btnSimPlanos').addEventListener('click', function(){
+    track('sim_ver_planos', { score: window.__simScore });
+    resumeIndex = null; // pula áudios restantes, vai direto pros planos
+    show('chat');
+    typingThenRun(400, function(){
+      addTextBubble('com base no seu perfil, esse é o ponto de partida ideal 👇');
+      typingThenRun(500, function(){ addPriceCard(window.__simScore, window.__simLabel || 'score preliminar da simulação'); });
+    });
   });
 
   document.getElementById('btnScoreBack').addEventListener('click', returnToChat);
+
 
   function returnToChat(){
     track('score_push_voltou_conversa');
