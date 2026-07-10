@@ -2,15 +2,16 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-export type AppRole = "admin" | "mentee" | "partner" | "scoreapp_user";
+export type AppRole = "admin" | "mentee" | "partner" | "scoreapp_user" | "escola_user";
 
-export type Module = "admin" | "mentee" | "partner" | "scoreapp";
+export type Module = "admin" | "mentee" | "partner" | "scoreapp" | "escola";
 
 const roleToModule: Record<AppRole, Module> = {
   admin: "admin",
   mentee: "mentee",
   partner: "partner",
   scoreapp_user: "scoreapp",
+  escola_user: "escola",
 };
 
 export const moduleRoute: Record<Module, string> = {
@@ -18,6 +19,7 @@ export const moduleRoute: Record<Module, string> = {
   mentee: "/app/mentorados",
   partner: "/app/parceiro",
   scoreapp: "/app/score",
+  escola: "/escola/conteudos",
 };
 
 export const moduleLabel: Record<Module, string> = {
@@ -25,6 +27,7 @@ export const moduleLabel: Record<Module, string> = {
   mentee: "Mentoria Comercial",
   partner: "Parceiros",
   scoreapp: "Score Comercial",
+  escola: "Escola de Vendedores",
 };
 
 export const roleLabel: Record<AppRole, string> = {
@@ -32,6 +35,7 @@ export const roleLabel: Record<AppRole, string> = {
   mentee: "Mentorado",
   partner: "Parceiro",
   scoreapp_user: "Usuário Score",
+  escola_user: "Aluno Escola",
 };
 
 export function useSessionRoles() {
