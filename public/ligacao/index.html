@@ -906,7 +906,7 @@
     var msg = INTER_MSGS[index];
 
     function sendAudio(){
-      typingThenRun(900, function(){
+      typingThenRun(index === 0 ? 500 : 900, function(){
         addAudioBubble(
           el, Math.round(item.seconds*1000) + 4000, formatDuration(item.seconds),
           function(){
@@ -922,7 +922,8 @@
               return;
             }
             playAudioSequence(index + 1);
-          }
+          },
+          index === 0 // autoStart no primeiro áudio, logo após atender
         );
       });
     }
