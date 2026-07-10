@@ -43,18 +43,8 @@ export default function ConhecaScoreApp() {
       </Helmet>
 
       {/* HEADER */}
-      <header className="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-40">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Trophy className="text-primary" size={20} />
-            <span className="font-serif text-lg">Score Comercial</span>
-          </div>
-          <div className="flex gap-2 text-sm items-center">
-            <Link to="/app/login" className="px-4 py-2 text-muted-foreground hover:text-foreground hidden sm:inline">Entrar</Link>
-            <Link to="/app/cadastro" className="px-4 py-2 bg-primary text-primary-foreground rounded-md uppercase tracking-wide text-xs">Assinar</Link>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
+
 
       {/* HERO */}
       <section className="max-w-5xl mx-auto px-6 py-20 md:py-28 text-center">
