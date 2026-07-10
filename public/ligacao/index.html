@@ -1102,22 +1102,30 @@
   document.getElementById('btnAnswer').addEventListener('click', function(){
     stopRingtone();
     track('ligacao_atendida');
-    // Pré-carrega áudios e vai direto pro chat, iniciando o áudio 1 automaticamente
+    // Pré-carrega áudios (gesto do usuário destrava o playback)
     AUDIO_FILES.forEach(function(item){
       var el = document.getElementById(item.id);
       if (!el.src) el.src = item.src;
     });
-    // Tenta destravar o playback com um "kick" no primeiro áudio (gesto do usuário)
     try {
       var oi = document.getElementById('audio-oi');
       oi.load();
       var pk = oi.play();
       if (pk && pk.then) pk.then(function(){ oi.pause(); oi.currentTime = 0; }).catch(function(){});
     } catch(e){}
-    show('chat');
-    chatBody.innerHTML = '';
-    dateSepInserted = false; lastAuthor = null;
-    playAudioSequence(0);
+
+    // UX de "não conectou": conectando… → falha → busy tone → cai pro lock com notificação
+    getAudioCtx();
+    show('status');
+    setStatus('conectando…', true);
+    setTimeout(function(){
+      setStatus('chamada não conectou', false);
+      track('ligacao_nao_conectou');
+      playBusyTone(6); // ~3s pi-pi-pi
+      setTimeout(function(){
+        goToLock('🎤','mensagem de voz');
+      }, 3200);
+    }, 1600);
   });
 
   document.getElementById('btnDecline').addEventListener('click', function(){
