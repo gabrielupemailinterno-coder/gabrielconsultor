@@ -247,6 +247,12 @@
   .wave-fill{position:absolute;top:0;left:0;bottom:0;width:0%;overflow:hidden;transition:width .12s linear;}
   .wave-fill .wave span{background:#53bdeb;}
   .audio-duration{font-size:10.5px;color:rgba(233,237,239,.55);flex-shrink:0;font-variant-numeric:tabular-nums;}
+  .audio-speed{background:rgba(255,255,255,.08);border:none;color:rgba(233,237,239,.75);
+    font-size:10.5px;font-weight:700;font-family:var(--font-ui);
+    padding:3px 7px;border-radius:10px;cursor:pointer;flex-shrink:0;line-height:1;
+    transition:background .15s ease,color .15s ease;}
+  .audio-speed:hover{background:rgba(255,255,255,.14);}
+  .audio-speed.active{background:rgba(83,189,235,.22);color:#53bdeb;}
 
   /* quick replies (mantido) */
   .quick-replies{display:flex;flex-direction:column;gap:8px;margin-top:6px;width:100%;}
