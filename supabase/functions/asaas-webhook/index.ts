@@ -83,6 +83,15 @@ Deno.serve(async (req) => {
     const email = customer.email?.toLowerCase().trim();
     const fullName = customer.name ?? "Mentorado";
     const phone = customer.mobilePhone ?? customer.phone ?? null;
+    let onboardingJson: Record<string, unknown> | null = null;
+    if (customer.observations && typeof customer.observations === "string") {
+      try {
+        const parsed = JSON.parse(customer.observations);
+        if (parsed && typeof parsed === "object" && parsed.mentoria_onboarding) {
+          onboardingJson = parsed.mentoria_onboarding as Record<string, unknown>;
+        }
+      } catch { /* ignore */ }
+    }
     if (!email) throw new Error("customer email missing");
 
     let partnerId: string | null = null;
@@ -210,15 +219,14 @@ Deno.serve(async (req) => {
     });
     if (provErr) throw new Error("provision: " + provErr.message);
 
-    const { error: paidErr } = await supabase
-      .from("mentees")
-      .update({
-        payment_status: "paid",
-        payment_updated_at: new Date().toISOString(),
-        partner_id: partnerId,
-        partner_code: partnerCode,
-      })
-      .eq("id", menteeId);
+    const paidUpdate: Record<string, unknown> = {
+      payment_status: "paid",
+      payment_updated_at: new Date().toISOString(),
+      partner_id: partnerId,
+      partner_code: partnerCode,
+    };
+    if (onboardingJson) paidUpdate.onboarding_json = onboardingJson;
+    const { error: paidErr } = await supabase.from("mentees").update(paidUpdate).eq("id", menteeId);
     if (paidErr) throw new Error("mark paid: " + paidErr.message);
 
     const { error: unlockErr } = await supabase

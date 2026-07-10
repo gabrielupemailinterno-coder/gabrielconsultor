@@ -12,6 +12,7 @@ import Admin from "./pages/Admin";
 import MentoriaProfissional from "./pages/MentoriaProfissional";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import CheckoutMentoria from "./pages/checkout/Mentoria";
 import EscolaLanding from "./pages/escola/Landing";
 import EscolaSignup from "./pages/escola/Signup";
 import EscolaLogin from "./pages/escola/Login";
@@ -64,6 +65,7 @@ function AppRoutes() {
       {/* Landing pública */}
       <Route path="/" element={<Index />} />
       <Route path="/mentoria-profissional" element={<MentoriaProfissional />} />
+      <Route path="/checkout/mentoria" element={<CheckoutMentoria />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/escola" element={<EscolaLanding />} />
