@@ -101,6 +101,9 @@
   .intro-dots span{width:6px;height:6px;border-radius:50%;background:var(--ink-dim);animation:typingBounce 1.1s ease-in-out infinite;}
   .intro-dots span:nth-child(2){animation-delay:.15s;}
   .intro-dots span:nth-child(3){animation-delay:.3s;}
+  .intro-hint{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);
+    margin-top:8px;animation:hintPulse 1.6s ease-in-out infinite;}
+  @keyframes hintPulse{0%,100%{opacity:.4}50%{opacity:.9}}
 
   /* ---------- Ligação (glass / iOS) ---------- */
   .screen-call .content{align-items:center;justify-content:space-between;padding:70px 24px 44px;text-align:center;}
@@ -338,12 +341,13 @@
   <button class="restart" id="btnRestart" title="Reiniciar demonstração">reiniciar</button>
 
   <!-- 0. Intro -->
-  <section class="screen screen-intro" data-screen="intro">
+  <section class="screen screen-intro" data-screen="intro" id="introScreen">
     <div class="bg-photo" style="background-image:url('https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN')"></div>
     <div class="content">
       <img class="intro-avatar" src="https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN" alt="Gabriel">
       <p class="intro-text">Gabriel está tentando falar com você</p>
       <div class="intro-dots"><span></span><span></span><span></span></div>
+      <p class="intro-hint">toque na tela</p>
     </div>
   </section>
 
@@ -549,6 +553,57 @@
     console.log('[funil]', name, params||'');
   }
 
+  function getAudioCtx(){
+    if (!window._actx){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      window._actx = new AC();
+    }
+    if (window._actx.state === 'suspended') window._actx.resume();
+    return window._actx;
+  }
+  function tone(ctx, freq, startTime, duration, type, peak){
+    var osc = ctx.createOscillator();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    var gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, startTime);
+    gain.gain.linearRampToValueAtTime(peak || 0.22, startTime + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(startTime);
+    osc.stop(startTime + duration + 0.05);
+  }
+  function playRingtoneLoop(){
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    stopRingtone();
+    var notes = [523.25, 659.25, 783.99, 659.25];
+    function pattern(){
+      var t = ctx.currentTime;
+      notes.forEach(function(f, i){ tone(ctx, f, t + i*0.16, 0.4, 'triangle', 0.2); });
+    }
+    pattern();
+    window._ringInterval = setInterval(pattern, 1900);
+  }
+  function stopRingtone(){
+    if (window._ringInterval){ clearInterval(window._ringInterval); window._ringInterval = null; }
+  }
+  function playNotificationChime(){
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    var t = ctx.currentTime;
+    tone(ctx, 1046.5, t, 0.16, 'sine', 0.18);
+    tone(ctx, 1568.0, t + 0.11, 0.22, 'sine', 0.15);
+  }
+  function playMessagePop(){
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    var t = ctx.currentTime;
+    tone(ctx, 680, t, 0.055, 'sine', 0.13);
+    tone(ctx, 980, t + 0.045, 0.07, 'sine', 0.13);
+  }
+
   function buildCheckoutUrl(base){
     var qs = window.location.search;
     if (!qs) return base;
@@ -584,6 +639,7 @@
     row.appendChild(b);
     chatBody.appendChild(row);
     scrollChat();
+    playMessagePop();
   }
 
   function addSentBubble(text){
@@ -619,6 +675,7 @@
       '</div>';
     chatBody.appendChild(row);
     scrollChat();
+    playMessagePop();
 
     var playBtn = row.querySelector('.play-btn');
     var wave = row.querySelector('.wave');
@@ -754,9 +811,14 @@
 
   // ---------- Fluxo: intro -> ligação ----------
   track('lp_visualizada');
-  setTimeout(function(){ show('call'); }, 1700);
+  document.getElementById('introScreen').addEventListener('click', function(){
+    getAudioCtx();
+    show('call');
+    playRingtoneLoop();
+  }, {once:true});
 
   document.getElementById('btnAnswer').addEventListener('click', function(){
+    stopRingtone();
     track('ligacao_atendida');
     show('status');
     setStatus('conectando…', true);
@@ -770,6 +832,7 @@
   });
 
   document.getElementById('btnDecline').addEventListener('click', function(){
+    stopRingtone();
     track('ligacao_recusada');
     show('status');
     setStatus('chamada recusada', false);
@@ -787,6 +850,7 @@
       String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
     document.getElementById('notifPreviewText').textContent = icon+' '+text;
     show('lock');
+    playNotificationChime();
   }
 
   document.getElementById('btnOpenChat').addEventListener('click', function(){
