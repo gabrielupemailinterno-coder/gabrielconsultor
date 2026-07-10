@@ -355,6 +355,37 @@
       <div class="chat-body" id="chatBody"></div>
     </div>
   </section>
+
+  <!-- 5. Score App (simulação) -->
+  <section class="screen screen-scoreapp" data-screen="scoreapp" hidden>
+    <div class="content">
+      <header class="sa-header">
+        <button class="sa-back" id="btnScoreBack" aria-label="Voltar para a conversa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          voltar
+        </button>
+        <div class="sa-brand">Score Comercial</div>
+      </header>
+      <div class="sa-body">
+        <div class="sa-greeting">boa noite — <span>2 min</span> pra fechar seu dia.</div>
+        <p class="sa-sub">registre rapidinho o que aconteceu hoje. o app calcula seu Score e mostra onde ajustar amanhã.</p>
+        <div class="sa-card">
+          <h3>registro de hoje</h3>
+          <p class="sa-hint">toque nos + e − pra preencher</p>
+          <div class="sa-row"><label>ligações feitas</label>
+            <div class="sa-stepper" data-key="lig"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div></div>
+          <div class="sa-row"><label>reuniões realizadas</label>
+            <div class="sa-stepper" data-key="reu"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div></div>
+          <div class="sa-row"><label>propostas enviadas</label>
+            <div class="sa-stepper" data-key="prop"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div></div>
+          <div class="sa-row"><label>follow-ups feitos</label>
+            <div class="sa-stepper" data-key="fup"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div></div>
+        </div>
+        <button class="sa-cta" id="btnScoreSave">calcular meu score de hoje</button>
+        <div id="scoreToast"></div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <audio id="audio-oi" preload="none"></audio>
