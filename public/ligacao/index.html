@@ -806,6 +806,16 @@
     playAudioSequence(0);
   }
 
+  // Mensagens curtas entre os áudios, pra manter a pessoa engajada.
+  // INTER_MSGS[i] = texto exibido ANTES do áudio de índice i (i>=1).
+  var INTER_MSGS = [
+    null,
+    'só um segundo, deixa eu te explicar melhor 👇',
+    'olha esse ponto aqui, é importante:',
+    'espera, só mais uma coisa rápida…',
+    'e pra fechar, o que muda pra você:'
+  ];
+
   function playAudioSequence(index){
     if (index >= AUDIO_FILES.length){
       typingThenRun(700, showDiagnostic);
@@ -814,20 +824,34 @@
     var item = AUDIO_FILES[index];
     var el = document.getElementById(item.id);
     var n = index + 1;
-    typingThenRun(index === 0 ? 1100 : 900, function(){
-      addAudioBubble(
-        el, Math.round(item.seconds*1000) + 4000, formatDuration(item.seconds),
-        function(){
-          track('audio_'+n+'_iniciado');
-          if (index === SCORE_PUSH_AT) scheduleScorePush(el);
-        },
-        function(){
-          track('audio_'+n+'_concluido');
-          playAudioSequence(index + 1);
-        }
-      );
-    });
+    var msg = INTER_MSGS[index];
+
+    function sendAudio(){
+      typingThenRun(900, function(){
+        addAudioBubble(
+          el, Math.round(item.seconds*1000) + 4000, formatDuration(item.seconds),
+          function(){
+            track('audio_'+n+'_iniciado');
+            if (index === SCORE_PUSH_AT) scheduleScorePush(el);
+          },
+          function(){
+            track('audio_'+n+'_concluido');
+            playAudioSequence(index + 1);
+          }
+        );
+      });
+    }
+
+    if (msg){
+      typingThenRun(900, function(){
+        addTextBubble(msg);
+        sendAudio();
+      });
+    } else {
+      typingThenRun(1100, function(){ sendAudio(); });
+    }
   }
+
 
   // ---------- Push notification "Score Comercial" durante áudio 3a ----------
   var scorePushShown = false;
