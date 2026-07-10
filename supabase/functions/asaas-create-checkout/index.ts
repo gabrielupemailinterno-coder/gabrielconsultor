@@ -182,6 +182,10 @@ Deno.serve(async (req) => {
     const findData = await findRes.json();
     let customerId = findData?.data?.[0]?.id;
 
+    const observationsPayload = onboarding && typeof onboarding === "object"
+      ? JSON.stringify({ mentoria_onboarding: onboarding, offer_slug: resolvedOfferSlug })
+      : undefined;
+
     const customerPayload = {
       name,
       email,
@@ -194,7 +198,8 @@ Deno.serve(async (req) => {
       province: province ?? undefined,
       city: city ?? undefined,
       state: state ?? undefined,
-      externalReference: plan_slug,
+      externalReference: resolvedOfferSlug,
+      observations: observationsPayload,
       notificationDisabled: false,
     };
 
