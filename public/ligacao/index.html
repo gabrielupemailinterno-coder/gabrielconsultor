@@ -809,7 +809,11 @@
 
   // ---------- Fluxo: intro -> ligação ----------
   track('lp_visualizada');
-  setTimeout(function(){ show('call'); }, 1700);
+  document.getElementById('introScreen').addEventListener('click', function(){
+    getAudioCtx();
+    show('call');
+    playRingtoneLoop();
+  }, {once:true});
 
   document.getElementById('btnAnswer').addEventListener('click', function(){
     track('ligacao_atendida');
