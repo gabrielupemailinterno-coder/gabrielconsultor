@@ -691,6 +691,20 @@
     var el = _sfx('sfx-ding'); if (!el) return;
     try { el.currentTime = 0; el.volume = 0.9; var p = el.play(); if (p && p.catch) p.catch(function(){}); } catch(e){}
   }
+  // Tom de linha caída (busy tone brasileiro: 425Hz, 250ms on / 250ms off)
+  var _busyTimer = null;
+  function playBusyTone(cycles){
+    var ctx = getAudioCtx(); if (!ctx) return;
+    stopBusyTone();
+    var n = cycles || 6;
+    var t0 = ctx.currentTime + 0.05;
+    for (var i = 0; i < n; i++){
+      tone(ctx, 425, t0 + i*0.5, 0.25, 'sine', 0.18);
+    }
+  }
+  function stopBusyTone(){
+    if (_busyTimer){ clearTimeout(_busyTimer); _busyTimer = null; }
+  }
 
   function buildCheckoutUrl(base){
     var qs = window.location.search;
