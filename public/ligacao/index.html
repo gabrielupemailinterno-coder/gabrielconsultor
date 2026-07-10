@@ -867,7 +867,7 @@
     AUDIO_FILES.forEach(function(item){
       document.getElementById(item.id).src = item.src;
     });
-    setTimeout(function(){ playAudioSequence(0); }, 3000);
+    playAudioSequence(0);
   }
 
   // Mensagens curtas entre os áudios, pra manter a pessoa engajada.
