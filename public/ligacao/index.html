@@ -659,92 +659,262 @@
   }
 
   var chatBody = document.getElementById('chatBody');
+  var chatStatusEl = document.getElementById('chatStatus');
+  var CHAT_AVATAR = 'https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN';
+  var dateSepInserted = false;
+  var lastAuthor = null; // 'them' | 'me'
+
   function scrollChat(){ chatBody.scrollTop = chatBody.scrollHeight; }
 
+  function fmtTime(){
+    var d = new Date();
+    return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  }
 
+  function setChatStatus(state){
+    if (!chatStatusEl) return;
+    chatStatusEl.classList.remove('online','typing');
+    if (state === 'typing'){ chatStatusEl.classList.add('typing'); chatStatusEl.textContent = 'digitando...'; }
+    else { chatStatusEl.classList.add('online'); chatStatusEl.textContent = 'online'; }
+  }
+
+  function ensureDateSep(){
+    if (dateSepInserted) return;
+    dateSepInserted = true;
+    var sep = document.createElement('div');
+    sep.className = 'date-sep';
+    sep.textContent = 'Hoje';
+    chatBody.appendChild(sep);
+  }
+
+  // Marca a bolha anterior do mesmo autor como agrupada (remove tail)
+  function beforeAppend(author){
+    ensureDateSep();
+    var last = chatBody.lastElementChild;
+    if (last && last.classList && last.classList.contains('bubble-row')){
+      var prevAuthor = last.dataset.author;
+      if (prevAuthor === author){
+        // remove tail da anterior; nova bolha fica tail
+        var prevBubble = last.querySelector('.bubble, .audio-bubble');
+        if (prevBubble) prevBubble.classList.remove('tail');
+        last.classList.remove('show-avatar');
+        return true; // grouped
+      }
+    }
+    return false;
+  }
 
   function typingThenRun(delay, fn){
-    var row = document.createElement('div');
-    row.className = 'bubble-row';
-    row.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
-    chatBody.appendChild(row);
-    scrollChat();
-    setTimeout(function(){ row.remove(); fn(); }, delay);
+    setChatStatus('typing');
+    setTimeout(function(){
+      setChatStatus('online');
+      fn();
+    }, delay);
+  }
+
+  // Long-press → menu de contexto flutuante
+  function attachLongPress(bubbleEl, getText){
+    var timer = null, moved = false, startX = 0, startY = 0;
+    function start(e){
+      moved = false;
+      var t = (e.touches && e.touches[0]) || e;
+      startX = t.clientX; startY = t.clientY;
+      timer = setTimeout(function(){
+        if (!moved) openCtxMenu(bubbleEl, getText());
+      }, 480);
+    }
+    function move(e){
+      var t = (e.touches && e.touches[0]) || e;
+      if (Math.abs(t.clientX - startX) > 6 || Math.abs(t.clientY - startY) > 6){
+        moved = true; if (timer){ clearTimeout(timer); timer = null; }
+      }
+    }
+    function cancel(){ if (timer){ clearTimeout(timer); timer = null; } }
+    bubbleEl.addEventListener('touchstart', start, {passive:true});
+    bubbleEl.addEventListener('touchmove', move, {passive:true});
+    bubbleEl.addEventListener('touchend', cancel);
+    bubbleEl.addEventListener('touchcancel', cancel);
+    bubbleEl.addEventListener('mousedown', start);
+    bubbleEl.addEventListener('mousemove', move);
+    bubbleEl.addEventListener('mouseup', cancel);
+    bubbleEl.addEventListener('mouseleave', cancel);
+    bubbleEl.addEventListener('contextmenu', function(e){ e.preventDefault(); openCtxMenu(bubbleEl, getText()); });
+  }
+
+  function openCtxMenu(bubbleEl, text){
+    closeCtxMenu();
+    var rect = bubbleEl.getBoundingClientRect();
+    var backdrop = document.createElement('div');
+    backdrop.className = 'ctx-backdrop';
+    backdrop.addEventListener('click', closeCtxMenu);
+
+    var reactions = document.createElement('div');
+    reactions.className = 'ctx-reactions';
+    ['❤️','👍','😂','😮','😢','🙏'].forEach(function(em){
+      var b = document.createElement('button');
+      b.type='button'; b.textContent = em;
+      b.addEventListener('click', function(){ closeCtxMenu(); });
+      reactions.appendChild(b);
+    });
+
+    var menu = document.createElement('div');
+    menu.className = 'ctx-menu';
+    [
+      {label:'Responder', icon:'↩︎'},
+      {label:'Copiar', icon:'⧉', action:function(){
+        if (text && navigator.clipboard){ navigator.clipboard.writeText(text).catch(function(){}); }
+      }},
+      {label:'Encaminhar', icon:'➤'}
+    ].forEach(function(opt){
+      var b = document.createElement('button');
+      b.type='button';
+      b.innerHTML = '<span>'+opt.label+'</span><span style="opacity:.6">'+opt.icon+'</span>';
+      b.addEventListener('click', function(){ if (opt.action) opt.action(); closeCtxMenu(); });
+      menu.appendChild(b);
+    });
+
+    document.body.appendChild(backdrop);
+    document.body.appendChild(reactions);
+    document.body.appendChild(menu);
+
+    // posiciona: reactions acima, menu abaixo
+    var vw = window.innerWidth, vh = window.innerHeight;
+    reactions.style.visibility='hidden'; menu.style.visibility='hidden';
+    requestAnimationFrame(function(){
+      var rW = reactions.offsetWidth, rH = reactions.offsetHeight;
+      var mW = menu.offsetWidth, mH = menu.offsetHeight;
+      var cx = rect.left + rect.width/2;
+      var rLeft = Math.max(8, Math.min(vw - rW - 8, cx - rW/2));
+      var mLeft = Math.max(8, Math.min(vw - mW - 8, cx - mW/2));
+      var rTop  = Math.max(8, rect.top - rH - 8);
+      var mTop  = Math.min(vh - mH - 8, rect.bottom + 8);
+      reactions.style.left = rLeft+'px'; reactions.style.top = rTop+'px'; reactions.style.visibility='visible';
+      menu.style.left = mLeft+'px'; menu.style.top = mTop+'px'; menu.style.visibility='visible';
+    });
+    window._ctxNodes = [backdrop, reactions, menu];
+  }
+  function closeCtxMenu(){
+    if (!window._ctxNodes) return;
+    window._ctxNodes.forEach(function(n){ if (n && n.parentNode) n.parentNode.removeChild(n); });
+    window._ctxNodes = null;
   }
 
   function addTextBubble(text){
+    var grouped = beforeAppend('them');
     var row = document.createElement('div');
-    row.className = 'bubble-row';
+    row.className = 'bubble-row' + (grouped ? ' grouped' : '');
+    row.dataset.author = 'them';
     var b = document.createElement('div');
-    b.className = 'bubble received';
-    b.textContent = text;
+    b.className = 'bubble received tail';
+    b.innerHTML = '<span class="msg-txt"></span><span class="meta"><span class="time">'+fmtTime()+'</span></span>';
+    b.querySelector('.msg-txt').textContent = text;
     row.appendChild(b);
     chatBody.appendChild(row);
+    lastAuthor = 'them';
     scrollChat();
     playMessagePop();
+    attachLongPress(b, function(){ return text; });
   }
 
   function addSentBubble(text){
+    var grouped = beforeAppend('me');
     var row = document.createElement('div');
-    row.className = 'bubble-row sent';
+    row.className = 'bubble-row sent' + (grouped ? ' grouped' : '');
+    row.dataset.author = 'me';
     var b = document.createElement('div');
-    b.className = 'bubble sent';
-    b.innerHTML = '<span>'+text+'</span><span class="ticks">✓✓</span>';
+    b.className = 'bubble sent tail';
+    b.innerHTML = '<span class="msg-txt"></span>' +
+      '<span class="meta"><span class="time">'+fmtTime()+'</span>' +
+      '<span class="ticks read">✓✓</span></span>';
+    b.querySelector('.msg-txt').textContent = text;
     row.appendChild(b);
     chatBody.appendChild(row);
+    lastAuthor = 'me';
     scrollChat();
+    attachLongPress(b, function(){ return text; });
   }
 
   function waveBars(){
     var html = '';
-    for (var i=0;i<22;i++){
-      var h = 6 + Math.round(Math.abs(Math.sin(i*1.7))*14);
+    for (var i=0;i<32;i++){
+      var h = 4 + Math.round(Math.abs(Math.sin(i*1.7)+Math.cos(i*.9))*8);
       html += '<span style="height:'+h+'px"></span>';
     }
     return html;
   }
 
   function addAudioBubble(audioEl, fallbackMs, durationLabel, onStart, onDone, autoStart){
+    var grouped = beforeAppend('them');
     var row = document.createElement('div');
-    row.className = 'bubble-row';
+    row.className = 'bubble-row show-avatar' + (grouped ? ' grouped' : '');
+    row.dataset.author = 'them';
+    var bars = waveBars();
     row.innerHTML =
-      '<div class="audio-bubble">' +
+      '<img class="avatar-sm" src="'+CHAT_AVATAR+'" alt="">' +
+      '<div class="audio-bubble tail">' +
         '<button class="play-btn" aria-label="Reproduzir áudio">' +
           '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>' +
         '</button>' +
-        '<div class="wave">'+waveBars()+'</div>' +
+        '<div class="wave-wrap">' +
+          '<div class="wave">'+bars+'</div>' +
+          '<div class="wave-fill"><div class="wave">'+bars+'</div></div>' +
+        '</div>' +
         '<span class="audio-duration">'+durationLabel+'</span>' +
       '</div>';
     chatBody.appendChild(row);
+    lastAuthor = 'them';
     scrollChat();
     playMessagePop();
 
+    var bubble = row.querySelector('.audio-bubble');
     var playBtn = row.querySelector('.play-btn');
-    var wave = row.querySelector('.wave');
-    var played = false;
+    var fill = row.querySelector('.wave-fill');
+    var durEl = row.querySelector('.audio-duration');
+    var totalSec = Math.max(1, Math.round(fallbackMs/1000));
+    var played = false, rafId = null;
+
+    attachLongPress(bubble, function(){ return '[áudio]'; });
+
+    function updateDurLabel(cur){
+      var s = Math.max(0, Math.min(totalSec, Math.round(cur)));
+      var m = Math.floor(s/60), r = s%60;
+      durEl.textContent = m+':'+String(r).padStart(2,'0');
+    }
+
+    function tickProgress(){
+      var dur = (audioEl.duration && isFinite(audioEl.duration)) ? audioEl.duration : totalSec;
+      var cur = audioEl.currentTime || 0;
+      var pct = Math.max(0, Math.min(100, (cur/dur)*100));
+      fill.style.width = pct+'%';
+      updateDurLabel(dur - cur);
+      rafId = requestAnimationFrame(tickProgress);
+    }
 
     function trigger(){
       if (played) return;
       played = true;
       onStart && onStart();
-      wave.classList.add('playing');
       playBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
 
       var finished = false;
       function finish(){
         if (finished) return;
         finished = true;
-        wave.classList.remove('playing');
+        if (rafId) cancelAnimationFrame(rafId);
+        fill.style.width = '100%';
+        updateDurLabel(0);
         onDone && onDone();
       }
       var p = audioEl.play();
       if (p && p.then){
         p.then(function(){
+          rafId = requestAnimationFrame(tickProgress);
           audioEl.addEventListener('ended', finish, {once:true});
         }).catch(function(){
           setTimeout(finish, fallbackMs);
         });
       } else {
+        rafId = requestAnimationFrame(tickProgress);
         audioEl.addEventListener('ended', finish, {once:true});
       }
       setTimeout(finish, fallbackMs + 4000);
@@ -753,6 +923,8 @@
     playBtn.addEventListener('click', trigger);
     if (autoStart) setTimeout(trigger, 120);
   }
+
+
 
   function addQuickReplies(options){
     var row = document.createElement('div');
