@@ -222,6 +222,53 @@
   .restart{position:absolute;top:14px;right:14px;z-index:5;background:rgba(0,0,0,.35);border:none;
     color:var(--ink-faint);font-size:11px;padding:6px 10px;border-radius:999px;cursor:pointer;font-family:var(--font-ui);}
 
+  /* ---------- Push notification (in-app, drops from top) ---------- */
+  .push-notif{
+    position:absolute;top:12px;left:12px;right:12px;z-index:20;
+    background:rgba(28,30,38,.88);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);
+    border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:12px 14px;
+    display:flex;gap:11px;align-items:flex-start;cursor:pointer;color:inherit;text-align:left;
+    box-shadow:0 14px 40px rgba(0,0,0,.55);
+    animation:dropIn .55s cubic-bezier(.2,.9,.3,1.2) both;
+  }
+  .push-notif.leaving{animation:dropOut .3s ease forwards;}
+  @keyframes dropOut{to{transform:translateY(-40px);opacity:0}}
+  .push-icon{width:34px;height:34px;border-radius:9px;flex-shrink:0;background:var(--gold);color:var(--gold-ink);
+    display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:15px;}
+  .push-body{flex:1;min-width:0;}
+  .push-title{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--ink-dim);margin-bottom:2px;font-weight:600;letter-spacing:.02em;}
+  .push-title span:last-child{font-size:10.5px;color:var(--ink-faint);font-weight:500;}
+  .push-msg{font-size:13.5px;line-height:1.35;color:var(--ink);}
+
+  /* ---------- Score app mock (fullscreen overlay) ---------- */
+  .screen-scoreapp{background:#0b0d12;z-index:15;}
+  .screen-scoreapp .content{padding:0;}
+  .sa-header{display:flex;align-items:center;gap:10px;padding:16px 16px 12px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;}
+  .sa-back{background:none;border:none;color:var(--gold);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-ui);
+    display:flex;align-items:center;gap:4px;padding:4px 6px;margin-left:-6px;}
+  .sa-back svg{width:16px;height:16px;}
+  .sa-brand{font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:.01em;flex:1;text-align:center;margin-right:38px;}
+  .sa-body{flex:1;overflow-y:auto;padding:22px 20px 30px;display:flex;flex-direction:column;gap:16px;}
+  .sa-greeting{font-family:var(--font-display);font-size:22px;font-weight:600;line-height:1.25;}
+  .sa-greeting span{color:var(--gold);}
+  .sa-sub{color:var(--ink-dim);font-size:13.5px;line-height:1.45;margin-top:-8px;}
+  .sa-card{background:#131822;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:18px;}
+  .sa-card h3{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--ink);}
+  .sa-card p.sa-hint{margin:0 0 14px;font-size:12px;color:var(--ink-dim);}
+  .sa-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+  .sa-row:last-child{border-bottom:none;}
+  .sa-row label{font-size:13.5px;color:var(--ink);}
+  .sa-stepper{display:flex;align-items:center;gap:10px;}
+  .sa-stepper button{width:28px;height:28px;border-radius:50%;border:1px solid rgba(231,184,78,.4);
+    background:transparent;color:var(--gold);font-size:16px;font-weight:600;cursor:pointer;line-height:1;}
+  .sa-stepper button:active{transform:scale(.92);}
+  .sa-stepper span{font-family:var(--font-display);font-weight:600;min-width:22px;text-align:center;color:var(--ink);}
+  .sa-cta{background:var(--gold);color:var(--gold-ink);border:none;padding:14px;border-radius:14px;
+    font-size:14.5px;font-weight:700;cursor:pointer;font-family:var(--font-ui);width:100%;}
+  .sa-cta:active{transform:scale(.985);}
+  .sa-toast{margin-top:6px;background:rgba(50,215,75,.14);border:1px solid rgba(50,215,75,.35);color:#8fd0a9;
+    border-radius:12px;padding:12px 14px;font-size:13px;text-align:center;animation:fadeIn .3s ease;}
+
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important;}}
 </style>
@@ -308,6 +355,37 @@
       <div class="chat-body" id="chatBody"></div>
     </div>
   </section>
+
+  <!-- 5. Score App (simulação) -->
+  <section class="screen screen-scoreapp" data-screen="scoreapp" hidden>
+    <div class="content">
+      <header class="sa-header">
+        <button class="sa-back" id="btnScoreBack" aria-label="Voltar para a conversa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          voltar
+        </button>
+        <div class="sa-brand">Score Comercial</div>
+      </header>
+      <div class="sa-body">
+        <div class="sa-greeting">boa noite — <span>2 min</span> pra fechar seu dia.</div>
+        <p class="sa-sub">registre rapidinho o que aconteceu hoje. o app calcula seu Score e mostra onde ajustar amanhã.</p>
+        <div class="sa-card">
+          <h3>registro de hoje</h3>
+          <p class="sa-hint">toque nos + e − pra preencher</p>
+          <div class="sa-row"><label>ligações feitas</label>
+            <div class="sa-stepper" data-key="lig"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div></div>
+          <div class="sa-row"><label>reuniões realizadas</label>
+            <div class="sa-stepper" data-key="reu"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div></div>
+          <div class="sa-row"><label>propostas enviadas</label>
+            <div class="sa-stepper" data-key="prop"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div></div>
+          <div class="sa-row"><label>follow-ups feitos</label>
+            <div class="sa-stepper" data-key="fup"><button data-op="-">−</button><span>0</span><button data-op="+">+</button></div></div>
+        </div>
+        <button class="sa-cta" id="btnScoreSave">calcular meu score de hoje</button>
+        <div id="scoreToast"></div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <audio id="audio-oi" preload="none"></audio>
@@ -356,6 +434,8 @@
 
   var chatBody = document.getElementById('chatBody');
   function scrollChat(){ chatBody.scrollTop = chatBody.scrollHeight; }
+
+
 
   function typingThenRun(delay, fn){
     var row = document.createElement('div');
@@ -608,7 +688,10 @@
     typingThenRun(index === 0 ? 1100 : 900, function(){
       addAudioBubble(
         el, Math.round(item.seconds*1000) + 4000, formatDuration(item.seconds),
-        function(){ track('audio_'+n+'_iniciado'); },
+        function(){
+          track('audio_'+n+'_iniciado');
+          if (n === 3) scheduleScorePush(el);
+        },
         function(){
           track('audio_'+n+'_concluido');
           playAudioSequence(index + 1);
@@ -616,6 +699,83 @@
       );
     });
   }
+
+  // ---------- Push notification "Score Comercial" durante áudio 3 ----------
+  var scorePushShown = false;
+  var pausedAudio = null;
+
+  function scheduleScorePush(audioEl){
+    if (scorePushShown) return;
+    // dispara ~9s depois do áudio 3 começar (meio do áudio)
+    setTimeout(function(){ showScorePush(audioEl); }, 9000);
+  }
+
+  function showScorePush(audioEl){
+    if (scorePushShown) return;
+    scorePushShown = true;
+    track('score_push_exibido');
+    var stage = document.getElementById('stage');
+    var notif = document.createElement('button');
+    notif.type = 'button';
+    notif.className = 'push-notif';
+    notif.innerHTML =
+      '<div class="push-icon">S</div>' +
+      '<div class="push-body">' +
+        '<div class="push-title"><span>SCORE COMERCIAL</span><span>agora</span></div>' +
+        '<div class="push-msg">hora de fechar seu dia — 2 min pra registrar suas atividades e ver seu score.</div>' +
+      '</div>';
+    stage.appendChild(notif);
+
+    var autoHide = setTimeout(function(){
+      if (notif.parentNode) { notif.classList.add('leaving'); setTimeout(function(){ notif.remove(); }, 300); }
+    }, 8000);
+
+    notif.addEventListener('click', function(){
+      clearTimeout(autoHide);
+      notif.remove();
+      track('score_push_aberto');
+      // pausa o áudio da conversa
+      try { audioEl.pause(); pausedAudio = audioEl; } catch(e){}
+      show('scoreapp');
+    });
+  }
+
+  // Score-app: steppers, salvar, voltar
+  document.querySelectorAll('.screen-scoreapp .sa-stepper').forEach(function(st){
+    var span = st.querySelector('span');
+    st.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        var v = parseInt(span.textContent, 10) || 0;
+        v = b.dataset.op === '+' ? v + 1 : Math.max(0, v - 1);
+        span.textContent = v;
+      });
+    });
+  });
+
+  document.getElementById('btnScoreSave').addEventListener('click', function(){
+    var vals = {};
+    document.querySelectorAll('.screen-scoreapp .sa-stepper').forEach(function(st){
+      vals[st.dataset.key] = parseInt(st.querySelector('span').textContent, 10) || 0;
+    });
+    var total = (vals.lig||0) + (vals.reu||0)*3 + (vals.prop||0)*4 + (vals.fup||0)*2;
+    var score = Math.min(100, Math.max(0, 30 + total * 3));
+    track('score_simulado_registrado', {score: score});
+    var toast = document.getElementById('scoreToast');
+    toast.innerHTML = '<div class="sa-toast">✓ registro salvo. seu score de hoje: <strong>'+score+'/100</strong>.</div>';
+    setTimeout(function(){ returnToChat(); }, 1600);
+  });
+
+  document.getElementById('btnScoreBack').addEventListener('click', returnToChat);
+
+  function returnToChat(){
+    track('score_push_voltou_conversa');
+    show('chat');
+    if (pausedAudio){
+      try { pausedAudio.play(); } catch(e){}
+      pausedAudio = null;
+    }
+  }
+
 
   function showDiagnostic(){
     addTextBubble('Qual dessas situações mais acontece com você?');
