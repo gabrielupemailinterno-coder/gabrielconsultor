@@ -228,7 +228,7 @@ export default function ScoreCheckout() {
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-6 pt-8 pb-20 grid lg:grid-cols-[1fr_360px] gap-10">
+      <div className="max-w-3xl mx-auto px-6 pt-8 pb-20">
         {/* COLUNA PRINCIPAL */}
         <div className="space-y-8">
 
