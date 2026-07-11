@@ -115,10 +115,22 @@ export default function ScoreCheckoutPix() {
         ) : (
           <div className="bg-card border border-border rounded-lg p-6 space-y-4">
             <h1 className="font-serif text-2xl text-center">Pagamento via PIX</h1>
+
+            {/* Resumo do pedido */}
+            <div className="border border-border rounded-md p-4 bg-muted/30">
+              <div className="text-[11px] uppercase tracking-widest text-primary mb-2">Resumo do pedido</div>
+              <div className="flex items-baseline justify-between">
+                <div>
+                  <div className="font-serif">Score Comercial</div>
+                  <div className="text-xs text-muted-foreground capitalize">Plano {profile?.plan ?? "mensal"}</div>
+                </div>
+                <div className="font-mono text-2xl text-primary">{formatted}</div>
+              </div>
+            </div>
+
             <p className="text-center text-muted-foreground text-sm">
               Escaneie o QR Code ou use o copia e cola para pagar
             </p>
-            <div className="text-center font-mono text-3xl text-primary">{formatted}</div>
 
             {profile?.cora_emv ? (
               <div className="flex justify-center">
