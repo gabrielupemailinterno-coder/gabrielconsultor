@@ -5,8 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getPartnerRef } from "@/lib/partnerRef";
 import {
-  Trophy, Check, Loader2, Lock, ShieldCheck, ArrowRight,
-  Target, BarChart3, Clock, Zap, ChevronDown,
+  Trophy, Check, Loader2, Lock, ShieldCheck, ArrowRight, Gift, Timer,
 } from "lucide-react";
 
 // -------- Planos (mesmos preços da edge fn cora-pix-checkout) --------
@@ -64,32 +63,8 @@ const ADDRESS_FIELDS: Array<[string, string, boolean]> = [
   ["state", "UF", true],
 ];
 
-const FAQS = [
-  {
-    q: "O Score Comercial serve para qualquer tipo de vendedor?",
-    a: "Sim. Foi desenhado para vendedores consultivos, corretores, representantes, SDRs, BDRs e autônomos — qualquer profissional que trabalhe com meta e precise controlar sua rotina.",
-  },
-  {
-    q: "Preciso saber usar CRM?",
-    a: "Não. O Score Comercial funciona por conta própria. Se você já usa um CRM, ele complementa; se não usa, você registra as atividades direto no Score em poucos minutos por dia.",
-  },
-  {
-    q: "Posso usar pelo celular?",
-    a: "Sim. Funciona no navegador do celular e do computador, sem instalar aplicativo.",
-  },
-  {
-    q: "O plano é renovado automaticamente?",
-    a: "O plano mensal é uma cobrança PIX recorrente que gera nova fatura a cada 30 dias. O plano semestral é uma cobrança única de R$ 49,70 e não renova automaticamente — você é avisado antes do fim para decidir se continua.",
-  },
-  {
-    q: "Quando recebo o acesso?",
-    a: "Assim que o PIX é confirmado pelo banco (normalmente segundos), o acesso é liberado automaticamente e você é redirecionado para o Score Comercial.",
-  },
-  {
-    q: "Como funciona a reunião do plano semestral?",
-    a: "Após a confirmação do pagamento você recebe as orientações por e-mail e WhatsApp para agendar sua reunião individual de 60 minutos com Gabriel Vieira.",
-  },
-];
+const BONUS_DURATION_MS = 10 * 60 * 1000;
+const BONUS_KEY = "score_bonus_deadline";
 
 export default function ScoreCheckout() {
   const navigate = useNavigate();
@@ -100,8 +75,24 @@ export default function ScoreCheckout() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<Record<string, string>>({});
   const [needsData, setNeedsData] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [terms, setTerms] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+  const [deadline] = useState<number>(() => {
+    if (typeof window === "undefined") return Date.now() + BONUS_DURATION_MS;
+    const stored = Number(localStorage.getItem(BONUS_KEY));
+    if (stored && stored > Date.now()) return stored;
+    const fresh = Date.now() + BONUS_DURATION_MS;
+    localStorage.setItem(BONUS_KEY, String(fresh));
+    return fresh;
+  });
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const remainingMs = Math.max(0, deadline - now);
+  const mm = String(Math.floor(remainingMs / 60000)).padStart(2, "0");
+  const ss = String(Math.floor((remainingMs % 60000) / 1000)).padStart(2, "0");
+  const bonusActive = remainingMs > 0;
 
   const plan = PLANS[selected];
 
@@ -198,35 +189,14 @@ export default function ScoreCheckout() {
     }
   };
 
-  const Stepper = () => (
-    <div className="flex items-center justify-center gap-2 sm:gap-4 text-xs">
-      {[
-        { n: 1, t: "Plano" },
-        { n: 2, t: "Seus dados" },
-        { n: 3, t: "Pagamento" },
-      ].map((s, i, arr) => (
-        <div key={s.n} className="flex items-center gap-2 sm:gap-4">
-          <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-primary/15 text-primary font-mono flex items-center justify-center text-[11px]">
-              {s.n}
-            </span>
-            <span className="text-muted-foreground uppercase tracking-widest">{s.t}</span>
-          </div>
-          {i < arr.length - 1 && <span className="w-4 sm:w-8 h-px bg-border" />}
-        </div>
-      ))}
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet>
         <title>Checkout · Score Comercial</title>
-        <meta name="description" content="Assine o Score Comercial e comece a acompanhar sua rotina, indicadores e gargalos de vendas hoje." />
+        <meta name="description" content="Assine o Score Comercial via PIX e libere o acesso automaticamente após a confirmação do pagamento." />
         <meta name="robots" content="noindex" />
       </Helmet>
 
-      {/* Cabeçalho simplificado */}
       <header className="border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/conhecascoreapp" className="flex items-center gap-2">
@@ -240,44 +210,28 @@ export default function ScoreCheckout() {
         </div>
       </header>
 
-      {/* Bloco principal */}
-      <section className="max-w-6xl mx-auto px-6 pt-12 pb-8 text-center">
-        <h1 className="font-serif text-3xl md:text-5xl leading-tight">
-          Você está a um passo de assumir o controle
-          <br className="hidden sm:block" /> dos seus resultados comerciais.
-        </h1>
-        <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
-          Escolha seu plano, conclua sua assinatura e comece a acompanhar o que realmente constrói sua meta.
-        </p>
-        <div className="mt-8">
-          <Stepper />
+      {/* Banner bônus com contagem regressiva */}
+      {bonusActive && (
+        <div className="bg-primary/10 border-b border-primary/30">
+          <div className="max-w-6xl mx-auto px-6 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="flex items-center gap-2 text-sm">
+              <Gift size={16} className="text-primary shrink-0" />
+              <span>
+                <strong>Fechando o plano semestral nos próximos 10 min</strong> você ganha{" "}
+                <strong>1h de consultoria de funil</strong> com Gabriel.
+              </span>
+            </div>
+            <div className="flex items-center gap-2 font-mono text-lg text-primary">
+              <Timer size={16} /> {mm}:{ss}
+            </div>
+          </div>
         </div>
-      </section>
+      )}
 
-      <div className="max-w-6xl mx-auto px-6 pb-20 grid lg:grid-cols-[1fr_360px] gap-10">
+      <div className="max-w-6xl mx-auto px-6 pt-8 pb-20 grid lg:grid-cols-[1fr_360px] gap-10">
         {/* COLUNA PRINCIPAL */}
-        <div className="space-y-10">
-          {/* Resumo do produto */}
-          <section className="bg-card border border-border rounded-lg p-6 md:p-8">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-primary mb-3">
-              <Trophy size={14} /> O que você começa a controlar
-            </div>
-            <div className="grid sm:grid-cols-2 gap-3 text-sm">
-              {[
-                { i: Target, t: "Metas diárias" },
-                { i: BarChart3, t: "Volume de prospecções" },
-                { i: Clock, t: "Ligações e contatos" },
-                { i: Zap, t: "Apresentações e follow-ups" },
-                { i: BarChart3, t: "Taxas de conversão" },
-                { i: Target, t: "Gargalos por etapa" },
-              ].map((x) => (
-                <div key={x.t} className="flex items-center gap-2 text-muted-foreground">
-                  <x.i size={14} className="text-primary shrink-0" />
-                  {x.t}
-                </div>
-              ))}
-            </div>
-          </section>
+        <div className="space-y-8">
+
 
           {/* Seleção do plano */}
           <section>
@@ -458,67 +412,6 @@ export default function ScoreCheckout() {
                 <ShieldCheck size={12} className="text-primary" />
                 Seus dados são protegidos e o pagamento é processado em ambiente seguro.
               </div>
-            </div>
-          </section>
-
-          {/* Quebra de objeção */}
-          <section className="bg-card border border-border rounded-lg p-8">
-            <h2 className="font-serif text-2xl mb-3">Você não precisa vender no escuro.</h2>
-            <p className="text-muted-foreground text-sm mb-4">
-              O Score Comercial não promete resultado sem execução. Ele mostra o que você está fazendo, onde está
-              deixando oportunidades pelo caminho e quais ações precisam entrar na sua rotina.
-            </p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              {[
-                "Leva poucos minutos por dia.",
-                "Funciona pelo celular ou computador.",
-                "Direcionamentos baseados nos seus próprios números.",
-              ].map((t) => (
-                <li key={t} className="flex items-start gap-2">
-                  <Check size={14} className="text-primary mt-0.5" /> {t}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* Sobre Gabriel */}
-          <section className="bg-card border border-border rounded-lg p-8">
-            <div className="text-xs uppercase tracking-widest text-primary mb-2">Sobre o criador</div>
-            <h2 className="font-serif text-2xl mb-3">Gabriel Vieira</h2>
-            <p className="text-muted-foreground text-sm">
-              Consultor e mentor comercial com atuação em processos de vendas, CRM, indicadores, gestão de funil e
-              desenvolvimento de vendedores.
-            </p>
-            <p className="text-muted-foreground text-sm mt-3">
-              O Score Comercial foi criado a partir dos indicadores e comportamentos acompanhados diariamente em
-              operações comerciais reais.
-            </p>
-          </section>
-
-          {/* FAQ */}
-          <section>
-            <h2 className="font-serif text-2xl mb-4">Perguntas frequentes</h2>
-            <div className="space-y-2">
-              {FAQS.map((f, i) => {
-                const open = openFaq === i;
-                return (
-                  <div key={f.q} className="bg-card border border-border rounded-lg">
-                    <button
-                      onClick={() => setOpenFaq(open ? null : i)}
-                      className="w-full text-left px-5 py-4 flex items-center justify-between gap-4"
-                    >
-                      <span className="font-serif text-base">{f.q}</span>
-                      <ChevronDown
-                        size={16}
-                        className={`text-muted-foreground transition ${open ? "rotate-180" : ""}`}
-                      />
-                    </button>
-                    {open && (
-                      <div className="px-5 pb-4 text-sm text-muted-foreground">{f.a}</div>
-                    )}
-                  </div>
-                );
-              })}
             </div>
           </section>
         </div>
