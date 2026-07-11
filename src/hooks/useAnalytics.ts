@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 const SESSION_KEY = "analytics_session_id";
+const EDIT_TOKEN_KEY = "analytics_session_edit_token";
 
 function getSessionId(): string {
   let id = sessionStorage.getItem(SESSION_KEY);
@@ -12,9 +13,19 @@ function getSessionId(): string {
   return id;
 }
 
+function getEditToken(): string {
+  let token = sessionStorage.getItem(EDIT_TOKEN_KEY);
+  if (!token) {
+    token = crypto.randomUUID();
+    sessionStorage.setItem(EDIT_TOKEN_KEY, token);
+  }
+  return token;
+}
+
 export function useAnalytics(path: string = "/") {
   useEffect(() => {
     const sessionId = getSessionId();
+    const editToken = getEditToken();
     const startedAt = Date.now();
     const userAgent = navigator.userAgent;
     const referrer = document.referrer || null;
@@ -36,35 +47,34 @@ export function useAnalytics(path: string = "/") {
       path,
       referrer,
       user_agent: userAgent,
+      edit_token: editToken,
       started_at: new Date(startedAt).toISOString(),
       last_seen_at: new Date(startedAt).toISOString(),
       duration_seconds: 0,
     }, { onConflict: "session_id" }).then(() => {});
 
-    // Heartbeat: update duration every 15s
-    const interval = window.setInterval(() => {
+    const heartbeat = () => {
       const seconds = Math.floor((Date.now() - startedAt) / 1000);
-      supabase.from("page_sessions").update({
-        duration_seconds: seconds,
-        last_seen_at: new Date().toISOString(),
-      }).eq("session_id", sessionId).then(() => {});
-    }, 15000);
-
-    const flush = () => {
-      const seconds = Math.floor((Date.now() - startedAt) / 1000);
-      supabase.from("page_sessions").update({
-        duration_seconds: seconds,
-        last_seen_at: new Date().toISOString(),
-      }).eq("session_id", sessionId).then(() => {});
+      supabase.rpc("update_page_session_heartbeat", {
+        p_session_id: sessionId,
+        p_edit_token: editToken,
+        p_duration_seconds: seconds,
+        p_last_seen_at: new Date().toISOString(),
+        p_path: path,
+      }).then(() => {});
     };
-    window.addEventListener("beforeunload", flush);
-    window.addEventListener("pagehide", flush);
+
+    // Heartbeat every 15s
+    const interval = window.setInterval(heartbeat, 15000);
+
+    window.addEventListener("beforeunload", heartbeat);
+    window.addEventListener("pagehide", heartbeat);
 
     return () => {
       window.clearInterval(interval);
-      window.removeEventListener("beforeunload", flush);
-      window.removeEventListener("pagehide", flush);
-      flush();
+      window.removeEventListener("beforeunload", heartbeat);
+      window.removeEventListener("pagehide", heartbeat);
+      heartbeat();
     };
   }, [path]);
 }
