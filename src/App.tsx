@@ -84,6 +84,8 @@ function AppRoutes() {
       <Route path="/r/:slug" element={<RedirectPartnerLink />} />
       <Route path="/ligacao" element={<LigacaoRedirect />} />
       <Route path="/ligacao/*" element={<LigacaoRedirect />} />
+      <Route path="/termos" element={<Termos />} />
+      <Route path="/privacidade" element={<Privacidade />} />
 
       {/* Plataforma (autenticada) — tudo sob /app */}
       <Route path="/app" element={<AppHub />} />
