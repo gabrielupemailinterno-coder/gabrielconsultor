@@ -190,35 +190,14 @@ export default function ScoreCheckout() {
     }
   };
 
-  const Stepper = () => (
-    <div className="flex items-center justify-center gap-2 sm:gap-4 text-xs">
-      {[
-        { n: 1, t: "Plano" },
-        { n: 2, t: "Seus dados" },
-        { n: 3, t: "Pagamento" },
-      ].map((s, i, arr) => (
-        <div key={s.n} className="flex items-center gap-2 sm:gap-4">
-          <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-primary/15 text-primary font-mono flex items-center justify-center text-[11px]">
-              {s.n}
-            </span>
-            <span className="text-muted-foreground uppercase tracking-widest">{s.t}</span>
-          </div>
-          {i < arr.length - 1 && <span className="w-4 sm:w-8 h-px bg-border" />}
-        </div>
-      ))}
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Helmet>
         <title>Checkout · Score Comercial</title>
-        <meta name="description" content="Assine o Score Comercial e comece a acompanhar sua rotina, indicadores e gargalos de vendas hoje." />
+        <meta name="description" content="Assine o Score Comercial via PIX e libere o acesso automaticamente após a confirmação do pagamento." />
         <meta name="robots" content="noindex" />
       </Helmet>
 
-      {/* Cabeçalho simplificado */}
       <header className="border-b border-border">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/conhecascoreapp" className="flex items-center gap-2">
@@ -232,44 +211,28 @@ export default function ScoreCheckout() {
         </div>
       </header>
 
-      {/* Bloco principal */}
-      <section className="max-w-6xl mx-auto px-6 pt-12 pb-8 text-center">
-        <h1 className="font-serif text-3xl md:text-5xl leading-tight">
-          Você está a um passo de assumir o controle
-          <br className="hidden sm:block" /> dos seus resultados comerciais.
-        </h1>
-        <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
-          Escolha seu plano, conclua sua assinatura e comece a acompanhar o que realmente constrói sua meta.
-        </p>
-        <div className="mt-8">
-          <Stepper />
+      {/* Banner bônus com contagem regressiva */}
+      {bonusActive && (
+        <div className="bg-primary/10 border-b border-primary/30">
+          <div className="max-w-6xl mx-auto px-6 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div className="flex items-center gap-2 text-sm">
+              <Gift size={16} className="text-primary shrink-0" />
+              <span>
+                <strong>Fechando o plano semestral nos próximos 10 min</strong> você ganha{" "}
+                <strong>1h de consultoria de funil</strong> com Gabriel.
+              </span>
+            </div>
+            <div className="flex items-center gap-2 font-mono text-lg text-primary">
+              <Timer size={16} /> {mm}:{ss}
+            </div>
+          </div>
         </div>
-      </section>
+      )}
 
-      <div className="max-w-6xl mx-auto px-6 pb-20 grid lg:grid-cols-[1fr_360px] gap-10">
+      <div className="max-w-6xl mx-auto px-6 pt-8 pb-20 grid lg:grid-cols-[1fr_360px] gap-10">
         {/* COLUNA PRINCIPAL */}
-        <div className="space-y-10">
-          {/* Resumo do produto */}
-          <section className="bg-card border border-border rounded-lg p-6 md:p-8">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-primary mb-3">
-              <Trophy size={14} /> O que você começa a controlar
-            </div>
-            <div className="grid sm:grid-cols-2 gap-3 text-sm">
-              {[
-                { i: Target, t: "Metas diárias" },
-                { i: BarChart3, t: "Volume de prospecções" },
-                { i: Clock, t: "Ligações e contatos" },
-                { i: Zap, t: "Apresentações e follow-ups" },
-                { i: BarChart3, t: "Taxas de conversão" },
-                { i: Target, t: "Gargalos por etapa" },
-              ].map((x) => (
-                <div key={x.t} className="flex items-center gap-2 text-muted-foreground">
-                  <x.i size={14} className="text-primary shrink-0" />
-                  {x.t}
-                </div>
-              ))}
-            </div>
-          </section>
+        <div className="space-y-8">
+
 
           {/* Seleção do plano */}
           <section>
