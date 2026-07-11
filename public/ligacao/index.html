@@ -1276,10 +1276,18 @@
   function askConfirmations(){
     addTextBubble('rápido antes de continuar: isso que eu tô descrevendo acontece com você?');
     addQuickReplies([
-      { label:'sim, muito', onClick:function(){ track('confirma_acontece', {r:'sim'}); askMetaProblem(); } },
+      { label:'sim, muito', onClick:function(){ track('confirma_acontece', {r:'sim'}); skipToNextAudio(); } },
       { label:'às vezes', onClick:function(){ track('confirma_acontece', {r:'as_vezes'}); askMetaProblem(); } },
       { label:'não é meu caso', onClick:function(){ track('confirma_acontece', {r:'nao'}); askMetaProblem(); } }
     ]);
+  }
+  function skipToNextAudio(){
+    track('confirma_pre_qualificada');
+    typingThenRun(700, function(){
+      addTextBubble('perfeito, então esse próximo é pra você — é a parte mais importante 👇');
+      confirmationDone = true;
+      playAudioSequence(2);
+    });
   }
   function askMetaProblem(){
     typingThenRun(900, function(){
