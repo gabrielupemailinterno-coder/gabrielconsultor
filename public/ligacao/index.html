@@ -981,22 +981,32 @@
       rafId = requestAnimationFrame(tickProgress);
     }
 
-    function trigger(){
-      if (played) return;
+    var PLAY_ICON  = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+    var PAUSE_ICON = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+    var isPlaying = false;
+
+    function trigger(isReplay){
+      var firstPlay = !played;
       played = true;
-      onStart && onStart();
-      playBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+      if (firstPlay) onStart && onStart();
+      playBtn.innerHTML = PAUSE_ICON;
+      isPlaying = true;
 
       var finished = false;
       function finish(){
         if (finished) return;
         finished = true;
         if (rafId) cancelAnimationFrame(rafId);
-        fill.style.width = '100%';
-        updateDurLabel(0);
-        onDone && onDone();
+        isPlaying = false;
+        playBtn.innerHTML = PLAY_ICON;
+        try { audioEl.pause(); } catch(e){}
+        try { audioEl.currentTime = 0; } catch(e){}
+        fill.style.width = '0%';
+        updateDurLabel(totalSec);
+        if (firstPlay) onDone && onDone();
       }
       audioEl.muted = false;
+      if (isReplay) { try { audioEl.currentTime = 0; } catch(e){} }
       var p = audioEl.play();
       if (p && p.then){
         p.then(function(){
@@ -1009,11 +1019,37 @@
         rafId = requestAnimationFrame(tickProgress);
         audioEl.addEventListener('ended', finish, {once:true});
       }
-      setTimeout(finish, fallbackMs + 4000);
+      if (firstPlay) setTimeout(finish, fallbackMs + 4000);
     }
 
-    playBtn.addEventListener('click', trigger);
-    if (autoStart) setTimeout(trigger, 120);
+    playBtn.addEventListener('click', function(){
+      if (isPlaying){
+        try { audioEl.pause(); } catch(e){}
+        if (rafId) cancelAnimationFrame(rafId);
+        isPlaying = false;
+        playBtn.innerHTML = PLAY_ICON;
+        return;
+      }
+      if (!played){ trigger(false); return; }
+      var dur = (audioEl.duration && isFinite(audioEl.duration)) ? audioEl.duration : totalSec;
+      if (audioEl.ended || audioEl.currentTime >= dur - 0.15){
+        trigger(true);
+      } else {
+        isPlaying = true;
+        playBtn.innerHTML = PAUSE_ICON;
+        audioEl.play();
+        rafId = requestAnimationFrame(tickProgress);
+        audioEl.addEventListener('ended', function(){
+          if (rafId) cancelAnimationFrame(rafId);
+          isPlaying = false;
+          playBtn.innerHTML = PLAY_ICON;
+          try { audioEl.currentTime = 0; } catch(e){}
+          fill.style.width = '0%';
+          updateDurLabel(totalSec);
+        }, {once:true});
+      }
+    });
+    if (autoStart) setTimeout(function(){ trigger(false); }, 120);
   }
 
 
