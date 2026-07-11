@@ -1673,14 +1673,13 @@
   var kbClose = document.getElementById('kbClose');
 
   var KB_OPTIONS = [
-    { label:'ver os planos', track:'composer_ver_planos', run:function(){
-        resumeIndex = null;
-        typingThenRun(400, function(){ addPriceCard(); postOfferFollowUp(); });
+    { label:'quero comprar agora', track:'composer_comprar', run:function(){
+        window.location.href = '/app/planos';
       }
     },
     { label:'tenho uma dúvida', track:'composer_duvida', run:function(){ askQuestions(); } },
     { label:'falar com o Gabriel no whatsapp', track:'composer_whatsapp', run:function(){
-        window.open('https://wa.me/5511999999999?text=' + encodeURIComponent('oi Gabriel, vim da ligação e queria falar com você'), '_blank');
+        window.open('https://wa.me/message/4C3KZ4FVWI5ED1', '_blank');
       }
     }
   ];
