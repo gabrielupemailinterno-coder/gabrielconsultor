@@ -76,7 +76,6 @@ export default function ScoreCheckout() {
   const [form, setForm] = useState<Record<string, string>>({});
   const [needsData, setNeedsData] = useState(false);
   const [terms, setTerms] = useState(false);
-  const [terms, setTerms] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const [deadline] = useState<number>(() => {
     if (typeof window === "undefined") return Date.now() + BONUS_DURATION_MS;
