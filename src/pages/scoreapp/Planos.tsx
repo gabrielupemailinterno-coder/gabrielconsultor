@@ -415,7 +415,7 @@ export default function ScoreCheckout() {
               </div>
             </div>
           </section>
-
+        </div>
 
         {/* RESUMO LATERAL */}
         <aside className="lg:sticky lg:top-6 h-fit">
