@@ -100,12 +100,26 @@ Deno.serve(async (req) => {
     const { plan_key, terms_accepted } = parsed.data;
     const plan = prices[plan_key];
 
-    const { data: profile } = await supabase.from("score_profiles").select("*").eq("user_id", userId).maybeSingle();
+    let { data: profile } = await supabase.from("score_profiles").select("*").eq("user_id", userId).maybeSingle();
     if (!profile) {
-      return new Response(JSON.stringify({ error: "Perfil não encontrado." }), {
-        status: 404,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      const meta = (authData.user.user_metadata ?? {}) as Record<string, any>;
+      const { data: created, error: createErr } = await supabase
+        .from("score_profiles")
+        .insert({
+          user_id: userId,
+          email,
+          full_name: meta.full_name ?? meta.name ?? "",
+          phone: meta.phone ?? null,
+        })
+        .select("*")
+        .maybeSingle();
+      if (createErr || !created) {
+        return new Response(JSON.stringify({ error: "Não foi possível criar seu perfil. Tente novamente." }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      profile = created;
     }
 
     let partnerId: string | null = profile.partner_id ?? null;
