@@ -115,16 +115,14 @@ export default function ScoreCheckout() {
         .select("*")
         .eq("user_id", sess.session.user.id)
         .maybeSingle();
-      if (data) {
-        setProfile(data);
-        const init: Record<string, string> = {};
-        ADDRESS_FIELDS.forEach(([k]) => (init[k] = (data as any)[k] ?? ""));
-        setForm(init);
-        const missing = ADDRESS_FIELDS.filter(([, , req]) => req).some(
-          ([k]) => !(data as any)[k],
-        );
-        setNeedsData(missing);
-      }
+      setProfile(data ?? null);
+      const init: Record<string, string> = {};
+      ADDRESS_FIELDS.forEach(([k]) => (init[k] = (data as any)?.[k] ?? ""));
+      setForm(init);
+      const missing = ADDRESS_FIELDS.filter(([, , req]) => req).some(
+        ([k]) => !(data as any)?.[k],
+      );
+      setNeedsData(missing);
     })();
   }, []);
 
