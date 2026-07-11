@@ -114,9 +114,12 @@ export default function Contagem() {
           font-size: 13px; color: var(--areia); opacity: 0.7; letter-spacing: 1px;
         }
         .contagem-page .cta {
-          display: inline-flex; align-items: center; gap: 10px; margin-top: 40px;
+          display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+          margin-top: 36px;
           background: var(--laranja); color: var(--offwhite); text-decoration: none;
-          font-weight: 700; font-size: 17px; padding: 18px 26px; border-radius: 6px;
+          font-weight: 700; font-size: clamp(15px, 4vw, 17px);
+          padding: 16px 22px; border-radius: 6px;
+          max-width: 100%;
           transition: transform 0.15s ease, opacity 0.15s ease;
         }
         .contagem-page .cta:hover { transform: translateY(-2px); opacity: 0.94; }
