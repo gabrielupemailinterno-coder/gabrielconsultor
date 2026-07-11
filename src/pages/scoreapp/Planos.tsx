@@ -422,4 +422,9 @@ export default function ScoreCheckout() {
             </div>
           </section>
         </div>
+      </div>
+    </div>
+  );
+}
+
 
