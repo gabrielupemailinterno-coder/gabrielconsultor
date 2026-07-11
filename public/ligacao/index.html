@@ -1655,59 +1655,70 @@
     });
   }
 
-  // ---------- Atalho: tocar na barra de composição libera opções ----------
-  var composerShortcutShown = false;
+  // ---------- Atalho: tocar na barra abre "teclado" com opções ----------
   function pauseAllAudios(){
     try {
       document.querySelectorAll('audio').forEach(function(a){
         try { if (!a.paused) a.pause(); } catch(e){}
       });
-      // sincroniza ícone dos bubbles em play
       document.querySelectorAll('.play-btn').forEach(function(btn){
         btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
       });
     } catch(e){}
   }
-  function showComposerShortcuts(){
-    if (composerShortcutShown) return;
-    composerShortcutShown = true;
-    track('composer_atalho_aberto');
-    addTextBubble('sem problema, posso adiantar 👇 escolhe uma opção:');
-    addQuickReplies([
-      { label:'ver os planos', onClick:function(){
-          track('composer_ver_planos');
-          resumeIndex = null;
-          typingThenRun(500, function(){ addPriceCard(); postOfferFollowUp(); });
-        }
-      },
-      { label:'tenho uma dúvida', onClick:function(){
-          track('composer_duvida');
-          askQuestions();
-        }
-      },
-      { label:'falar com o Gabriel', onClick:function(){
-          track('composer_falar_gabriel');
-          typingThenRun(500, function(){
-            addTextBubble('bora! me chama no whatsapp 👇');
-            addQuickReplies([
-              { label:'abrir whatsapp', onClick:function(){
-                  track('composer_whatsapp');
-                  window.open('https://wa.me/5511999999999?text=' + encodeURIComponent('oi Gabriel, vim da ligação e queria falar com você'), '_blank');
-                }
-              }
-            ]);
-          });
-        }
+
+  var kbSheet = document.getElementById('kbSheet');
+  var kbBackdrop = document.getElementById('kbBackdrop');
+  var kbOpts = document.getElementById('kbOpts');
+  var kbClose = document.getElementById('kbClose');
+
+  var KB_OPTIONS = [
+    { label:'ver os planos', track:'composer_ver_planos', run:function(){
+        resumeIndex = null;
+        typingThenRun(400, function(){ addPriceCard(); postOfferFollowUp(); });
       }
-    ]);
+    },
+    { label:'tenho uma dúvida', track:'composer_duvida', run:function(){ askQuestions(); } },
+    { label:'falar com o Gabriel no whatsapp', track:'composer_whatsapp', run:function(){
+        window.open('https://wa.me/5511999999999?text=' + encodeURIComponent('oi Gabriel, vim da ligação e queria falar com você'), '_blank');
+      }
+    }
+  ];
+
+  function renderKbOpts(){
+    kbOpts.innerHTML = '';
+    KB_OPTIONS.forEach(function(opt){
+      var b = document.createElement('button');
+      b.className = 'kb-opt';
+      b.innerHTML = '<svg class="kb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg><span>' + opt.label + '</span>';
+      b.addEventListener('click', function(){
+        track(opt.track);
+        closeKb();
+        opt.run();
+      });
+      kbOpts.appendChild(b);
+    });
+  }
+  renderKbOpts();
+
+  function openKb(){
+    pauseAllAudios();
+    kbBackdrop.classList.add('show');
+    kbSheet.classList.add('show');
+    track('composer_atalho_aberto');
+  }
+  function closeKb(){
+    kbBackdrop.classList.remove('show');
+    kbSheet.classList.remove('show');
   }
   document.querySelectorAll('.chat-composer').forEach(function(composer){
     composer.addEventListener('click', function(ev){
       ev.preventDefault();
-      pauseAllAudios();
-      showComposerShortcuts();
+      openKb();
     });
   });
+  kbBackdrop.addEventListener('click', closeKb);
+  kbClose.addEventListener('click', closeKb);
 
 })();
 
