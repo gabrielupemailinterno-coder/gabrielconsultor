@@ -308,11 +308,7 @@
   .cta-btn:active{transform:scale(.985);}
   .fine-print{text-align:center;font-size:11px;color:var(--ink-faint);margin-top:10px;}
 
-  .restart{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);z-index:5;
-    background:transparent;border:none;color:rgba(255,255,255,.18);font-size:9px;
-    padding:2px 6px;letter-spacing:.05em;cursor:pointer;font-family:var(--font-ui);
-    text-transform:lowercase;}
-  .restart:hover{color:rgba(255,255,255,.45);}
+  .restart{display:none !important;}
 
   /* ---------- Push notification (in-app, drops from top) ---------- */
   .push-notif{
@@ -1629,6 +1625,60 @@
       ]);
     });
   }
+
+  // ---------- Atalho: tocar na barra de composição libera opções ----------
+  var composerShortcutShown = false;
+  function pauseAllAudios(){
+    try {
+      document.querySelectorAll('audio').forEach(function(a){
+        try { if (!a.paused) a.pause(); } catch(e){}
+      });
+      // sincroniza ícone dos bubbles em play
+      document.querySelectorAll('.play-btn').forEach(function(btn){
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+      });
+    } catch(e){}
+  }
+  function showComposerShortcuts(){
+    if (composerShortcutShown) return;
+    composerShortcutShown = true;
+    track('composer_atalho_aberto');
+    addTextBubble('sem problema, posso adiantar 👇 escolhe uma opção:');
+    addQuickReplies([
+      { label:'ver os planos', onClick:function(){
+          track('composer_ver_planos');
+          resumeIndex = null;
+          typingThenRun(500, function(){ addPriceCard(); postOfferFollowUp(); });
+        }
+      },
+      { label:'tenho uma dúvida', onClick:function(){
+          track('composer_duvida');
+          askQuestions();
+        }
+      },
+      { label:'falar com o Gabriel', onClick:function(){
+          track('composer_falar_gabriel');
+          typingThenRun(500, function(){
+            addTextBubble('bora! me chama no whatsapp 👇');
+            addQuickReplies([
+              { label:'abrir whatsapp', onClick:function(){
+                  track('composer_whatsapp');
+                  window.open('https://wa.me/5511999999999?text=' + encodeURIComponent('oi Gabriel, vim da ligação e queria falar com você'), '_blank');
+                }
+              }
+            ]);
+          });
+        }
+      }
+    ]);
+  }
+  document.querySelectorAll('.chat-composer').forEach(function(composer){
+    composer.addEventListener('click', function(ev){
+      ev.preventDefault();
+      pauseAllAudios();
+      showComposerShortcuts();
+    });
+  });
 
 })();
 
