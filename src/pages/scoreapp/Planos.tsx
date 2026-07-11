@@ -75,7 +75,7 @@ export default function ScoreCheckout() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<Record<string, string>>({});
   const [needsData, setNeedsData] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [terms, setTerms] = useState(false);
   const [terms, setTerms] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const [deadline] = useState<number>(() => {
