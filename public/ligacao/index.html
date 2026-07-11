@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Score Comercial — Ligação</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin>
+<link rel="preload" as="image" href="https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN" fetchpriority="high">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"></noscript>
 
 <!--
   ======================================================================
@@ -438,7 +442,7 @@
   <section class="screen screen-intro" data-screen="intro" id="introScreen">
     <div class="bg-photo" style="background-image:url('https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN')"></div>
     <div class="content">
-      <img class="intro-avatar" src="https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN" alt="Gabriel">
+      <img class="intro-avatar" src="https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN" alt="Gabriel" fetchpriority="high" decoding="async" width="180" height="180">
       <p class="intro-text">Gabriel está tentando falar com você</p>
       <div class="intro-dots"><span></span><span></span><span></span></div>
       <p class="intro-hint">toque na tela</p>
@@ -452,7 +456,7 @@
       <span class="call-label">chamada recebida</span>
       <div class="avatar-wrap">
         <div class="pulse-ring"></div>
-        <img class="avatar-photo" src="https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN" alt="Gabriel">
+        <img class="avatar-photo" src="https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN" alt="Gabriel" loading="lazy" decoding="async" width="180" height="180">
       </div>
       <div>
         <h1 class="caller-name">Gabriel</h1>
@@ -489,7 +493,7 @@
       <div class="lock-time" id="lockTime">--:--</div>
       <div class="lock-date">chamada encerrada</div>
       <button class="notification" id="btnOpenChat">
-        <img class="notif-icon" src="https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN" alt="">
+        <img class="notif-icon" src="https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN" alt="" loading="lazy" decoding="async" width="44" height="44">
         <div class="notif-text">
           <strong>Gabriel</strong>
           <span id="notifPreviewText">🎤 mensagem de voz</span>
@@ -506,7 +510,7 @@
         <button class="chat-back" aria-label="voltar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
-        <img class="chat-avatar" src="https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN" alt="Gabriel">
+        <img class="chat-avatar" src="https://lh3.googleusercontent.com/d/1CsbySbeNXqvgnurD_xy5gbmsy4n-rtFN" alt="Gabriel" loading="lazy" decoding="async" width="40" height="40">
         <div class="chat-header-txt">
           <strong>Gabriel</strong>
           <span class="chat-status online" id="chatStatus">online</span>
@@ -625,9 +629,9 @@
 <audio id="audio-04" preload="none"></audio>
 
 <!-- SFX iOS -->
-<audio id="sfx-ring" src="/ligacao/audio/ringtone.mp3" loop preload="auto"></audio>
-<audio id="sfx-ding" src="/ligacao/audio/ding.mp3" preload="auto"></audio>
-<audio id="sfx-aurora" src="/ligacao/audio/aurora.mp3" preload="auto"></audio>
+<audio id="sfx-ring" src="/ligacao/audio/ringtone.mp3" loop preload="none"></audio>
+<audio id="sfx-ding" src="/ligacao/audio/ding.mp3" preload="none"></audio>
+<audio id="sfx-aurora" src="/ligacao/audio/aurora.mp3" preload="none"></audio>
 
 <script>
 (function(){
