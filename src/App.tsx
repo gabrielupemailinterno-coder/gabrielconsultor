@@ -87,6 +87,7 @@ function AppRoutes() {
       <Route path="/ligacao/*" element={<LigacaoRedirect />} />
       <Route path="/termos" element={<Termos />} />
       <Route path="/privacidade" element={<Privacidade />} />
+      <Route path="/contagem" element={<Contagem />} />
 
       {/* Plataforma (autenticada) — tudo sob /app */}
       <Route path="/app" element={<AppHub />} />
