@@ -1434,7 +1434,7 @@
     show('chat');
     typingThenRun(400, function(){
       addTextBubble('com base no seu perfil, esse é o ponto de partida ideal 👇');
-      typingThenRun(500, function(){ addPriceCard(window.__simScore, window.__simLabel || 'score preliminar da simulação'); });
+      typingThenRun(500, function(){ addPriceCard(window.__simScore, window.__simLabel || 'score preliminar da simulação'); postOfferFollowUp(); });
     });
   });
 
@@ -1461,7 +1461,7 @@
             track('cta_fechar_direto');
             typingThenRun(700, function(){
               addTextBubble('perfeito. dá uma olhada nos planos:');
-              typingThenRun(500, function(){ addPriceCard(); });
+              typingThenRun(500, function(){ addPriceCard(); postOfferFollowUp(); });
             });
           }
         },
@@ -1512,7 +1512,7 @@
               track('cta_fechar_pos_duvida');
               typingThenRun(600, function(){
                 addTextBubble('boa. escolhe seu plano:');
-                typingThenRun(400, function(){ addPriceCard(); });
+                typingThenRun(400, function(){ addPriceCard(); postOfferFollowUp(); });
               });
             }
           },
@@ -1525,6 +1525,32 @@
       });
     });
   }
+
+  function postOfferFollowUp(){
+    typingThenRun(1400, function(){
+      addTextBubble('ficou alguma dúvida antes de escolher o plano? posso te explicar melhor 👇');
+      addQuickReplies([
+        { label:'tenho uma dúvida', onClick:function(){
+            track('cta_duvida_pos_oferta');
+            askQuestions();
+          }
+        },
+        { label:'quero falar com o Gabriel', onClick:function(){
+            track('cta_falar_gabriel_pos_oferta');
+            typingThenRun(700, function(){
+              addTextBubble('fechou. me chama no whatsapp que eu te respondo pessoalmente 👇');
+              addQuickReplies([
+                { label:'abrir whatsapp', onClick:function(){
+                    track('whatsapp_pos_oferta');
+                    window.open('https://wa.me/5511999999999?text=' + encodeURIComponent('oi Gabriel, vim da ligação e tenho uma dúvida antes de fechar o score comercial'), '_blank');
+                  }
+                }
+              ]);
+            });
+          }
+        }
+      ]);
+    });
 
 })();
 
