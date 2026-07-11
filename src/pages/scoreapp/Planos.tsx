@@ -77,6 +77,23 @@ export default function ScoreCheckout() {
   const [needsData, setNeedsData] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [terms, setTerms] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
+  const [deadline] = useState<number>(() => {
+    if (typeof window === "undefined") return Date.now() + BONUS_DURATION_MS;
+    const stored = Number(localStorage.getItem(BONUS_KEY));
+    if (stored && stored > Date.now()) return stored;
+    const fresh = Date.now() + BONUS_DURATION_MS;
+    localStorage.setItem(BONUS_KEY, String(fresh));
+    return fresh;
+  });
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const remainingMs = Math.max(0, deadline - now);
+  const mm = String(Math.floor(remainingMs / 60000)).padStart(2, "0");
+  const ss = String(Math.floor((remainingMs % 60000) / 1000)).padStart(2, "0");
+  const bonusActive = remainingMs > 0;
 
   const plan = PLANS[selected];
 
