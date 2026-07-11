@@ -48,6 +48,7 @@ import Termos from "./pages/legal/Termos";
 import Privacidade from "./pages/legal/Privacidade";
 import Configuracoes from "./pages/app/Configuracoes";
 import Notificacoes from "./pages/app/Notificacoes";
+import Contagem from "./pages/Contagem";
 import { usePartnerRefCapture } from "@/hooks/usePartnerRef";
 import { ImpersonationProvider } from "@/hooks/useImpersonation";
 
