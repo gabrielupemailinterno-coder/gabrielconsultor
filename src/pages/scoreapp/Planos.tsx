@@ -416,67 +416,6 @@ export default function ScoreCheckout() {
             </div>
           </section>
 
-          {/* Quebra de objeção */}
-          <section className="bg-card border border-border rounded-lg p-8">
-            <h2 className="font-serif text-2xl mb-3">Você não precisa vender no escuro.</h2>
-            <p className="text-muted-foreground text-sm mb-4">
-              O Score Comercial não promete resultado sem execução. Ele mostra o que você está fazendo, onde está
-              deixando oportunidades pelo caminho e quais ações precisam entrar na sua rotina.
-            </p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              {[
-                "Leva poucos minutos por dia.",
-                "Funciona pelo celular ou computador.",
-                "Direcionamentos baseados nos seus próprios números.",
-              ].map((t) => (
-                <li key={t} className="flex items-start gap-2">
-                  <Check size={14} className="text-primary mt-0.5" /> {t}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* Sobre Gabriel */}
-          <section className="bg-card border border-border rounded-lg p-8">
-            <div className="text-xs uppercase tracking-widest text-primary mb-2">Sobre o criador</div>
-            <h2 className="font-serif text-2xl mb-3">Gabriel Vieira</h2>
-            <p className="text-muted-foreground text-sm">
-              Consultor e mentor comercial com atuação em processos de vendas, CRM, indicadores, gestão de funil e
-              desenvolvimento de vendedores.
-            </p>
-            <p className="text-muted-foreground text-sm mt-3">
-              O Score Comercial foi criado a partir dos indicadores e comportamentos acompanhados diariamente em
-              operações comerciais reais.
-            </p>
-          </section>
-
-          {/* FAQ */}
-          <section>
-            <h2 className="font-serif text-2xl mb-4">Perguntas frequentes</h2>
-            <div className="space-y-2">
-              {FAQS.map((f, i) => {
-                const open = openFaq === i;
-                return (
-                  <div key={f.q} className="bg-card border border-border rounded-lg">
-                    <button
-                      onClick={() => setOpenFaq(open ? null : i)}
-                      className="w-full text-left px-5 py-4 flex items-center justify-between gap-4"
-                    >
-                      <span className="font-serif text-base">{f.q}</span>
-                      <ChevronDown
-                        size={16}
-                        className={`text-muted-foreground transition ${open ? "rotate-180" : ""}`}
-                      />
-                    </button>
-                    {open && (
-                      <div className="px-5 pb-4 text-sm text-muted-foreground">{f.a}</div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-        </div>
 
         {/* RESUMO LATERAL */}
         <aside className="lg:sticky lg:top-6 h-fit">
