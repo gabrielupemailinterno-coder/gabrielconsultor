@@ -15,6 +15,8 @@ import IntegrationsAdmin from "@/components/admin/IntegrationsAdmin";
 import ContentsAdmin from "@/components/admin/ContentsAdmin";
 import PartnersAdmin from "@/components/admin/PartnersAdmin";
 import SettingsAdmin from "@/components/admin/SettingsAdmin";
+import CampaignsAdmin from "@/components/admin/CampaignsAdmin";
+
 
 import LeadsTable, { type Lead } from "@/components/admin/analytics/LeadsTable";
 import VisitsTable from "@/components/admin/analytics/VisitsTable";
@@ -26,9 +28,10 @@ type Click = { id: string; session_id: string; element_type: string | null; elem
 type Session = { session_id: string; duration_seconds: number; started_at: string; referrer: string | null };
 
 const VALID_VIEWS: AdminView[] = [
-  "overview", "mentees", "score", "conteudos", "partners", "prospect",
+  "overview", "mentees", "score", "conteudos", "partners", "campaigns", "prospect",
   "integrations", "leads", "visits", "clicks", "sessions", "blog", "settings",
 ];
+
 
 const getInitialView = (): AdminView => {
   if (typeof window === "undefined") return "overview";
@@ -168,6 +171,8 @@ const Admin = () => {
       {view === "score" && <ScoreAdmin />}
       {view === "conteudos" && <ContentsAdmin />}
       {view === "partners" && <PartnersAdmin />}
+      {view === "campaigns" && <CampaignsAdmin />}
+
       {view === "prospect" && <ProspectingBulk />}
       {view === "integrations" && <IntegrationsAdmin />}
       {view === "leads" && <LeadsTable leads={leads} onDelete={deleteLead} />}

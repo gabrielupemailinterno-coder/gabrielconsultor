@@ -12,6 +12,7 @@ import {
   FileText,
   Handshake,
   Settings,
+  Megaphone,
 } from "lucide-react";
 
 export type AdminView =
@@ -21,6 +22,7 @@ export type AdminView =
   | "conteudos"
   | "integrations"
   | "partners"
+  | "campaigns"
   | "leads"
   | "visits"
   | "clicks"
@@ -28,6 +30,7 @@ export type AdminView =
   | "blog"
   | "prospect"
   | "settings";
+
 
 type Group = {
   label: string;
@@ -61,12 +64,14 @@ export const ADMIN_GROUPS: Group[] = [
   {
     label: "Marketing & Conteúdo",
     items: [
+      { view: "campaigns", label: "Campanhas", icon: Megaphone, hint: "acessos e cliques por campanha" },
       { view: "leads", label: "Leads", icon: UserPlus },
       { view: "blog", label: "Blog", icon: FileText },
       // "Prospecção" (envio por e-mail) removida da navegação — plataforma não envia comunicação;
       // toda comunicação sai via webhooks/API para ferramentas externas de WhatsApp.
     ],
   },
+
   {
     label: "Integrações",
     items: [
