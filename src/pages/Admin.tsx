@@ -171,6 +171,8 @@ const Admin = () => {
       {view === "score" && <ScoreAdmin />}
       {view === "conteudos" && <ContentsAdmin />}
       {view === "partners" && <PartnersAdmin />}
+      {view === "campaigns" && <CampaignsAdmin />}
+
       {view === "prospect" && <ProspectingBulk />}
       {view === "integrations" && <IntegrationsAdmin />}
       {view === "leads" && <LeadsTable leads={leads} onDelete={deleteLead} />}
