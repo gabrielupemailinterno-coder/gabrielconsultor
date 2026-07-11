@@ -196,6 +196,27 @@
   .chat-composer .cc-sticker{margin-left:auto;color:#8696a0;display:flex;}
   .chat-composer .cc-sticker svg{width:22px;height:22px;}
 
+  /* keyboard-like options sheet */
+  .kb-backdrop{position:absolute;inset:0;background:transparent;z-index:40;display:none;}
+  .kb-backdrop.show{display:block;}
+  .kb-sheet{position:absolute;left:0;right:0;bottom:0;z-index:50;
+    background:#1c1f24;border-top:1px solid rgba(255,255,255,.06);
+    padding:10px 12px calc(14px + env(safe-area-inset-bottom,0px));
+    transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.9,.3,1.05);
+    box-shadow:0 -8px 24px rgba(0,0,0,.4);}
+  .kb-sheet.show{transform:translateY(0);}
+  .kb-sheet .kb-head{display:flex;align-items:center;justify-content:space-between;
+    padding:4px 4px 10px;color:#8696a0;font-size:12px;letter-spacing:.02em;}
+  .kb-sheet .kb-close{background:none;border:none;color:#8696a0;font-size:20px;line-height:1;
+    padding:2px 6px;cursor:pointer;}
+  .kb-sheet .kb-opts{display:flex;flex-direction:column;gap:8px;}
+  .kb-sheet .kb-opt{width:100%;text-align:left;background:#2a2f36;border:1px solid rgba(255,255,255,.04);
+    color:#e9edef;padding:14px 16px;border-radius:12px;font-size:15px;font-weight:500;
+    cursor:pointer;font-family:var(--font-ui);display:flex;align-items:center;gap:12px;
+    transition:background .15s;}
+  .kb-sheet .kb-opt:active{background:#333941;}
+  .kb-sheet .kb-opt .kb-ico{width:20px;height:20px;color:#00a884;flex-shrink:0;}
+
   /* date separator pill */
   .date-sep{align-self:center;background:rgba(31,44,52,.85);color:var(--ink-dim);
     font-size:11px;font-weight:600;letter-spacing:.02em;padding:5px 12px;border-radius:999px;
@@ -533,6 +554,14 @@
         <button class="cc-icon" tabindex="-1" aria-label="Microfone">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
         </button>
+      </div>
+      <div class="kb-backdrop" id="kbBackdrop"></div>
+      <div class="kb-sheet" id="kbSheet" role="dialog" aria-label="Opções rápidas">
+        <div class="kb-head">
+          <span>opções rápidas</span>
+          <button class="kb-close" id="kbClose" aria-label="Fechar">×</button>
+        </div>
+        <div class="kb-opts" id="kbOpts"></div>
       </div>
     </div>
   </section>
@@ -1626,59 +1655,70 @@
     });
   }
 
-  // ---------- Atalho: tocar na barra de composição libera opções ----------
-  var composerShortcutShown = false;
+  // ---------- Atalho: tocar na barra abre "teclado" com opções ----------
   function pauseAllAudios(){
     try {
       document.querySelectorAll('audio').forEach(function(a){
         try { if (!a.paused) a.pause(); } catch(e){}
       });
-      // sincroniza ícone dos bubbles em play
       document.querySelectorAll('.play-btn').forEach(function(btn){
         btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
       });
     } catch(e){}
   }
-  function showComposerShortcuts(){
-    if (composerShortcutShown) return;
-    composerShortcutShown = true;
-    track('composer_atalho_aberto');
-    addTextBubble('sem problema, posso adiantar 👇 escolhe uma opção:');
-    addQuickReplies([
-      { label:'ver os planos', onClick:function(){
-          track('composer_ver_planos');
-          resumeIndex = null;
-          typingThenRun(500, function(){ addPriceCard(); postOfferFollowUp(); });
-        }
-      },
-      { label:'tenho uma dúvida', onClick:function(){
-          track('composer_duvida');
-          askQuestions();
-        }
-      },
-      { label:'falar com o Gabriel', onClick:function(){
-          track('composer_falar_gabriel');
-          typingThenRun(500, function(){
-            addTextBubble('bora! me chama no whatsapp 👇');
-            addQuickReplies([
-              { label:'abrir whatsapp', onClick:function(){
-                  track('composer_whatsapp');
-                  window.open('https://wa.me/5511999999999?text=' + encodeURIComponent('oi Gabriel, vim da ligação e queria falar com você'), '_blank');
-                }
-              }
-            ]);
-          });
-        }
+
+  var kbSheet = document.getElementById('kbSheet');
+  var kbBackdrop = document.getElementById('kbBackdrop');
+  var kbOpts = document.getElementById('kbOpts');
+  var kbClose = document.getElementById('kbClose');
+
+  var KB_OPTIONS = [
+    { label:'ver os planos', track:'composer_ver_planos', run:function(){
+        resumeIndex = null;
+        typingThenRun(400, function(){ addPriceCard(); postOfferFollowUp(); });
       }
-    ]);
+    },
+    { label:'tenho uma dúvida', track:'composer_duvida', run:function(){ askQuestions(); } },
+    { label:'falar com o Gabriel no whatsapp', track:'composer_whatsapp', run:function(){
+        window.open('https://wa.me/5511999999999?text=' + encodeURIComponent('oi Gabriel, vim da ligação e queria falar com você'), '_blank');
+      }
+    }
+  ];
+
+  function renderKbOpts(){
+    kbOpts.innerHTML = '';
+    KB_OPTIONS.forEach(function(opt){
+      var b = document.createElement('button');
+      b.className = 'kb-opt';
+      b.innerHTML = '<svg class="kb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg><span>' + opt.label + '</span>';
+      b.addEventListener('click', function(){
+        track(opt.track);
+        closeKb();
+        opt.run();
+      });
+      kbOpts.appendChild(b);
+    });
+  }
+  renderKbOpts();
+
+  function openKb(){
+    pauseAllAudios();
+    kbBackdrop.classList.add('show');
+    kbSheet.classList.add('show');
+    track('composer_atalho_aberto');
+  }
+  function closeKb(){
+    kbBackdrop.classList.remove('show');
+    kbSheet.classList.remove('show');
   }
   document.querySelectorAll('.chat-composer').forEach(function(composer){
     composer.addEventListener('click', function(ev){
       ev.preventDefault();
-      pauseAllAudios();
-      showComposerShortcuts();
+      openKb();
     });
   });
+  kbBackdrop.addEventListener('click', closeKb);
+  kbClose.addEventListener('click', closeKb);
 
 })();
 
