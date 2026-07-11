@@ -81,19 +81,32 @@ export default function Contagem() {
           margin-top: 18px; color: var(--areia);
           font-size: clamp(16px, 3.4vw, 19px); line-height: 1.5; max-width: 46ch;
         }
-        .contagem-page .countdown { display: flex; gap: 12px; margin-top: 40px; flex-wrap: wrap; }
+        .contagem-page .countdown {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 8px;
+          margin-top: 32px;
+          width: 100%;
+          max-width: 420px;
+        }
         .contagem-page .unit {
           background: var(--petroleo);
           border: 1px solid rgba(200,167,122,0.25);
-          border-radius: 4px; padding: 16px 14px; min-width: 76px; text-align: center;
+          border-radius: 4px;
+          padding: 14px 6px;
+          text-align: center;
+          min-width: 0;
         }
         .contagem-page .unit .num {
           font-family: 'Courier New', 'IBM Plex Mono', monospace;
-          font-size: clamp(30px, 7vw, 44px); font-weight: 700; color: var(--offwhite);
+          font-size: clamp(24px, 8vw, 42px);
+          font-weight: 700; color: var(--offwhite);
           font-variant-numeric: tabular-nums; line-height: 1;
         }
         .contagem-page .unit .label {
-          margin-top: 8px; font-size: 11px; letter-spacing: 2px; color: var(--areia); text-transform: uppercase;
+          margin-top: 8px;
+          font-size: clamp(9px, 2.4vw, 11px);
+          letter-spacing: 1.5px; color: var(--areia); text-transform: uppercase;
         }
         .contagem-page .target-line {
           margin-top: 16px;
