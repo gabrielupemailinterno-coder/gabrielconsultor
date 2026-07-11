@@ -1136,9 +1136,9 @@
     });
     try {
       var oi = document.getElementById('audio-oi');
+      oi.muted = true;
       oi.load();
-      var pk = oi.play();
-      if (pk && pk.then) pk.then(function(){ oi.pause(); oi.currentTime = 0; }).catch(function(){});
+      // não damos play aqui pra não vazar trecho do áudio 1 durante "ligação falhou"
     } catch(e){}
 
     // UX de "não conectou": conectando… → falha → busy tone → cai pro lock com notificação
