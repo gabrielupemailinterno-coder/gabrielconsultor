@@ -8,11 +8,13 @@ const TARGET = new Date("2026-07-13T12:00:00-03:00").getTime();
 const pad = (n: number) => String(n).padStart(2, "0");
 
 export default function Contagem() {
+  useAnalytics("/contagem");
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
+
 
   const diff = Math.max(0, TARGET - now);
   const launched = TARGET - now <= 0;
