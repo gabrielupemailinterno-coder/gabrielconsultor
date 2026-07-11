@@ -5,8 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getPartnerRef } from "@/lib/partnerRef";
 import {
-  Trophy, Check, Loader2, Lock, ShieldCheck, ArrowRight,
-  Target, BarChart3, Clock, Zap, ChevronDown,
+  Trophy, Check, Loader2, Lock, ShieldCheck, ArrowRight, Gift, Timer,
 } from "lucide-react";
 
 // -------- Planos (mesmos preços da edge fn cora-pix-checkout) --------
