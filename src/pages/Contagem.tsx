@@ -61,7 +61,7 @@ export default function Contagem() {
         .contagem-page main {
           position: relative; z-index: 1; flex: 1;
           display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
-          padding: 24px 28px 8px; max-width: 640px;
+          padding: 24px 20px 8px; max-width: 640px; width: 100%;
         }
         .contagem-page .questions { margin-top: 18px; }
         .contagem-page .questions p {
