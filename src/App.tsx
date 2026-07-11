@@ -44,6 +44,8 @@ import EsqueciSenha from "./pages/EsqueciSenha";
 import RedefinirSenha from "./pages/RedefinirSenha";
 import AppHub from "./pages/AppHub";
 import LigacaoRedirect from "./pages/LigacaoRedirect";
+import Termos from "./pages/legal/Termos";
+import Privacidade from "./pages/legal/Privacidade";
 import Configuracoes from "./pages/app/Configuracoes";
 import Notificacoes from "./pages/app/Notificacoes";
 import { usePartnerRefCapture } from "@/hooks/usePartnerRef";
@@ -82,6 +84,8 @@ function AppRoutes() {
       <Route path="/r/:slug" element={<RedirectPartnerLink />} />
       <Route path="/ligacao" element={<LigacaoRedirect />} />
       <Route path="/ligacao/*" element={<LigacaoRedirect />} />
+      <Route path="/termos" element={<Termos />} />
+      <Route path="/privacidade" element={<Privacidade />} />
 
       {/* Plataforma (autenticada) — tudo sob /app */}
       <Route path="/app" element={<AppHub />} />
