@@ -1007,18 +1007,39 @@
       }
       audioEl.muted = false;
       if (isReplay) { try { audioEl.currentTime = 0; } catch(e){} }
-      var p = audioEl.play();
-      if (p && p.then){
-        p.then(function(){
-          rafId = requestAnimationFrame(tickProgress);
-          audioEl.addEventListener('ended', finish, {once:true});
-        }).catch(function(){
-          setTimeout(finish, fallbackMs);
-        });
-      } else {
+      var startPlayback = function(){
         rafId = requestAnimationFrame(tickProgress);
         audioEl.addEventListener('ended', finish, {once:true});
+      };
+      var p;
+      try { p = audioEl.play(); } catch(e){ p = null; }
+      if (p && p.then){
+        p.then(startPlayback).catch(function(){
+          // Aguarda o arquivo ficar pronto e tenta de novo uma vez.
+          var retry = function(){
+            audioEl.removeEventListener('canplay', retry);
+            var p2;
+            try { p2 = audioEl.play(); } catch(e){ p2 = null; }
+            if (p2 && p2.then){
+              p2.then(startPlayback).catch(function(){
+                // Falha real: não trava o fluxo — segue rápido pra próxima etapa.
+                setTimeout(finish, 1500);
+              });
+            } else {
+              startPlayback();
+            }
+          };
+          audioEl.addEventListener('canplay', retry, {once:true});
+          // Se nem canplay disparar em 3s, destrava o fluxo.
+          setTimeout(function(){
+            audioEl.removeEventListener('canplay', retry);
+            if (!finished) finish();
+          }, 3000);
+        });
+      } else {
+        startPlayback();
       }
+      // Salvaguarda final: nunca deixa o fluxo pendurado além do tempo esperado do áudio + folga.
       if (firstPlay) setTimeout(finish, fallbackMs + 4000);
     }
 
