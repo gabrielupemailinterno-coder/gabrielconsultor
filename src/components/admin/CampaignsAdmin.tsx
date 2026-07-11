@@ -6,28 +6,53 @@ type CampaignDef = {
   key: string;
   name: string;
   description: string;
-  path: string;
-  ctaLabels: string[];
+  pathPrefix: string; // ex: "/contagem"
+  ctaType: string;    // ex: "cta_whatsapp_group"
+  variants: { id: string; headline: string }[];
 };
 
 const CAMPAIGNS: CampaignDef[] = [
   {
     key: "contagem",
     name: "Contagem — Lançamento Score",
-    description: "Página /contagem com CTA para o grupo do WhatsApp.",
-    path: "/contagem",
-    ctaLabels: ["Entrar no grupo do WhatsApp"],
+    description: "Teste A/B/C/D/E de headlines em /contagem. Variante sorteada por sessão.",
+    pathPrefix: "/contagem",
+    ctaType: "cta_whatsapp_group",
+    variants: [
+      { id: "A", headline: "Vendedor sem rotina não tem resultado." },
+      { id: "B", headline: "Quem não mede, não bate meta." },
+      { id: "C", headline: "Meta não se bate no dia 28." },
+      { id: "D", headline: "Pare de vender no escuro." },
+      { id: "E", headline: "Disciplina vende mais que talento." },
+    ],
   },
 ];
 
-type Stats = {
+type VisitRow = { session_id: string; path: string; referrer: string | null; created_at: string };
+type ClickRow = { session_id: string; path: string; element_type: string | null; element_label: string | null; created_at: string };
+
+type VariantStats = {
+  id: string;
+  headline: string;
   visits: number;
   uniqueSessions: number;
-  ctaClicks: number;
+  clicks: number;
   conversion: number;
-  recentVisits: { created_at: string; referrer: string | null; session_id: string }[];
-  recentClicks: { created_at: string; element_label: string | null; session_id: string }[];
 };
+
+type Stats = {
+  totalVisits: number;
+  totalSessions: number;
+  totalClicks: number;
+  totalConversion: number;
+  perVariant: VariantStats[];
+  recentClicks: ClickRow[];
+};
+
+function variantFromPath(path: string): string {
+  const m = path.match(/[?&]v=([^&]+)/);
+  return m ? m[1] : "?";
+}
 
 export default function CampaignsAdmin() {
   const [selected, setSelected] = useState<CampaignDef>(CAMPAIGNS[0]);
@@ -40,33 +65,48 @@ export default function CampaignsAdmin() {
       const [visitsRes, clicksRes] = await Promise.all([
         supabase
           .from("page_visits")
-          .select("session_id, referrer, created_at")
-          .eq("path", selected.path)
+          .select("session_id, path, referrer, created_at")
+          .like("path", `${selected.pathPrefix}%`)
           .order("created_at", { ascending: false })
-          .limit(1000),
+          .limit(5000),
         supabase
           .from("page_clicks")
-          .select("session_id, element_type, element_label, created_at")
-          .eq("path", selected.path)
+          .select("session_id, path, element_type, element_label, created_at")
+          .like("path", `${selected.pathPrefix}%`)
           .order("created_at", { ascending: false })
-          .limit(1000),
+          .limit(5000),
       ]);
 
-      const visits = visitsRes.data || [];
-      const clicks = (clicksRes.data || []).filter((c: any) =>
-        c.element_type === "cta_whatsapp_group" || selected.ctaLabels.includes(c.element_label || "")
+      const visits = (visitsRes.data || []) as VisitRow[];
+      const clicks = ((clicksRes.data || []) as ClickRow[]).filter(
+        (c) => c.element_type === selected.ctaType,
       );
-      const uniqueSessions = new Set(visits.map((v: any) => v.session_id)).size;
-      const ctaClicks = clicks.length;
-      const conversion = uniqueSessions > 0 ? (ctaClicks / uniqueSessions) * 100 : 0;
+
+      const perVariant: VariantStats[] = selected.variants.map((v) => {
+        const vs = visits.filter((x) => variantFromPath(x.path) === v.id);
+        const cs = clicks.filter((x) => variantFromPath(x.path) === v.id);
+        const uniq = new Set(vs.map((x) => x.session_id)).size;
+        const clickCount = cs.length;
+        return {
+          id: v.id,
+          headline: v.headline,
+          visits: vs.length,
+          uniqueSessions: uniq,
+          clicks: clickCount,
+          conversion: uniq > 0 ? (clickCount / uniq) * 100 : 0,
+        };
+      });
+
+      const totalSessions = new Set(visits.map((v) => v.session_id)).size;
+      const totalClicks = clicks.length;
 
       setStats({
-        visits: visits.length,
-        uniqueSessions,
-        ctaClicks,
-        conversion,
-        recentVisits: visits.slice(0, 20) as any,
-        recentClicks: clicks.slice(0, 20) as any,
+        totalVisits: visits.length,
+        totalSessions,
+        totalClicks,
+        totalConversion: totalSessions > 0 ? (totalClicks / totalSessions) * 100 : 0,
+        perVariant,
+        recentClicks: clicks.slice(0, 20),
       });
       setLoading(false);
     })();
@@ -92,7 +132,7 @@ export default function CampaignsAdmin() {
       </div>
 
       <div className="text-sm text-muted-foreground">
-        {selected.description} <span className="font-mono text-xs">({selected.path})</span>
+        {selected.description} <span className="font-mono text-xs">({selected.pathPrefix})</span>
       </div>
 
       {loading || !stats ? (
@@ -102,54 +142,77 @@ export default function CampaignsAdmin() {
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Kpi icon={<Eye className="h-4 w-4" />} label="Acessos" value={stats.visits} />
-            <Kpi icon={<Users className="h-4 w-4" />} label="Sessões únicas" value={stats.uniqueSessions} />
-            <Kpi icon={<MousePointerClick className="h-4 w-4" />} label="Cliques no grupo" value={stats.ctaClicks} />
-            <Kpi
-              icon={<TrendingUp className="h-4 w-4" />}
-              label="Conversão"
-              value={`${stats.conversion.toFixed(1)}%`}
-            />
+            <Kpi icon={<Eye className="h-4 w-4" />} label="Acessos totais" value={stats.totalVisits} />
+            <Kpi icon={<Users className="h-4 w-4" />} label="Sessões únicas" value={stats.totalSessions} />
+            <Kpi icon={<MousePointerClick className="h-4 w-4" />} label="Cliques no grupo" value={stats.totalClicks} />
+            <Kpi icon={<TrendingUp className="h-4 w-4" />} label="Conversão" value={`${stats.totalConversion.toFixed(1)}%`} />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <Section title="Últimos acessos">
-              {stats.recentVisits.length === 0 ? (
-                <Empty>Sem visitas ainda.</Empty>
-              ) : (
-                <ul className="divide-y divide-border text-sm">
-                  {stats.recentVisits.map((v, i) => (
-                    <li key={i} className="py-2 flex justify-between gap-3">
-                      <span className="whitespace-nowrap text-muted-foreground">
-                        {new Date(v.created_at).toLocaleString("pt-BR")}
-                      </span>
-                      <span className="truncate text-xs text-muted-foreground/80">
-                        {v.referrer || "direto"}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Section>
+          <div className="border border-border rounded-lg bg-card overflow-hidden">
+            <div className="px-4 py-3 border-b border-border">
+              <h3 className="text-sm font-semibold">Desempenho por headline (A/B test)</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Cada sessão vê uma variante sorteada. A melhor conversão indica a headline vencedora.
+              </p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-xs uppercase text-muted-foreground tracking-wider bg-muted/30">
+                  <tr>
+                    <th className="text-left px-4 py-2">Var</th>
+                    <th className="text-left px-4 py-2">Headline</th>
+                    <th className="text-right px-4 py-2">Acessos</th>
+                    <th className="text-right px-4 py-2">Sessões</th>
+                    <th className="text-right px-4 py-2">Cliques</th>
+                    <th className="text-right px-4 py-2">Conversão</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...stats.perVariant]
+                    .sort((a, b) => b.conversion - a.conversion)
+                    .map((v) => {
+                      const isWinner =
+                        v.uniqueSessions >= 5 &&
+                        v.conversion === Math.max(...stats.perVariant.map((x) => x.conversion));
+                      return (
+                        <tr key={v.id} className="border-t border-border">
+                          <td className="px-4 py-3 font-mono font-semibold">
+                            <span className={isWinner ? "text-primary" : ""}>{v.id}</span>
+                          </td>
+                          <td className="px-4 py-3">{v.headline}</td>
+                          <td className="px-4 py-3 text-right font-mono">{v.visits}</td>
+                          <td className="px-4 py-3 text-right font-mono">{v.uniqueSessions}</td>
+                          <td className="px-4 py-3 text-right font-mono">{v.clicks}</td>
+                          <td className={"px-4 py-3 text-right font-mono " + (isWinner ? "text-primary font-semibold" : "")}>
+                            {v.conversion.toFixed(1)}%
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-            <Section title="Últimos cliques no grupo do WhatsApp">
-              {stats.recentClicks.length === 0 ? (
-                <Empty>Sem cliques ainda.</Empty>
-              ) : (
-                <ul className="divide-y divide-border text-sm">
-                  {stats.recentClicks.map((c, i) => (
-                    <li key={i} className="py-2 flex justify-between gap-3">
-                      <span className="whitespace-nowrap text-muted-foreground">
-                        {new Date(c.created_at).toLocaleString("pt-BR")}
-                      </span>
-                      <span className="font-mono text-xs text-muted-foreground/70">
-                        {c.session_id.slice(0, 8)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Section>
+          <div className="border border-border rounded-lg p-4 bg-card">
+            <h3 className="text-sm font-semibold mb-3">Últimos cliques no grupo do WhatsApp</h3>
+            {stats.recentClicks.length === 0 ? (
+              <div className="text-sm text-muted-foreground py-6 text-center">Sem cliques ainda.</div>
+            ) : (
+              <ul className="divide-y divide-border text-sm">
+                {stats.recentClicks.map((c, i) => (
+                  <li key={i} className="py-2 flex justify-between gap-3">
+                    <span className="whitespace-nowrap text-muted-foreground">
+                      {new Date(c.created_at).toLocaleString("pt-BR")}
+                    </span>
+                    <span className="font-mono text-xs">
+                      var <span className="text-primary">{variantFromPath(c.path)}</span>
+                      <span className="text-muted-foreground/60"> · {c.session_id.slice(0, 8)}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </>
       )}
@@ -167,17 +230,4 @@ function Kpi({ icon, label, value }: { icon: React.ReactNode; label: string; val
       <div className="mt-2 text-2xl font-semibold font-mono">{value}</div>
     </div>
   );
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="border border-border rounded-lg p-4 bg-card">
-      <h3 className="text-sm font-semibold mb-3">{title}</h3>
-      {children}
-    </div>
-  );
-}
-
-function Empty({ children }: { children: React.ReactNode }) {
-  return <div className="text-sm text-muted-foreground py-6 text-center">{children}</div>;
 }
