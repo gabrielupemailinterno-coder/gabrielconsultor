@@ -61,7 +61,7 @@ export default function Contagem() {
         .contagem-page main {
           position: relative; z-index: 1; flex: 1;
           display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
-          padding: 24px 28px 8px; max-width: 640px;
+          padding: 24px 20px 8px; max-width: 640px; width: 100%;
         }
         .contagem-page .questions { margin-top: 18px; }
         .contagem-page .questions p {
@@ -81,19 +81,32 @@ export default function Contagem() {
           margin-top: 18px; color: var(--areia);
           font-size: clamp(16px, 3.4vw, 19px); line-height: 1.5; max-width: 46ch;
         }
-        .contagem-page .countdown { display: flex; gap: 12px; margin-top: 40px; flex-wrap: wrap; }
+        .contagem-page .countdown {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 8px;
+          margin-top: 32px;
+          width: 100%;
+          max-width: 420px;
+        }
         .contagem-page .unit {
           background: var(--petroleo);
           border: 1px solid rgba(200,167,122,0.25);
-          border-radius: 4px; padding: 16px 14px; min-width: 76px; text-align: center;
+          border-radius: 4px;
+          padding: 14px 6px;
+          text-align: center;
+          min-width: 0;
         }
         .contagem-page .unit .num {
           font-family: 'Courier New', 'IBM Plex Mono', monospace;
-          font-size: clamp(30px, 7vw, 44px); font-weight: 700; color: var(--offwhite);
+          font-size: clamp(24px, 8vw, 42px);
+          font-weight: 700; color: var(--offwhite);
           font-variant-numeric: tabular-nums; line-height: 1;
         }
         .contagem-page .unit .label {
-          margin-top: 8px; font-size: 11px; letter-spacing: 2px; color: var(--areia); text-transform: uppercase;
+          margin-top: 8px;
+          font-size: clamp(9px, 2.4vw, 11px);
+          letter-spacing: 1.5px; color: var(--areia); text-transform: uppercase;
         }
         .contagem-page .target-line {
           margin-top: 16px;
@@ -101,9 +114,12 @@ export default function Contagem() {
           font-size: 13px; color: var(--areia); opacity: 0.7; letter-spacing: 1px;
         }
         .contagem-page .cta {
-          display: inline-flex; align-items: center; gap: 10px; margin-top: 40px;
+          display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+          margin-top: 36px;
           background: var(--laranja); color: var(--offwhite); text-decoration: none;
-          font-weight: 700; font-size: 17px; padding: 18px 26px; border-radius: 6px;
+          font-weight: 700; font-size: clamp(15px, 4vw, 17px);
+          padding: 16px 22px; border-radius: 6px;
+          max-width: 100%;
           transition: transform 0.15s ease, opacity 0.15s ease;
         }
         .contagem-page .cta:hover { transform: translateY(-2px); opacity: 0.94; }
