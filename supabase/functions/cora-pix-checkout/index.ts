@@ -166,7 +166,7 @@ Deno.serve(async (req) => {
     const dueDateStr = dueDate.toISOString().slice(0, 10);
 
     const invoiceBody: Record<string, unknown> = {
-      code: `score_${userId}_${plan_key}_${Date.now()}`,
+      code: `sc_${userId.replace(/-/g, "").slice(0, 12)}_${plan_key}_${Date.now()}`.slice(0, 64),
       customer: {
         name: profile.full_name.slice(0, 60),
         email: email.slice(0, 60),
