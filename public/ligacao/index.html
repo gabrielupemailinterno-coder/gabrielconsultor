@@ -1224,13 +1224,14 @@
           el, Math.round(item.seconds*1000) + 4000, formatDuration(item.seconds),
           function(){
             track('audio_'+n+'_iniciado');
-            // Score push: dispara ANTES do áudio 03b terminar,
+            // Score push: dispara no MEIO do áudio 03b,
             // sincronizado com a fala "vou te mandar agora".
             if (index === 3){
               var pushFired = false;
               var onTU = function(){
                 var d = el.duration && isFinite(el.duration) ? el.duration : item.seconds;
-                if (!pushFired && el.currentTime >= d - 0.6){
+                var target = Math.max(2, d * 0.5);
+                if (!pushFired && el.currentTime >= target){
                   pushFired = true;
                   el.removeEventListener('timeupdate', onTU);
                   resumeIndex = index + 1;
