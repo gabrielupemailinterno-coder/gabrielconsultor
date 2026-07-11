@@ -7,6 +7,7 @@ const WhatsAppFloatButton = () => {
   const { pathname } = useLocation();
   if (pathname.startsWith("/app/admin")) return null;
   if (pathname.startsWith("/app/planos") || pathname.startsWith("/app/checkout")) return null;
+  if (pathname.startsWith("/contagem")) return null;
 
   const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(DEFAULT_MESSAGE)}`;
 
