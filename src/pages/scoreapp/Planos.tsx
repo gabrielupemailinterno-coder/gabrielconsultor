@@ -138,10 +138,11 @@ export default function ScoreCheckout() {
     if (!session) return false;
     const payload: any = {};
     ADDRESS_FIELDS.forEach(([k]) => (payload[k] = form[k]?.trim() || null));
+    payload.user_id = session.user.id;
+    payload.email = session.user.email ?? profile?.email ?? "";
     const { error } = await supabase
       .from("score_profiles")
-      .update(payload)
-      .eq("user_id", session.user.id);
+      .upsert(payload, { onConflict: "user_id" });
     if (error) {
       toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
       return false;
