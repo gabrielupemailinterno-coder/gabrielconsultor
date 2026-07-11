@@ -942,12 +942,18 @@
     var played = false, rafId = null;
 
     var SPEEDS = [1, 1.5, 2];
-    var spIdx = 0;
+    var spIdx = SPEEDS.indexOf(window.__preferredRate || 1);
+    if (spIdx < 0) spIdx = 0;
+    var initV = SPEEDS[spIdx];
+    try { audioEl.playbackRate = initV; } catch(err){}
+    speedBtn.textContent = (initV === 1 ? '1x' : (initV === 1.5 ? '1.5x' : '2x'));
+    speedBtn.classList.toggle('active', initV !== 1);
     speedBtn.addEventListener('click', function(e){
       e.stopPropagation();
       spIdx = (spIdx + 1) % SPEEDS.length;
       var v = SPEEDS[spIdx];
       try { audioEl.playbackRate = v; } catch(err){}
+      window.__preferredRate = v;
       speedBtn.textContent = (v === 1 ? '1x' : (v === 1.5 ? '1.5x' : '2x'));
       speedBtn.classList.toggle('active', v !== 1);
     });
