@@ -6,6 +6,7 @@ const DEFAULT_MESSAGE = "Olá Gabriel, vim pelo site e gostaria de conversar.";
 const WhatsAppFloatButton = () => {
   const { pathname } = useLocation();
   if (pathname.startsWith("/app/admin")) return null;
+  if (pathname.startsWith("/app/planos") || pathname.startsWith("/app/checkout")) return null;
 
   const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(DEFAULT_MESSAGE)}`;
 
