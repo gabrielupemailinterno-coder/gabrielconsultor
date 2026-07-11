@@ -63,32 +63,8 @@ const ADDRESS_FIELDS: Array<[string, string, boolean]> = [
   ["state", "UF", true],
 ];
 
-const FAQS = [
-  {
-    q: "O Score Comercial serve para qualquer tipo de vendedor?",
-    a: "Sim. Foi desenhado para vendedores consultivos, corretores, representantes, SDRs, BDRs e autônomos — qualquer profissional que trabalhe com meta e precise controlar sua rotina.",
-  },
-  {
-    q: "Preciso saber usar CRM?",
-    a: "Não. O Score Comercial funciona por conta própria. Se você já usa um CRM, ele complementa; se não usa, você registra as atividades direto no Score em poucos minutos por dia.",
-  },
-  {
-    q: "Posso usar pelo celular?",
-    a: "Sim. Funciona no navegador do celular e do computador, sem instalar aplicativo.",
-  },
-  {
-    q: "O plano é renovado automaticamente?",
-    a: "O plano mensal é uma cobrança PIX recorrente que gera nova fatura a cada 30 dias. O plano semestral é uma cobrança única de R$ 49,70 e não renova automaticamente — você é avisado antes do fim para decidir se continua.",
-  },
-  {
-    q: "Quando recebo o acesso?",
-    a: "Assim que o PIX é confirmado pelo banco (normalmente segundos), o acesso é liberado automaticamente e você é redirecionado para o Score Comercial.",
-  },
-  {
-    q: "Como funciona a reunião do plano semestral?",
-    a: "Após a confirmação do pagamento você recebe as orientações por e-mail e WhatsApp para agendar sua reunião individual de 60 minutos com Gabriel Vieira.",
-  },
-];
+const BONUS_DURATION_MS = 10 * 60 * 1000;
+const BONUS_KEY = "score_bonus_deadline";
 
 export default function ScoreCheckout() {
   const navigate = useNavigate();
