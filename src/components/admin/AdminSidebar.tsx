@@ -12,6 +12,7 @@ import {
   FileText,
   Handshake,
   Settings,
+  Megaphone,
 } from "lucide-react";
 
 export type AdminView =
@@ -21,6 +22,7 @@ export type AdminView =
   | "conteudos"
   | "integrations"
   | "partners"
+  | "campaigns"
   | "leads"
   | "visits"
   | "clicks"
@@ -28,6 +30,7 @@ export type AdminView =
   | "blog"
   | "prospect"
   | "settings";
+
 
 type Group = {
   label: string;
