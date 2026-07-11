@@ -64,12 +64,14 @@ export const ADMIN_GROUPS: Group[] = [
   {
     label: "Marketing & Conteúdo",
     items: [
+      { view: "campaigns", label: "Campanhas", icon: Megaphone, hint: "acessos e cliques por campanha" },
       { view: "leads", label: "Leads", icon: UserPlus },
       { view: "blog", label: "Blog", icon: FileText },
       // "Prospecção" (envio por e-mail) removida da navegação — plataforma não envia comunicação;
       // toda comunicação sai via webhooks/API para ferramentas externas de WhatsApp.
     ],
   },
+
   {
     label: "Integrações",
     items: [
