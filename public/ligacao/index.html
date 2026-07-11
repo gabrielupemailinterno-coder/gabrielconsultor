@@ -992,6 +992,7 @@
         updateDurLabel(0);
         onDone && onDone();
       }
+      audioEl.muted = false;
       var p = audioEl.play();
       if (p && p.then){
         p.then(function(){
