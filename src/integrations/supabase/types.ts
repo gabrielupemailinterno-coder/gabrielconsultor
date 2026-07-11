@@ -1343,6 +1343,7 @@ export type Database = {
       page_sessions: {
         Row: {
           duration_seconds: number
+          edit_token: string | null
           last_seen_at: string
           path: string
           referrer: string | null
@@ -1352,6 +1353,7 @@ export type Database = {
         }
         Insert: {
           duration_seconds?: number
+          edit_token?: string | null
           last_seen_at?: string
           path: string
           referrer?: string | null
@@ -1361,6 +1363,7 @@ export type Database = {
         }
         Update: {
           duration_seconds?: number
+          edit_token?: string | null
           last_seen_at?: string
           path?: string
           referrer?: string | null
@@ -2367,6 +2370,16 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      update_page_session_heartbeat: {
+        Args: {
+          p_duration_seconds: number
+          p_edit_token: string
+          p_last_seen_at?: string
+          p_path?: string
+          p_session_id: string
+        }
+        Returns: undefined
       }
     }
     Enums: {
