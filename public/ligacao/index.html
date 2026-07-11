@@ -1526,6 +1526,32 @@
     });
   }
 
+  function postOfferFollowUp(){
+    typingThenRun(1400, function(){
+      addTextBubble('ficou alguma dúvida antes de escolher o plano? posso te explicar melhor 👇');
+      addQuickReplies([
+        { label:'tenho uma dúvida', onClick:function(){
+            track('cta_duvida_pos_oferta');
+            askQuestions();
+          }
+        },
+        { label:'quero falar com o Gabriel', onClick:function(){
+            track('cta_falar_gabriel_pos_oferta');
+            typingThenRun(700, function(){
+              addTextBubble('fechou. me chama no whatsapp que eu te respondo pessoalmente 👇');
+              addQuickReplies([
+                { label:'abrir whatsapp', onClick:function(){
+                    track('whatsapp_pos_oferta');
+                    window.open('https://wa.me/5511999999999?text=' + encodeURIComponent('oi Gabriel, vim da ligação e tenho uma dúvida antes de fechar o score comercial'), '_blank');
+                  }
+                }
+              ]);
+            });
+          }
+        }
+      ]);
+    });
+
 })();
 
 </script>
