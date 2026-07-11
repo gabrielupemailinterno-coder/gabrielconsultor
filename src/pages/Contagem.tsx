@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { useAnalytics, trackClick } from "@/hooks/useAnalytics";
+
+
 
 const TARGET = new Date("2026-07-13T12:00:00-03:00").getTime();
 const pad = (n: number) => String(n).padStart(2, "0");
