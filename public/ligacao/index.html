@@ -1007,18 +1007,39 @@
       }
       audioEl.muted = false;
       if (isReplay) { try { audioEl.currentTime = 0; } catch(e){} }
-      var p = audioEl.play();
-      if (p && p.then){
-        p.then(function(){
-          rafId = requestAnimationFrame(tickProgress);
-          audioEl.addEventListener('ended', finish, {once:true});
-        }).catch(function(){
-          setTimeout(finish, fallbackMs);
-        });
-      } else {
+      var startPlayback = function(){
         rafId = requestAnimationFrame(tickProgress);
         audioEl.addEventListener('ended', finish, {once:true});
+      };
+      var p;
+      try { p = audioEl.play(); } catch(e){ p = null; }
+      if (p && p.then){
+        p.then(startPlayback).catch(function(){
+          // Aguarda o arquivo ficar pronto e tenta de novo uma vez.
+          var retry = function(){
+            audioEl.removeEventListener('canplay', retry);
+            var p2;
+            try { p2 = audioEl.play(); } catch(e){ p2 = null; }
+            if (p2 && p2.then){
+              p2.then(startPlayback).catch(function(){
+                // Falha real: não trava o fluxo — segue rápido pra próxima etapa.
+                setTimeout(finish, 1500);
+              });
+            } else {
+              startPlayback();
+            }
+          };
+          audioEl.addEventListener('canplay', retry, {once:true});
+          // Se nem canplay disparar em 3s, destrava o fluxo.
+          setTimeout(function(){
+            audioEl.removeEventListener('canplay', retry);
+            if (!finished) finish();
+          }, 3000);
+        });
+      } else {
+        startPlayback();
       }
+      // Salvaguarda final: nunca deixa o fluxo pendurado além do tempo esperado do áudio + folga.
       if (firstPlay) setTimeout(finish, fallbackMs + 4000);
     }
 
@@ -1170,17 +1191,31 @@
   document.getElementById('btnAnswer').addEventListener('click', function(){
     stopRingtone();
     track('ligacao_atendida');
-    // Pré-carrega áudios (gesto do usuário destrava o playback)
+    // Prime + preload TODOS os áudios (gesto do usuário destrava o playback no Safari/iOS).
+    // Muted-play + pause imediato "desbloqueia" cada <audio> pra chamadas .play() futuras
+    // fora de gesto, e força o browser a iniciar o download do arquivo.
     AUDIO_FILES.forEach(function(item){
-      var el = document.getElementById(item.id);
-      if (!el.src) el.src = item.src;
+      try {
+        var el = document.getElementById(item.id);
+        if (!el.src) el.src = item.src;
+        el.setAttribute('preload','auto');
+        el.muted = true;
+        var pp = el.play();
+        if (pp && pp.then){
+          pp.then(function(){
+            try { el.pause(); } catch(e){}
+            try { el.currentTime = 0; } catch(e){}
+            el.muted = false;
+          }).catch(function(){
+            el.muted = false;
+            try { el.load(); } catch(e){}
+          });
+        } else {
+          try { el.pause(); } catch(e){}
+          el.muted = false;
+        }
+      } catch(e){}
     });
-    try {
-      var oi = document.getElementById('audio-oi');
-      oi.muted = true;
-      oi.load();
-      // não damos play aqui pra não vazar trecho do áudio 1 durante "ligação falhou"
-    } catch(e){}
 
     // UX de "não conectou": conectando… → falha → busy tone → cai pro lock com notificação
     getAudioCtx();
@@ -1233,8 +1268,10 @@
 
   // ---------- Chat ----------
   function startChat(){
+    // NÃO reatribuir src — isso descartaria o preload feito no gesto de "atender"
     AUDIO_FILES.forEach(function(item){
-      document.getElementById(item.id).src = item.src;
+      var el = document.getElementById(item.id);
+      if (!el.src) el.src = item.src;
     });
     playAudioSequence(0);
   }
