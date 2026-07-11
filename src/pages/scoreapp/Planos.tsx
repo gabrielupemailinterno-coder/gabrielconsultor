@@ -115,16 +115,14 @@ export default function ScoreCheckout() {
         .select("*")
         .eq("user_id", sess.session.user.id)
         .maybeSingle();
-      if (data) {
-        setProfile(data);
-        const init: Record<string, string> = {};
-        ADDRESS_FIELDS.forEach(([k]) => (init[k] = (data as any)[k] ?? ""));
-        setForm(init);
-        const missing = ADDRESS_FIELDS.filter(([, , req]) => req).some(
-          ([k]) => !(data as any)[k],
-        );
-        setNeedsData(missing);
-      }
+      setProfile(data ?? null);
+      const init: Record<string, string> = {};
+      ADDRESS_FIELDS.forEach(([k]) => (init[k] = (data as any)?.[k] ?? ""));
+      setForm(init);
+      const missing = ADDRESS_FIELDS.filter(([, , req]) => req).some(
+        ([k]) => !(data as any)?.[k],
+      );
+      setNeedsData(missing);
     })();
   }, []);
 
@@ -140,10 +138,11 @@ export default function ScoreCheckout() {
     if (!session) return false;
     const payload: any = {};
     ADDRESS_FIELDS.forEach(([k]) => (payload[k] = form[k]?.trim() || null));
+    payload.user_id = session.user.id;
+    payload.email = session.user.email ?? profile?.email ?? "";
     const { error } = await supabase
       .from("score_profiles")
-      .update(payload)
-      .eq("user_id", session.user.id);
+      .upsert(payload, { onConflict: "user_id" });
     if (error) {
       toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
       return false;
