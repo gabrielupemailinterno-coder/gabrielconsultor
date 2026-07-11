@@ -327,33 +327,40 @@ export default function ScoreCheckout() {
                       Dados de cobrança (obrigatórios para gerar o PIX)
                     </div>
                     <div className="grid md:grid-cols-2 gap-3">
-                      {ADDRESS_FIELDS.map(([k, label, req]) => (
-                        <input
-                          key={k}
-                          value={form[k] ?? ""}
-                          onChange={(e) => setForm((f) => ({ ...f, [k]: e.target.value }))}
-                          onBlur={async (e) => {
-                            if (k !== "postal_code") return;
-                            const cep = e.target.value.replace(/\D/g, "");
-                            if (cep.length !== 8) return;
-                            try {
-                              const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-                              const d = await r.json();
-                              if (d.erro) return;
-                              setForm((f) => ({
-                                ...f,
-                                address: d.logradouro || f.address || "",
-                                province: d.bairro || f.province || "",
-                                city: d.localidade || f.city || "",
-                                state: d.uf || f.state || "",
-                              }));
-                            } catch {}
-                          }}
-                          placeholder={req ? `${label} *` : label}
-                          maxLength={k === "state" ? 2 : undefined}
-                          className="bg-input border border-border rounded-md px-4 py-3 text-sm"
-                        />
-                      ))}
+                      {ADDRESS_FIELDS.map(([k, label, req]) => {
+                        const fetchCep = async (raw: string) => {
+                          const cep = raw.replace(/\D/g, "");
+                          if (cep.length !== 8) return;
+                          try {
+                            const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                            const d = await r.json();
+                            if (d.erro) return;
+                            setForm((f) => ({
+                              ...f,
+                              address: d.logradouro || f.address || "",
+                              province: d.bairro || f.province || "",
+                              city: d.localidade || f.city || "",
+                              state: d.uf || f.state || "",
+                            }));
+                          } catch {}
+                        };
+                        return (
+                          <input
+                            key={k}
+                            value={form[k] ?? ""}
+                            inputMode={k === "postal_code" || k === "address_number" ? "numeric" : undefined}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              setForm((f) => ({ ...f, [k]: v }));
+                              if (k === "postal_code" && v.replace(/\D/g, "").length === 8) fetchCep(v);
+                            }}
+                            onBlur={(e) => { if (k === "postal_code") fetchCep(e.target.value); }}
+                            placeholder={req ? `${label} *` : label}
+                            maxLength={k === "state" ? 2 : k === "postal_code" ? 9 : undefined}
+                            className="bg-input border border-border rounded-md px-4 py-3 text-sm"
+                          />
+                        );
+                      })}
                     </div>
                   </div>
                 )}
