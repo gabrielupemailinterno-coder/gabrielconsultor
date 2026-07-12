@@ -13,9 +13,9 @@ type CampaignDef = {
 
 const CAMPAIGNS: CampaignDef[] = [
   {
-    key: "contagem",
-    name: "Contagem — Lançamento Score",
-    description: "Teste A/B/C/D/E de headlines em /contagem. Variante sorteada por sessão.",
+    key: "contagem-p1",
+    name: "Contagem — Parte 1 (A/B/C/D/E)",
+    description: "Teste A/B/C/D/E de headlines em /contagem. Variante sorteada por sessão. (Encerrada — dados históricos.)",
     pathPrefix: "/contagem",
     ctaType: "cta_whatsapp_group",
     variants: [
@@ -24,6 +24,16 @@ const CAMPAIGNS: CampaignDef[] = [
       { id: "C", headline: "Meta não se bate no dia 28." },
       { id: "D", headline: "Pare de vender no escuro." },
       { id: "E", headline: "Disciplina vende mais que talento." },
+    ],
+  },
+  {
+    key: "contagem-p2",
+    name: "Contagem — Parte 2 (Redirect Score)",
+    description: "Página /contagem redireciona direto para o WhatsApp do Score comercial. Em execução.",
+    pathPrefix: "/contagem",
+    ctaType: "cta_whatsapp_score",
+    variants: [
+      { id: "P2", headline: "Redirect direto → WhatsApp Score comercial" },
     ],
   },
 ];
