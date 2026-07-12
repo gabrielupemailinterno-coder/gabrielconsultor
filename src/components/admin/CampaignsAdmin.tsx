@@ -87,9 +87,12 @@ export default function CampaignsAdmin() {
           .limit(5000),
       ]);
 
-      const visits = (visitsRes.data || []) as VisitRow[];
+      const validIds = new Set(selected.variants.map((v) => v.id));
+      const visits = ((visitsRes.data || []) as VisitRow[]).filter((x) =>
+        validIds.has(variantFromPath(x.path)),
+      );
       const clicks = ((clicksRes.data || []) as ClickRow[]).filter(
-        (c) => c.element_type === selected.ctaType,
+        (c) => c.element_type === selected.ctaType && validIds.has(variantFromPath(c.path)),
       );
 
       const perVariant: VariantStats[] = selected.variants.map((v) => {
