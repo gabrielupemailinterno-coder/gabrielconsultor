@@ -47,6 +47,8 @@ export default function ConhecaScoreApp() {
         <script>{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-JM84RGKV4H');`}</script>
       </Helmet>
 
+      <noscript><img height="1" width="1" style={{ display: "none" }} src="https://www.facebook.com/tr?id=1622839295496776&ev=PageView&noscript=1" alt="" /></noscript>
+
       {/* HEADER */}
       <SiteHeader />
 
