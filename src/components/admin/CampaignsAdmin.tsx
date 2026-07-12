@@ -127,21 +127,22 @@ export default function CampaignsAdmin() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-2">
-        {CAMPAIGNS.map((c) => (
-          <button
-            key={c.key}
-            onClick={() => setSelected(c)}
-            className={
-              "px-3 py-2 rounded-md text-sm border transition-colors " +
-              (selected.key === c.key
-                ? "bg-primary/15 text-primary border-primary/30"
-                : "border-border text-muted-foreground hover:text-foreground")
-            }
-          >
-            {c.name}
-          </button>
-        ))}
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="text-xs uppercase tracking-wider text-muted-foreground">Campanha</label>
+        <select
+          value={selected.key}
+          onChange={(e) => {
+            const next = CAMPAIGNS.find((c) => c.key === e.target.value);
+            if (next) setSelected(next);
+          }}
+          className="px-3 py-2 rounded-md text-sm bg-card border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+        >
+          {CAMPAIGNS.map((c) => (
+            <option key={c.key} value={c.key}>
+              {c.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="text-sm text-muted-foreground">
