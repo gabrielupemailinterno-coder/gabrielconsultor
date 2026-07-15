@@ -1385,7 +1385,7 @@ fbq('track', 'PageView');
             }
             playAudioSequence(index + 1);
           },
-          index === 0 // autoStart no primeiro áudio, logo após atender
+          false // nunca autoStart — usuário precisa clicar em play em todos os áudios
         );
       });
     }
