@@ -568,6 +568,10 @@ export default function SimuladorUP() {
         </div>
       </section>
 
+      <CalculadoraComissao />
+
+
+
       {/* O QUE A UP FORNECE */}
       <section style={{ background: petroleo, color: off }} className="border-t border-b border-[rgba(244,239,232,0.1)]">
         <div className="mx-auto max-w-6xl px-5 py-16 sm:py-24">
