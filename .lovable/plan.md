@@ -1,108 +1,63 @@
+## Objetivo
 
-# Plano: Portal do Parceiro / Afiliado
+Adicionar uma nova seção na página `/simulador-up` (`src/pages/SimuladorUP.tsx`) com uma **Calculadora de Comissão Liberada** — separada do simulador de receita já existente, mantendo a mesma identidade visual (grafite, petróleo, laranja, areia, off-white / Libre Baskerville + Inter).
 
-## 1. Modelo de dados (migrations novas, sem alterar `partners` existente)
+## Onde entra
 
-### 1.1 Vincular parceiro a um usuário (login do portal)
-Adicionar coluna `user_id uuid` (nullable, FK lógica para `auth.users.id`, UNIQUE) em `partners`. Permite que um parceiro autentique-se e o portal saiba qual `partner_id` mostrar. Nullable porque muitos parceiros hoje são só cadastro interno.
+Nova seção `<section id="calc-comissao">` inserida logo após o bloco do simulador atual e antes das demais seções da página. O simulador de receita existente permanece intacto.
 
-Nova role em `app_role`: `'partner'`. Atribuída via `user_roles` quando o admin conecta um `partners.user_id`. **Não dá acesso ao `/admin`** (guard atual usa `has_role(uid,'admin')`).
+## Campos de entrada
 
-### 1.2 Comissão configurável por parceiro
-Em `partners`: `commission_rate numeric(5,2) NOT NULL DEFAULT 70.00` (percentual). Permite override futuro sem mudar código.
+1. **Valor do imóvel** — input com máscara de moeda BRL (reaproveita o helper `brl` e um parser de dígitos → número, no estilo de `src/lib/scoreapp/masks.ts`).
+2. **Porcentagem de comissão** — input numérico com sufixo `%` (aceita decimais, ex.: `2` ou `2,5`).
+3. **Porcentagem de desbloqueio** — input numérico com sufixo `%`.
+4. **Valor já pago pelo cliente** — input com máscara de moeda BRL.
 
-### 1.3 Novas tabelas
+Todos os campos são controlados via `useState`. Cálculo em tempo real com `useMemo`.
 
-**`partner_links`** — links de divulgação que o parceiro cria/copia.
-- `id`, `partner_id` (FK partners), `slug text UNIQUE` (ex.: código curto), `label text` (ex.: "Instagram bio"), `destination text` (rota interna: `/`, `/mentoria-profissional`, `/scoreapp`, etc.), `utm_source/medium/campaign text`, `active bool`, `created_at`, `updated_at`.
-- URL pública final: `https://gabrielconsultor.com/r/{slug}` ou querystring `?ref={partner_code}` (ver §3).
+## Lógica de cálculo
 
-**`partner_attributions`** — cliques rastreados.
-- `id`, `partner_id`, `link_id` (nullable), `partner_code`, `destination`, `session_id`, `ip_hash`, `user_agent`, `referrer`, `created_at`.
+```
+comissaoTotal      = valorImovel * (pctComissao / 100)
+valorDesbloqueio   = valorImovel * (pctDesbloqueio / 100)
+pctAtingido        = valorDesbloqueio > 0
+                       ? min(valorPago / valorDesbloqueio, 1)
+                       : 0
+comissaoLiberada   = valorPago >= valorDesbloqueio
+                       ? comissaoTotal
+                       : comissaoTotal * (valorPago / valorDesbloqueio)
+comissaoRestante   = comissaoTotal - comissaoLiberada
+```
 
-**`partner_conversions`** — leads/compras atribuídos.
-- `id`, `partner_id`, `partner_code`, `kind text CHECK IN ('lead','purchase')`, `source_table text` (`leads`/`mentees`/`score_profiles`), `source_id uuid`, `amount_cents int` (null p/ lead), `commission_cents int` (calculado no insert = `amount_cents * commission_rate / 100`), `commission_status text DEFAULT 'pending'` (`pending`|`approved`|`paid`|`canceled`), `notes`, `created_at`, `updated_at`.
-- UNIQUE `(source_table, source_id)` para idempotência.
+Guardas: se `valorDesbloqueio === 0`, tratar `pctAtingido = 0` e `comissaoLiberada = 0` para evitar divisão por zero.
 
-**Atribuição em tabelas existentes** — colunas nullable, sem quebrar dados:
-- `leads.partner_id uuid`, `leads.partner_code text`
-- `mentees.partner_id uuid`, `mentees.partner_code text`
-- `score_profiles.partner_id uuid`, `score_profiles.partner_code text`
+Validação do exemplo: imóvel R$ 322.000, comissão 2% → total R$ 6.440; desbloqueio 20% → R$ 64.400; pago R$ 10.000 → liberada = 6.440 × (10.000 / 64.400) = **R$ 1.000** ✓.
 
-### 1.4 RLS
-- `partners`: manter policy admin. Adicionar policy `SELECT` para o próprio parceiro (`user_id = auth.uid()`).
-- `partner_links`: admin ALL; parceiro `SELECT/INSERT/UPDATE` onde `partner_id = (select id from partners where user_id = auth.uid())`.
-- `partner_attributions`: admin ALL; parceiro SELECT do próprio. INSERT via edge function (service role) — nunca do cliente, para evitar fraude de clique.
-- `partner_conversions`: admin ALL (incl. update de `commission_status`); parceiro SELECT do próprio.
-- GRANTs padrão para `authenticated` + `service_role` em todas as novas tabelas.
+## Card de resultado
 
-## 2. Portal do parceiro (`/parceiro`)
+Card único (estilo dos cards existentes: `rounded-sm border up-rule bg-white`) exibindo, em fonte tabular:
 
-Rotas novas em `src/pages/parceiro/`:
-- `/parceiro/login` — Supabase auth email/senha (magic link opcional). Após login: se `user_roles.role = 'partner'` e `partners.user_id = uid`, entra; senão erro.
-- `/parceiro` (dashboard):
-  - KPIs: cliques 7d/30d, leads atribuídos, vendas atribuídas, comissão acumulada (pending/approved/paid).
-  - Lista de **meus links** com botão Copiar, editar label/destino, criar novo, ativar/desativar.
-  - Tabela de conversões recentes (kind, valor, comissão, status) — somente leitura.
-  - Dados do parceiro (nome, email, taxa de comissão) — leitura.
-- Layout próprio (não reaproveita AdminLayout). Guard: se `!partner role` → redirect `/parceiro/login`. Se tentar `/admin` → guard admin atual já bloqueia (parceiro não tem role admin).
+- Comissão total
+- Valor necessário para desbloqueio
+- Valor já pago
+- Percentual atingido (barra de progresso simples usando `div` com largura proporcional em laranja sobre trilho areia)
+- **Comissão liberada** (destaque em laranja, tamanho maior)
+- Comissão restante
 
-Componentes reutilizáveis: `KpiCard`, `QuickAction` já existem.
+## Ações
 
-## 3. Rastreio (clique → lead → compra)
+- Botão **Limpar** — zera todos os campos.
+- Botão **Copiar resultado** — usa `navigator.clipboard.writeText(...)` com um resumo em texto plano e dispara `toast.success("Resultado copiado")` (o `toast` do sonner já está importado no arquivo).
 
-### 3.1 Captura do `partner_code`
-- Middleware client-side em `App.tsx` (ou hook em Layout público): ao carregar qualquer rota, ler `?ref=CODE` do querystring. Se presente:
-  - Salvar em `localStorage.partner_ref = { code, ts }` (TTL 30 dias).
-  - Salvar cookie `partner_ref` (para SSR/edge).
-  - Chamar edge function `track-partner-click` (fire-and-forget) que valida o code em `partners` e insere `partner_attributions`.
-- Rota curta `/r/:slug` (React route): resolve `slug` via edge function → grava clique → `window.location.replace(destination + '?ref=CODE')`.
+## Layout
 
-### 3.2 Propagação para lead/compra
-- Ao enviar lead (`useLeadCapture`, `sendBotConversaLead`, forms do `/scoreapp`, checkout Asaas): incluir `partner_code` do localStorage no payload.
-- Backend (edge functions e triggers de insert em `leads`/`mentees`/`score_profiles`): resolver `partner_code → partner_id` e preencher colunas. Trigger `AFTER INSERT` em cada tabela cria linha em `partner_conversions` (kind='lead' ou 'purchase' conforme tabela/valor).
-- `provision_mentee` já é SECURITY DEFINER: adicionar params `_partner_code`, gravar em `mentees`, e inserir `partner_conversions` kind='purchase' com `amount_cents` do plano.
+- Grid `lg:grid-cols-5`: formulário `lg:col-span-2`, card de resultado `lg:col-span-3` (mesmo padrão do simulador acima).
+- Responsivo: em mobile, empilha (form em cima, resultado embaixo).
+- Header da seção com o `up-mark` laranja + título Libre Baskerville, seguindo o padrão da página.
 
-## 4. Comissão (sem pagamento automático)
+## Detalhes técnicos
 
-- Cálculo no insert de `partner_conversions.commission_cents` = `amount_cents * partners.commission_rate / 100` (default 70%). Feito por trigger `BEFORE INSERT` para garantir consistência.
-- Status inicial `pending`. Admin altera manualmente para `approved` (após período de reembolso) → `paid` (quando pagar off-platform).
-- Nada de gateway/split agora. Apenas relatório: total `pending`, `approved`, `paid` por parceiro, exportável em CSV do admin.
-
-## 5. Integração com `/admin` (PartnersAdmin)
-
-Adicionar abas dentro de `PartnersAdmin.tsx`:
-- **Parceiros** (existente).
-- **Testes** (existente).
-- **Links** — todos os `partner_links` com filtro por parceiro.
-- **Conversões** — tabela de `partner_conversions` com filtro parceiro/status/período, ação "aprovar"/"marcar como pago", exportar CSV.
-- No card resumo do parceiro: cliques 30d, conversões, comissão pendente, botão "Vincular usuário" (input email → cria/associa `auth.users` + `user_roles.partner` + `partners.user_id`).
-
-Reaproveitar `KpiCard` e agrupamento visual do cockpit atual.
-
-## 6. Isolamento de acesso
-
-- Guard atual do `/admin` verifica `has_role(uid,'admin')`. Nova role `'partner'` **não** concede admin — nenhum código muda em `Admin.tsx`.
-- Portal `/parceiro` tem guard próprio exigindo role `partner`. Admin também pode entrar (útil para suporte), mas não parceiro no admin.
-- RLS garante que mesmo com token válido, parceiro só lê linhas próprias.
-- Edge functions de vinculação (criar usuário parceiro, alterar `commission_status`) exigem `has_role(admin)`.
-
-## 7. Detalhes técnicos
-
-- Migrations: 1 migration para colunas em `partners`/`leads`/`mentees`/`score_profiles` + role `partner`; outra para as 3 novas tabelas com GRANTs, RLS, triggers de comissão e `updated_at`.
-- Edge functions novas: `track-partner-click`, `resolve-partner-link` (para `/r/:slug`), `create-partner-user` (admin), `update-conversion-status` (admin).
-- Alterar `provision_mentee` assinatura com `_partner_code` default null (retrocompatível).
-- Rota `/r/:slug` no `App.tsx`.
-- Novos componentes em `src/components/partner/` e páginas em `src/pages/parceiro/`.
-
-## 8. Fora de escopo desta fase
-- Pagamento automático da comissão (split Asaas/Cora).
-- Multi-nível/sub-afiliados.
-- Materiais de marketing (banners/vídeos) — pode virar tabela `partner_assets` depois.
-- Antifraude avançado (dedupe de clique por device fingerprint além de ip_hash+ua).
-
-## Premissas a confirmar
-1. Comissão 70% incide sobre valor bruto da compra do plano de mentoria; leads do Score não geram comissão (só tracking). OK?
-2. Janela de atribuição: 30 dias no localStorage — confirma?
-3. Formato do link: preferir `/r/{slug}` curto ou `?ref={code}` na URL atual? Plano suporta os dois.
-4. Login do parceiro: email/senha padrão; magic link só se pedir.
+- Todo o código novo fica dentro de `src/pages/SimuladorUP.tsx`. Sem novas dependências.
+- Helpers locais de máscara: parser `parseBRL(str) => number` (só dígitos ÷ 100) e formatter reaproveitando `brl` (ajustar `maximumFractionDigits: 2` para este bloco via um `brl2` local).
+- Percentuais aceitos como `number` no state, exibidos com sufixo `%` e vírgula decimal em pt-BR.
+- Nada muda fora dessa página.
