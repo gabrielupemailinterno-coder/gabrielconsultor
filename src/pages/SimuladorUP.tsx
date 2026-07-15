@@ -889,3 +889,280 @@ export default function SimuladorUP() {
     </div>
   );
 }
+
+// =====================================================================
+// Calculadora de Comissão Liberada
+// =====================================================================
+
+const brl2 = (v: number) =>
+  new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number.isFinite(v) ? v : 0);
+
+const parseBRL = (raw: string): number => {
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return 0;
+  return Number(digits) / 100;
+};
+
+const formatPct = (v: number): string =>
+  new Intl.NumberFormat("pt-BR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(Number.isFinite(v) ? v : 0);
+
+const parsePct = (raw: string): number => {
+  const cleaned = raw.replace(/[^\d,.]/g, "").replace(",", ".");
+  const n = Number(cleaned);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(n, 100));
+};
+
+function CalculadoraComissao() {
+  const [valorImovel, setValorImovel] = useState<number>(0);
+  const [pctComissao, setPctComissao] = useState<number>(0);
+  const [pctDesbloqueio, setPctDesbloqueio] = useState<number>(0);
+  const [valorPago, setValorPago] = useState<number>(0);
+
+  const [txtImovel, setTxtImovel] = useState<string>(brl2(0));
+  const [txtPago, setTxtPago] = useState<string>(brl2(0));
+  const [txtCom, setTxtCom] = useState<string>("");
+  const [txtDes, setTxtDes] = useState<string>("");
+
+  const r = useMemo(() => {
+    const comissaoTotal = valorImovel * (pctComissao / 100);
+    const valorDesbloqueio = valorImovel * (pctDesbloqueio / 100);
+    if (valorDesbloqueio <= 0) {
+      return { comissaoTotal, valorDesbloqueio, pctAtingido: 0, liberada: 0, restante: comissaoTotal };
+    }
+    const pctAtingido = Math.min(valorPago / valorDesbloqueio, 1);
+    const liberada = valorPago >= valorDesbloqueio ? comissaoTotal : comissaoTotal * (valorPago / valorDesbloqueio);
+    return {
+      comissaoTotal,
+      valorDesbloqueio,
+      pctAtingido,
+      liberada,
+      restante: Math.max(comissaoTotal - liberada, 0),
+    };
+  }, [valorImovel, pctComissao, pctDesbloqueio, valorPago]);
+
+  function limpar() {
+    setValorImovel(0);
+    setPctComissao(0);
+    setPctDesbloqueio(0);
+    setValorPago(0);
+    setTxtImovel(brl2(0));
+    setTxtPago(brl2(0));
+    setTxtCom("");
+    setTxtDes("");
+  }
+
+  async function copiar() {
+    const linhas = [
+      `Comissão total: ${brl2(r.comissaoTotal)}`,
+      `Valor necessário p/ desbloqueio: ${brl2(r.valorDesbloqueio)}`,
+      `Valor já pago: ${brl2(valorPago)}`,
+      `Percentual atingido: ${formatPct(r.pctAtingido * 100)}%`,
+      `Comissão liberada: ${brl2(r.liberada)}`,
+      `Comissão restante: ${brl2(r.restante)}`,
+    ].join("\n");
+    try {
+      await navigator.clipboard.writeText(linhas);
+      toast.success("Resultado copiado");
+    } catch {
+      toast.error("Não foi possível copiar");
+    }
+  }
+
+  const pctLabel = `${formatPct(r.pctAtingido * 100)}%`;
+
+  return (
+    <section
+      id="calc-comissao"
+      style={{
+        background: "rgba(17,20,24,0.03)",
+        borderBottom: "1px solid rgba(17,20,24,0.06)",
+      }}
+    >
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:py-20">
+        <div className="max-w-2xl">
+          <div
+            className="text-[11px] uppercase tracking-[0.2em] font-semibold up-mark"
+            style={{ color: "#C4632D" }}
+          >
+            Calculadora
+          </div>
+          <h2 className="ff-display mt-3 text-2xl sm:text-3xl font-bold">
+            Comissão liberada por desbloqueio
+          </h2>
+          <p className="mt-3 text-sm sm:text-base" style={{ color: "rgba(17,20,24,0.7)" }}>
+            Descubra quanto da sua comissão já está liberada com base no valor
+            pago pelo cliente e na regra de desbloqueio do empreendimento.
+          </p>
+        </div>
+
+        <div className="mt-8 grid gap-6 lg:grid-cols-5">
+          {/* FORM */}
+          <Card
+            className="lg:col-span-2 p-6 sm:p-7 rounded-sm border up-rule shadow-none bg-white"
+            style={{ color: "#111418" }}
+          >
+            <div className="space-y-5">
+              <div>
+                <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#17242B" }}>
+                  Valor do imóvel
+                </Label>
+                <Input
+                  inputMode="decimal"
+                  value={txtImovel}
+                  onChange={(e) => {
+                    const n = parseBRL(e.target.value);
+                    setValorImovel(n);
+                    setTxtImovel(brl2(n));
+                  }}
+                  className="mt-2 h-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] num-tabular"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#17242B" }}>
+                    Comissão (%)
+                  </Label>
+                  <div className="mt-2 relative">
+                    <Input
+                      inputMode="decimal"
+                      placeholder="0"
+                      value={txtCom}
+                      onChange={(e) => {
+                        setTxtCom(e.target.value);
+                        setPctComissao(parsePct(e.target.value));
+                      }}
+                      className="h-11 pr-8 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] num-tabular"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: "rgba(17,20,24,0.5)" }}>%</span>
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#17242B" }}>
+                    Desbloqueio (%)
+                  </Label>
+                  <div className="mt-2 relative">
+                    <Input
+                      inputMode="decimal"
+                      placeholder="0"
+                      value={txtDes}
+                      onChange={(e) => {
+                        setTxtDes(e.target.value);
+                        setPctDesbloqueio(parsePct(e.target.value));
+                      }}
+                      className="h-11 pr-8 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] num-tabular"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: "rgba(17,20,24,0.5)" }}>%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#17242B" }}>
+                  Valor já pago pelo cliente
+                </Label>
+                <Input
+                  inputMode="decimal"
+                  value={txtPago}
+                  onChange={(e) => {
+                    const n = parseBRL(e.target.value);
+                    setValorPago(n);
+                    setTxtPago(brl2(n));
+                  }}
+                  className="mt-2 h-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] num-tabular"
+                />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={limpar}
+                  className="flex-1 h-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] hover:bg-[rgba(17,20,24,0.04)] hover:text-[#111418]"
+                >
+                  Limpar
+                </Button>
+                <Button
+                  type="button"
+                  onClick={copiar}
+                  className="flex-1 h-11 rounded-sm border-0"
+                  style={{ background: "#C4632D", color: "#F4EFE8" }}
+                >
+                  Copiar resultado
+                </Button>
+              </div>
+            </div>
+          </Card>
+
+          {/* RESULTADO */}
+          <Card
+            className="lg:col-span-3 p-6 sm:p-8 rounded-sm border-0 shadow-none"
+            style={{ background: "#17242B", color: "#F4EFE8" }}
+          >
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "rgba(244,239,232,0.5)" }}>
+              Resultado
+            </div>
+
+            <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <div className="text-[11px] uppercase tracking-wider" style={{ color: "rgba(244,239,232,0.55)" }}>
+                  Comissão total
+                </div>
+                <div className="ff-display num-tabular mt-1 text-xl font-bold">{brl2(r.comissaoTotal)}</div>
+              </div>
+              <div>
+                <div className="text-[11px] uppercase tracking-wider" style={{ color: "rgba(244,239,232,0.55)" }}>
+                  Desbloqueio (necessário)
+                </div>
+                <div className="ff-display num-tabular mt-1 text-xl font-bold">{brl2(r.valorDesbloqueio)}</div>
+              </div>
+              <div>
+                <div className="text-[11px] uppercase tracking-wider" style={{ color: "rgba(244,239,232,0.55)" }}>
+                  Valor já pago
+                </div>
+                <div className="ff-display num-tabular mt-1 text-xl font-bold">{brl2(valorPago)}</div>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <div className="flex items-baseline justify-between">
+                <span className="text-[11px] uppercase tracking-wider" style={{ color: "rgba(244,239,232,0.55)" }}>
+                  Percentual atingido
+                </span>
+                <span className="num-tabular text-sm font-semibold" style={{ color: "#C8A77A" }}>{pctLabel}</span>
+              </div>
+              <div className="mt-2 h-2 rounded-sm overflow-hidden" style={{ background: "rgba(200,167,122,0.20)" }}>
+                <div
+                  className="h-full transition-all"
+                  style={{ width: `${Math.min(r.pctAtingido * 100, 100)}%`, background: "#C4632D" }}
+                />
+              </div>
+            </div>
+
+            <div className="mt-8 p-5 rounded-sm" style={{ background: "rgba(196,99,45,0.10)", border: "1px solid rgba(196,99,45,0.35)" }}>
+              <div className="text-[11px] uppercase tracking-wider font-semibold" style={{ color: "#C4632D" }}>
+                Comissão liberada agora
+              </div>
+              <div className="ff-display num-tabular mt-2 text-4xl sm:text-5xl font-bold" style={{ color: "#C4632D" }}>
+                {brl2(r.liberada)}
+              </div>
+              <div className="mt-2 text-xs" style={{ color: "rgba(244,239,232,0.65)" }}>
+                Restante para liberar: <span className="num-tabular font-semibold" style={{ color: "#F4EFE8" }}>{brl2(r.restante)}</span>
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </section>
+  );
+}
+
