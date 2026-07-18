@@ -925,37 +925,36 @@ function CalculadoraComissao() {
   const [valorImovel, setValorImovel] = useState<number>(0);
   const [pctComissao, setPctComissao] = useState<number>(0);
   const [pctDesbloqueio, setPctDesbloqueio] = useState<number>(0);
-  const [valorPago, setValorPago] = useState<number>(0);
+  const [pctPagoEntrada, setPctPagoEntrada] = useState<number>(0);
 
   const [txtImovel, setTxtImovel] = useState<string>(brl2(0));
-  const [txtPago, setTxtPago] = useState<string>(brl2(0));
+  const [txtPagoPct, setTxtPagoPct] = useState<string>("");
   const [txtCom, setTxtCom] = useState<string>("");
   const [txtDes, setTxtDes] = useState<string>("");
 
   const r = useMemo(() => {
     const comissaoTotal = valorImovel * (pctComissao / 100);
     const valorDesbloqueio = valorImovel * (pctDesbloqueio / 100);
-    if (valorDesbloqueio <= 0) {
-      return { comissaoTotal, valorDesbloqueio, pctAtingido: 0, liberada: 0, restante: comissaoTotal };
-    }
-    const pctAtingido = Math.min(valorPago / valorDesbloqueio, 1);
-    const liberada = valorPago >= valorDesbloqueio ? comissaoTotal : comissaoTotal * (valorPago / valorDesbloqueio);
+    const pctAtingido = Math.min(pctPagoEntrada / 100, 1);
+    const valorPago = valorDesbloqueio * pctAtingido;
+    const liberada = comissaoTotal * pctAtingido;
     return {
       comissaoTotal,
       valorDesbloqueio,
       pctAtingido,
+      valorPago,
       liberada,
       restante: Math.max(comissaoTotal - liberada, 0),
     };
-  }, [valorImovel, pctComissao, pctDesbloqueio, valorPago]);
+  }, [valorImovel, pctComissao, pctDesbloqueio, pctPagoEntrada]);
 
   function limpar() {
     setValorImovel(0);
     setPctComissao(0);
     setPctDesbloqueio(0);
-    setValorPago(0);
+    setPctPagoEntrada(0);
     setTxtImovel(brl2(0));
-    setTxtPago(brl2(0));
+    setTxtPagoPct("");
     setTxtCom("");
     setTxtDes("");
   }
@@ -964,8 +963,8 @@ function CalculadoraComissao() {
     const linhas = [
       `Comissão total: ${brl2(r.comissaoTotal)}`,
       `Valor necessário p/ desbloqueio: ${brl2(r.valorDesbloqueio)}`,
-      `Valor já pago: ${brl2(valorPago)}`,
-      `Percentual atingido: ${formatPct(r.pctAtingido * 100)}%`,
+      `% já paga da entrada: ${formatPct(r.pctAtingido * 100)}%`,
+      `Valor equivalente pago: ${brl2(r.valorPago)}`,
       `Comissão liberada: ${brl2(r.liberada)}`,
       `Comissão restante: ${brl2(r.restante)}`,
     ].join("\n");
@@ -976,6 +975,7 @@ function CalculadoraComissao() {
       toast.error("Não foi possível copiar");
     }
   }
+
 
   const pctLabel = `${formatPct(r.pctAtingido * 100)}%`;
 
@@ -1068,19 +1068,26 @@ function CalculadoraComissao() {
 
               <div>
                 <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#17242B" }}>
-                  Valor já pago pelo cliente
+                  % já paga da entrada
                 </Label>
-                <Input
-                  inputMode="decimal"
-                  value={txtPago}
-                  onChange={(e) => {
-                    const n = parseBRL(e.target.value);
-                    setValorPago(n);
-                    setTxtPago(brl2(n));
-                  }}
-                  className="mt-2 h-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] num-tabular"
-                />
+                <div className="mt-2 relative">
+                  <Input
+                    inputMode="decimal"
+                    placeholder="0"
+                    value={txtPagoPct}
+                    onChange={(e) => {
+                      setTxtPagoPct(e.target.value);
+                      setPctPagoEntrada(parsePct(e.target.value));
+                    }}
+                    className="h-11 pr-8 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] num-tabular"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: "rgba(17,20,24,0.5)" }}>%</span>
+                </div>
+                <p className="mt-1.5 text-[11px]" style={{ color: "rgba(17,20,24,0.55)" }}>
+                  Ex.: cliente pagou metade da entrada = 50%.
+                </p>
               </div>
+
 
               <div className="flex gap-2 pt-2">
                 <Button
@@ -1127,10 +1134,11 @@ function CalculadoraComissao() {
               </div>
               <div>
                 <div className="text-[11px] uppercase tracking-wider" style={{ color: "rgba(244,239,232,0.55)" }}>
-                  Valor já pago
+                  Equivalente pago
                 </div>
-                <div className="ff-display num-tabular mt-1 text-xl font-bold">{brl2(valorPago)}</div>
+                <div className="ff-display num-tabular mt-1 text-xl font-bold">{brl2(r.valorPago)}</div>
               </div>
+
             </div>
 
             <div className="mt-6">
