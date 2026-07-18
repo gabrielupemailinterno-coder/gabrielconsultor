@@ -1068,19 +1068,26 @@ function CalculadoraComissao() {
 
               <div>
                 <Label className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#17242B" }}>
-                  Valor já pago pelo cliente
+                  % já paga da entrada
                 </Label>
-                <Input
-                  inputMode="decimal"
-                  value={txtPago}
-                  onChange={(e) => {
-                    const n = parseBRL(e.target.value);
-                    setValorPago(n);
-                    setTxtPago(brl2(n));
-                  }}
-                  className="mt-2 h-11 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] num-tabular"
-                />
+                <div className="mt-2 relative">
+                  <Input
+                    inputMode="decimal"
+                    placeholder="0"
+                    value={txtPagoPct}
+                    onChange={(e) => {
+                      setTxtPagoPct(e.target.value);
+                      setPctPagoEntrada(parsePct(e.target.value));
+                    }}
+                    className="h-11 pr-8 rounded-sm bg-white border-[rgba(17,20,24,0.15)] text-[#111418] num-tabular"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: "rgba(17,20,24,0.5)" }}>%</span>
+                </div>
+                <p className="mt-1.5 text-[11px]" style={{ color: "rgba(17,20,24,0.55)" }}>
+                  Ex.: cliente pagou metade da entrada = 50%.
+                </p>
               </div>
+
 
               <div className="flex gap-2 pt-2">
                 <Button
