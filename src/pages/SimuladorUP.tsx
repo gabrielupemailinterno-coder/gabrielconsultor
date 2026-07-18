@@ -925,37 +925,36 @@ function CalculadoraComissao() {
   const [valorImovel, setValorImovel] = useState<number>(0);
   const [pctComissao, setPctComissao] = useState<number>(0);
   const [pctDesbloqueio, setPctDesbloqueio] = useState<number>(0);
-  const [valorPago, setValorPago] = useState<number>(0);
+  const [pctPagoEntrada, setPctPagoEntrada] = useState<number>(0);
 
   const [txtImovel, setTxtImovel] = useState<string>(brl2(0));
-  const [txtPago, setTxtPago] = useState<string>(brl2(0));
+  const [txtPagoPct, setTxtPagoPct] = useState<string>("");
   const [txtCom, setTxtCom] = useState<string>("");
   const [txtDes, setTxtDes] = useState<string>("");
 
   const r = useMemo(() => {
     const comissaoTotal = valorImovel * (pctComissao / 100);
     const valorDesbloqueio = valorImovel * (pctDesbloqueio / 100);
-    if (valorDesbloqueio <= 0) {
-      return { comissaoTotal, valorDesbloqueio, pctAtingido: 0, liberada: 0, restante: comissaoTotal };
-    }
-    const pctAtingido = Math.min(valorPago / valorDesbloqueio, 1);
-    const liberada = valorPago >= valorDesbloqueio ? comissaoTotal : comissaoTotal * (valorPago / valorDesbloqueio);
+    const pctAtingido = Math.min(pctPagoEntrada / 100, 1);
+    const valorPago = valorDesbloqueio * pctAtingido;
+    const liberada = comissaoTotal * pctAtingido;
     return {
       comissaoTotal,
       valorDesbloqueio,
       pctAtingido,
+      valorPago,
       liberada,
       restante: Math.max(comissaoTotal - liberada, 0),
     };
-  }, [valorImovel, pctComissao, pctDesbloqueio, valorPago]);
+  }, [valorImovel, pctComissao, pctDesbloqueio, pctPagoEntrada]);
 
   function limpar() {
     setValorImovel(0);
     setPctComissao(0);
     setPctDesbloqueio(0);
-    setValorPago(0);
+    setPctPagoEntrada(0);
     setTxtImovel(brl2(0));
-    setTxtPago(brl2(0));
+    setTxtPagoPct("");
     setTxtCom("");
     setTxtDes("");
   }
@@ -964,8 +963,8 @@ function CalculadoraComissao() {
     const linhas = [
       `Comissão total: ${brl2(r.comissaoTotal)}`,
       `Valor necessário p/ desbloqueio: ${brl2(r.valorDesbloqueio)}`,
-      `Valor já pago: ${brl2(valorPago)}`,
-      `Percentual atingido: ${formatPct(r.pctAtingido * 100)}%`,
+      `% já paga da entrada: ${formatPct(r.pctAtingido * 100)}%`,
+      `Valor equivalente pago: ${brl2(r.valorPago)}`,
       `Comissão liberada: ${brl2(r.liberada)}`,
       `Comissão restante: ${brl2(r.restante)}`,
     ].join("\n");
@@ -976,6 +975,7 @@ function CalculadoraComissao() {
       toast.error("Não foi possível copiar");
     }
   }
+
 
   const pctLabel = `${formatPct(r.pctAtingido * 100)}%`;
 
