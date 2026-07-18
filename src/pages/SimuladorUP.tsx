@@ -1134,10 +1134,11 @@ function CalculadoraComissao() {
               </div>
               <div>
                 <div className="text-[11px] uppercase tracking-wider" style={{ color: "rgba(244,239,232,0.55)" }}>
-                  Valor já pago
+                  Equivalente pago
                 </div>
-                <div className="ff-display num-tabular mt-1 text-xl font-bold">{brl2(valorPago)}</div>
+                <div className="ff-display num-tabular mt-1 text-xl font-bold">{brl2(r.valorPago)}</div>
               </div>
+
             </div>
 
             <div className="mt-6">
