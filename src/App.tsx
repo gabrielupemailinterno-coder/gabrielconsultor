@@ -18,7 +18,6 @@ import EscolaSignup from "./pages/escola/Signup";
 import EscolaLogin from "./pages/escola/Login";
 import EscolaConteudos from "./pages/escola/Conteudos";
 import EscolaConteudoDetalhe from "./pages/escola/ConteudoDetalhe";
-import { EscolaGuard } from "./pages/escola/EscolaGuard";
 import PortalDashboard from "./pages/portal/PortalDashboard";
 import Parceiros from "./pages/Parceiros";
 import SimuladorUP from "./pages/SimuladorUP";
@@ -75,8 +74,8 @@ function AppRoutes() {
       <Route path="/escola" element={<EscolaLanding />} />
       <Route path="/escola/cadastro" element={<EscolaSignup />} />
       <Route path="/escola/login" element={<EscolaLogin />} />
-      <Route path="/escola/conteudos" element={<EscolaGuard><EscolaConteudos /></EscolaGuard>} />
-      <Route path="/escola/conteudos/:slug" element={<EscolaGuard><EscolaConteudoDetalhe /></EscolaGuard>} />
+      <Route path="/escola/conteudos" element={<EscolaConteudos />} />
+      <Route path="/escola/conteudos/:slug" element={<EscolaConteudoDetalhe />} />
       <Route path="/associadoacidel" element={<Parceiros />} />
       <Route path="/parceiros" element={<Navigate to="/associadoacidel" replace />} />
       <Route path="/simulador-up" element={<SimuladorUP />} />

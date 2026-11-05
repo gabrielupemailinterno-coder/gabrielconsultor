@@ -439,7 +439,7 @@ const Index = () => {
                   : "Restructured the funnel into 4 stages, removed follow-up bottleneck and standardized the proposal. Result: $200K+ closed in 60 days."}
               </p>
               <Link
-                to="/blog/processo-comercial-r1-milh%C3%A3o-contratos-2-meses"
+                to="/blog/processo-comercial-r1-milhao-contratos-2-meses"
                 className="text-xs font-mono uppercase tracking-widest text-primary hover:underline inline-flex items-center gap-2"
               >
                 {locale === "pt" ? "Ler o case completo" : "Read the full case"} <ArrowRight className="w-3 h-3" />

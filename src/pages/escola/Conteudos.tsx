@@ -19,14 +19,19 @@ export default function EscolaConteudos() {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
-        .from("blog_posts")
-        .select("id,title,slug,excerpt,cover_image_url,published_at")
-        .eq("published", true)
-        .order("published_at", { ascending: false });
+      const [{ data: sessionData }, { data }] = await Promise.all([
+        supabase.auth.getSession(),
+        supabase
+          .from("blog_posts")
+          .select("id,title,slug,excerpt,cover_image_url,published_at")
+          .eq("published", true)
+          .order("published_at", { ascending: false }),
+      ]);
+      setSignedIn(Boolean(sessionData.session));
       setPosts((data as Post[]) || []);
       setLoading(false);
     })();
@@ -50,12 +55,21 @@ export default function EscolaConteudos() {
             <GraduationCap className="text-primary" size={18} />
             <span className="font-serif text-lg">Escola de Vendedores</span>
           </Link>
-          <button
-            onClick={logout}
-            className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
-          >
-            <LogOut size={14} /> Sair
-          </button>
+          {signedIn ? (
+            <button
+              onClick={logout}
+              className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+            >
+              <LogOut size={14} /> Sair
+            </button>
+          ) : (
+            <Link
+              to="/escola/login"
+              className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+            >
+              Entrar
+            </Link>
+          )}
         </div>
       </header>
 
