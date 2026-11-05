@@ -1,4 +1,4 @@
-# GABRIEL CONSULTOR SISTEMA 
+# GABRIEL CONSULTOR SISTEMA  
 
 "Crie uma Landing Page de alta conversão para Gabriel, Consultor em Processos Comerciais. O design deve ser minimalista, sofisticado e exalar autoridade B2B, seguindo estritamente a identidade visual abaixo:
 
