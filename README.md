@@ -1,73 +1,56 @@
-# Welcome to your Lovable project
+# GABRIEL CONSULTOR SISTEMA 
 
-## Project info
+"Crie uma Landing Page de alta conversão para Gabriel, Consultor em Processos Comerciais. O design deve ser minimalista, sofisticado e exalar autoridade B2B, seguindo estritamente a identidade visual abaixo:
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+1. Identidade Visual e Estilo:
 
-## How can I edit this code?
+Paleta de Cores: Fundo principal em Azul Marinho Profundo (#0A192F ou similar à imagem), com detalhes e botões em Dourado/Bege Areia (#C5A059) para transmitir exclusividade. Use Branco Puro para textos de leitura.
 
-There are several ways of editing your application.
+Tipografia: Use a fonte 'Libre Baskerville' para todos os títulos e subtítulos (serifada, estilo editorial). Para textos de corpo, use uma Sans-Serif limpa (como Inter ou Montserrat) para garantir legibilidade.
 
-**Use Lovable**
+Estilo Visual: Use bordas levemente arredondadas, sombras suaves e divisores de seção discretos (horizontal rules) em dourado fino.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+2. Estrutura de Conteúdo:
 
-Changes made via Lovable will be committed automatically to this repo.
+Hero Section: * Título: 'Transforme seu Setor Comercial em uma Máquina de Vendas Previsível.'
 
-**Use your preferred IDE**
+Subtítulo: 'Diagnóstico de gargalos e estruturação de funis inbound/outbound. Onde a estratégia encontra a execução.'
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+CTA: Botão Dourado 'Agendar Diagnóstico Profissional'.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Seção de Diagnóstico (Dores): Cards elegantes com ícones minimalistas abordando: Falta de leads, baixa conversão, falta de processos e time sem ritmo.
 
-Follow these steps:
+Seção de Planos (Nobre e Clara):
+
+Card 01: Consultoria – Diagnóstico + Plano de Execução (4 semanas). Foco em mapeamento, análise de rotinas e plano de ação (Execução pelo cliente).
+
+Card 02: Mentoria Comercial Estratégica (8 a 12 semanas). Foco em acompanhamento semanal com o líder, quinzenal com o time e revisão de métricas/KPIs.
+
+Posicionamento: Destaque em bloco de citação (blockquote): 'Eu forneço o mapa e a bússola; seu time domina o território. Consultoria focada em processos, não apenas em teoria.'
+
+3. Funcionalidade de Contato: Todos os botões de Call to Action (CTA) devem abrir o WhatsApp com o link: https://wa.me/5532998316501?text=quero%20saber%20mais%20sobre%20sua%20consultoria
+
+A página deve ser totalmente responsiva e carregar com animações suaves de fade-in."
+
+This project was built with [Lovable](https://lovable.dev).
+
+**Live app**: https://gabrielconsultor.lovable.app
+
+## Build with Lovable
+
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/23c7c571-7937-48a2-8fa0-119301ed2634).
+
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+
+## Development
+
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+git clone <this-repository-url>
+cd <repository-name>
 npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
